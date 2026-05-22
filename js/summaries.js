@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submit-summary-btn');
     const summaryForm = document.getElementById('add-summary-form');
 
-    // التحقق من صلاحيات التدريس لعرض أزرار الحذف
-    const isFaculty = localStorage.getItem('currentRole') === 'faculty';
+    // التحقق من صلاحيات التدريس
+    const isFaculty = localStorage.getItem('is_faculty') === 'true' || localStorage.getItem('currentRole') === 'faculty';
 
     // 1. عند تغيير المستوى في الشاشة الرئيسية:
     if (levelSelect) {
