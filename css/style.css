@@ -1142,7 +1142,7 @@ body.dark-theme .display-1.text-gold,
 body.dark-theme .display-1 .text-warning,
 body.dark-theme .course-card .fs-4.text-warning,
 body.dark-theme .breadcrumb-item a.text-warning {
-    color: var(--white) !important;
+    color: #ffffff !important;
 }
 
 /* ألوان الخلفيات والحدود */
@@ -1169,7 +1169,7 @@ body.dark-theme .progress-bar.bg-warning {
 body.dark-theme .bg-warning.bg-opacity-10,
 body.dark-theme .bg-gold.bg-opacity-10 {
     background-color: rgba(255, 255, 255, 0.1) !important;
-    color: var(--white) !important;
+    color: #ffffff !important;
 }
 
 .border-warning,
@@ -1877,3 +1877,110 @@ html {
         padding: 1.2rem;
     }
 }
+
+/* ==========================================================================
+   Comprehensive Dark Mode Text & Background Overrides
+   ========================================================================== */
+body.dark-theme,
+body.dark-theme .text-dark,
+body.dark-theme .text-black {
+    color: #ffffff !important;
+}
+
+body.dark-theme .text-muted,
+body.dark-theme .text-secondary {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme .bg-white,
+body.dark-theme .bg-light,
+body.dark-theme .card,
+body.dark-theme .list-group-item {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .modal-content {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .form-control,
+body.dark-theme .form-select,
+body.dark-theme input,
+body.dark-theme textarea {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark-theme .form-control:focus,
+body.dark-theme .form-select:focus {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .table {
+    color: #ffffff !important;
+}
+body.dark-theme .table th,
+body.dark-theme .table td {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.dark-theme .table-striped>tbody>tr:nth-of-type(odd)>* {
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Specific Dark Mode Button & Modal Overrides
+   ========================================================================== */
+/* Fix btn-gold in navbar and hero section which was becoming white-on-white */
+body.dark-theme .navbar .btn-gold,
+body.dark-theme .hero-section .btn-gold {
+    background-color: #0f172a !important; /* Dark blue background */
+    color: #ffffff !important; /* White text */
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark-theme .navbar .btn-gold:hover,
+body.dark-theme .hero-section .btn-gold:hover {
+    background-color: #ffffff !important; 
+    color: #0f172a !important;
+    border-color: #ffffff !important;
+}
+
+/* Fix btn-outline-dark visibility in dark mode (used in Auth Modal) */
+body.dark-theme .btn-outline-dark {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+body.dark-theme .btn-outline-dark:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Fix Auth Modal default text color in dark mode */
+body.dark-theme .auth-modal {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+

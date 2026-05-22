@@ -772,24 +772,6 @@ function initLevelPagesEvents() {
                 actionsDiv.appendChild(completeBtn);
             }
 
-            // تفعيل زر "تفاصيل المادة" لفتح نافذة منبثقة تفاعلية بدلاً من النقل
-            let detailBtn = actionsDiv.querySelector('.btn-outline-dark');
-            if (detailBtn && detailBtn.textContent.includes('اختبار')) {
-                // هذا زر كويز، لنغيره ليكون زر تفاصيل أو نتركه ونضيف زر تفاصيل المادة
-            }
-            
-            // سنقوم بتحويل زر "اختبار تفاعلي" ليكون زر "تفاصيل المقرر" في بطاقة المادة
-            // وجعل زر "تفاصيل المقرر" يفتح المودال بالمنهج الدراسي والأسابيع
-            if (detailBtn && detailBtn.textContent.includes('اختبار')) {
-                detailBtn.textContent = 'تفاصيل المادة';
-                detailBtn.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i> تفاصيل المادة';
-                detailBtn.className = 'btn btn-outline-dark btn-sm';
-                detailBtn.removeAttribute('href');
-                detailBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openSyllabusModal(courseId);
-                });
-            }
         }
     });
 }
