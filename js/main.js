@@ -1050,20 +1050,20 @@ function downloadExamPDF(level, subjectId, examIndex) {
     `;
     
     questions.forEach((q, idx) => {
-        html += \`<div class="question-box">
-                    <div class="question-text">\${idx + 1}. \${q.q}</div>
-                    <div class="options-list">\`;
+        html += `<div class="question-box">
+                    <div class="question-text">${idx + 1}. ${q.q}</div>
+                    <div class="options-list">`;
         
         if (q.type === 'mcq' || q.type === 'tf') {
             q.options.forEach(opt => {
-                html += \`<div class="option-item"><span class="circle"></span> \${opt}</div>\`;
+                html += `<div class="option-item"><span class="circle"></span> ${opt}</div>`;
             });
         } else if (q.type === 'essay') {
-            html += \`<div class="essay-lines"></div><div class="essay-lines"></div><div class="essay-lines"></div>\`;
+            html += `<div class="essay-lines"></div><div class="essay-lines"></div><div class="essay-lines"></div>`;
         }
         
-        html += \`   </div>
-                 </div>\`;
+        html += `   </div>
+                 </div>`;
     });
     
     html += `
