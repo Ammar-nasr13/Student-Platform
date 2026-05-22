@@ -133,7 +133,7 @@ window.deleteQuestion = function(index) {
 // Save entire exam
 const addExamForm = document.getElementById('add-exam-form');
 if (addExamForm) {
-    addExamForm.addEventListener('submit', function(e) {
+    addExamForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         if (currentExamQuestions.length === 0) {
@@ -250,13 +250,19 @@ async function renderManageExams() {
     }
 }
 
-window.deleteExam = = function(key, index) {
+window.deleteExam = async function(examId) {
     if (confirm('هل أنت متأكد من حذف هذا الاختبار نهائياً؟ لا يمكن التراجع عن هذه الخطوة.')) {
-        let customExams = JSON.parse(localStorage.getItem('custom_exams') || '{}');
-        if (customExams[key] && Array.isArray(customExams[key])) {
-            customExams[key].splice(index, 1);
-            localStorage.setItem('custom_exams', JSON.stringify(customExams));
+        try {
+            await window.AppwriteDB.deleteDocument(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.examsCol,
+                examId
+            );
+            alert('تم حذف الاختبار بنجاح!');
             renderManageExams();
+        } catch (error) {
+            console.error("Appwrite Error:", error);
+            alert('حدث خطأ أثناء الحذف: ' + error.message);
         }
     }
 };
