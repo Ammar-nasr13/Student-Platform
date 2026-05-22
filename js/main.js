@@ -1261,28 +1261,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkAuthSession() {
     const gateway = document.getElementById('auth-gateway');
-    // If we are on a page with a gateway
-    if (gateway) {
-        const isStudent = sessionStorage.getItem('is_student');
-        const isFaculty = localStorage.getItem('is_faculty');
-
-        if (isStudent === 'true' || isFaculty === 'true') {
-            gateway.classList.add('d-none');
-            updateUIForFaculty();
-        }
-    } else {
-        // Just check if faculty to update UI on other pages
-        updateUIForFaculty();
-    }
+    
+    // We only update the UI for faculty, but we DO NOT auto-hide the gateway anymore.
+    // The user requested the selection screen to always appear first.
+    updateUIForFaculty();
 }
 
 window.selectRole = function(role) {
     if (role === 'student') {
-        sessionStorage.setItem('is_student', 'true');
         closeAuthGateway();
     } else if (role === 'faculty') {
-        document.getElementById('auth-role-selection').classList.add('d-none');
-        document.getElementById('auth-faculty-login').classList.remove('d-none');
+        // If already logged in as faculty, skip the password screen and just enter
+        if (localStorage.getItem('is_faculty') === 'true') {
+            closeAuthGateway();
+            updateUIForFaculty();
+        } else {
+            document.getElementById('auth-role-selection').classList.add('d-none');
+            document.getElementById('auth-faculty-login').classList.remove('d-none');
+        }
     }
 };
 
