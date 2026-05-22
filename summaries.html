@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملخصات الطلابية | قسم تكنولوجيا صناعة السياحة والضيافة | جامعة المنيا</title>
+    <meta name="description" content="منصة تبادل الملخصات الطلابية لقسم تكنولوجيا صناعة السياحة والضيافة بجامعة المنيا. شارك واستفد من ملخصات زملائك.">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+    <!-- Preload Critical CSS -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" as="style">
+    <link rel="preload" href="css/style.css" as="style">
+    <!-- Bootstrap 5 RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- شاشة التحميل المسبق -->
+    <div id="preloader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">جاري تحميل المنصة...</div>
+    </div>
+
+    <!-- شريط التنقل (Navbar) -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none me-0" style="max-width: calc(100% - 120px);" href="index.html">
+                <img src="assets/logo.webp" alt="شعار القسم" class="navbar-brand-logo flex-shrink-0" style="width: 60px; height: auto;">
+                <div class="d-flex flex-column justify-content-center" style="min-width: 0;">
+                    <span class="d-block lh-sm text-white fw-bold mb-1 text-truncate" style="font-size: 1.1rem;">تكنولوجيا صناعة السياحة والضيافة</span>
+                    <small class="fw-light text-white-50 lh-sm text-truncate" style="font-size: 0.8rem;">كلية السياحة والفنادق - جامعة المنيا</small>
+                </div>
+            </a>
+            
+            <div class="d-flex align-items-center d-lg-none flex-shrink-0">
+                <button class="theme-toggle-btn me-2" id="theme-toggle-mobile" onclick="document.getElementById('theme-toggle').click()" title="تغيير المظهر">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <div class="d-flex justify-content-end d-lg-none mt-3 mb-2 px-3">
+                    <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                        <i class="fa-solid fa-xmark me-1"></i> إغلاق
+                    </button>
+                </div>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-link-item"><a class="nav-link" href="index.html">الرئيسية</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="levelsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            المستويات الدراسية
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-right" aria-labelledby="levelsDropdown">
+                            <li><a class="dropdown-item" href="level1.html">المستوى الأول</a></li>
+                            <li><a class="dropdown-item" href="level2.html">المستوى الثاني</a></li>
+                            <li><a class="dropdown-item" href="level3.html">المستوى الثالث</a></li>
+                            <li><a class="dropdown-item" href="level4.html">المستوى الرابع</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-link-item"><a class="nav-link" href="exams.html">الاختبارات التفاعلية</a></li>
+                    <li class="nav-link-item"><a class="nav-link active" href="summaries.html">الملخصات الطلابية</a></li>
+                </ul>
+                <div class="d-flex ms-lg-3 align-items-center">
+                    <button class="theme-toggle-btn me-2 d-none d-lg-flex" id="theme-toggle" title="تغيير المظهر">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <a href="exams.html" class="btn btn-gold btn-sm px-3 rounded-pill"><i class="fa-solid fa-pen-to-square me-1"></i> ابدأ اختباراً الآن</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ترويسة الصفحة (Header) -->
+    <header class="page-header text-center">
+        <div class="container animated-fade-in">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-2">
+                    <li class="breadcrumb-item"><a href="index.html" class="text-warning text-decoration-none">الرئيسية</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">الملخصات الطلابية</li>
+                </ol>
+            </nav>
+            <h1 class="fw-extrabold text-white mb-2">منصة تبادل الملخصات الطلابية</h1>
+            <p class="text-white-50 lead">ساهم في مساعدة زملائك وانشر ملخصاتك، وتصفح ملخصات المقررات المختلفة.</p>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card p-4 p-md-5 animated-fade-in shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <div>
+                            <h3 class="fw-bold text-primary mb-1">تصفح المقررات والملخصات</h3>
+                            <p class="text-muted small">حدد المستوى الدراسي لعرض الملفات المتاحة.</p>
+                        </div>
+                        <button class="btn btn-gold fw-bold px-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#addSummaryModal">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i> إضافة ملخص جديد
+                        </button>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <select class="form-select py-2 border-2" id="summaries-level-select">
+                                <option value="">-- حدد المستوى الدراسي --</option>
+                                <option value="1">المستوى الأول</option>
+                                <option value="2">المستوى الثاني</option>
+                                <option value="3">المستوى الثالث</option>
+                                <option value="4">المستوى الرابع</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- حاوية عرض المقررات -->
+                    <div id="subjects-summaries-container" class="mt-4">
+                        <div class="text-center text-muted py-5" id="summaries-placeholder">
+                            <i class="fa-solid fa-folder-open fs-1 mb-3"></i>
+                            <h5>يرجى تحديد المستوى الدراسي لعرض الملخصات المتوفرة</h5>
+                        </div>
+                        <div id="summaries-loading" class="text-center py-5 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">جاري التحميل...</span>
+                            </div>
+                            <h6 class="mt-3 text-muted">جاري جلب الملفات...</h6>
+                        </div>
+                        <div id="summaries-content" class="row g-4 d-none">
+                            <!-- المحتوى الديناميكي -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- نافذة إضافة ملخص -->
+    <div class="modal fade" id="addSummaryModal" tabindex="-1" aria-labelledby="addSummaryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="addSummaryModalLabel"><i class="fa-solid fa-cloud-arrow-up me-2"></i> رفع ونشر ملخص</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="add-summary-form">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">اسم الطالب الناشر (الرباعي)</label>
+                    <input type="text" class="form-control bg-light" id="summary-student-name" required placeholder="أدخل اسمك الكريم">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">المستوى الدراسي</label>
+                    <select class="form-select bg-light" id="summary-level" required>
+                        <option value="">-- اختر المستوى --</option>
+                        <option value="1">المستوى الأول</option>
+                        <option value="2">المستوى الثاني</option>
+                        <option value="3">المستوى الثالث</option>
+                        <option value="4">المستوى الرابع</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">المادة الدراسية</label>
+                    <select class="form-select bg-light" id="summary-subject" required disabled>
+                        <option value="">-- يرجى اختيار المستوى أولاً --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">ملف الملخص (PDF أو صور أو مستندات)</label>
+                    <input class="form-control bg-light" type="file" id="summary-file" required>
+                    <div class="form-text">سيتم رفع الملف باسم المادة واسم الناشر.</div>
+                </div>
+            </form>
+          </div>
+          <div class="modal-footer bg-light border-0">
+            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">إلغاء</button>
+            <button type="button" class="btn btn-gold fw-bold px-4" id="submit-summary-btn">
+                <span class="spinner-border spinner-border-sm d-none me-1" id="summary-spinner" role="status" aria-hidden="true"></span>
+                <i class="fa-solid fa-upload me-1" id="summary-upload-icon"></i> <span id="summary-btn-text">رفع ونشر</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر (تذييل الصفحة المشترك) -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="mb-3">
+                        <img src="assets/logo.webp" alt="شعار القسم" class="footer-logo">
+                        <h5 class="fw-bold text-white mb-0">تكنولوجيا السياحة والضيافة</h5>
+                    </div>
+                    <p class="text-white-50 small mb-3">منصة طلابية متخصصة تجمع كل ما يحتاجه طالب كلية السياحة والفنادق بجامعة المنيا لتسهيل التحصيل العلمي والاطلاع على مستجدات المقررات والامتحانات.</p>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <h5 class="fw-bold text-white mb-3">روابط سريعة</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="level1.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> المستوى الأول</a></li>
+                        <li class="mb-2"><a href="level2.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> المستوى الثاني</a></li>
+                        <li class="mb-2"><a href="level3.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> المستوى الثالث</a></li>
+                        <li class="mb-2"><a href="level4.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> المستوى الرابع</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <h5 class="fw-bold text-white mb-3">المساعدة والدعم</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="exams.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> الاختبارات التفاعلية</a></li>
+                        <li class="mb-2"><a href="summaries.html"><i class="fa-solid fa-chevron-left me-1 small text-warning"></i> الملخصات الطلابية</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center text-white-50">
+                <p class="mb-0">&copy; 2026 كلية السياحة والفنادق - جامعة المنيا. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/appwrite-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/summaries.js"></script>
+</body>
+</html>
