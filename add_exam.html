@@ -151,6 +151,34 @@
         </div>
     </div>
 
+    <div class="container mt-5 mb-5 animated-fade-in">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header text-white py-3 d-flex justify-content-between align-items-center" style="background-color: #2e8b57;">
+                <h5 class="fw-bold m-0">نتائج امتحانات الطلاب <i class="fa-solid fa-graduation-cap ms-2"></i></h5>
+                <button class="btn btn-sm btn-light fw-bold" onclick="renderStudentResults()"><i class="fa-solid fa-arrows-rotate me-1"></i> تحديث</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center" dir="rtl">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اسم الطالب</th>
+                                <th>الاختبار</th>
+                                <th>المادة</th>
+                                <th>النتيجة</th>
+                                <th>النسبة المئوية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manage-results-list">
+                            <!-- Results will be loaded here -->
+                            <tr><td colspan="5" class="text-muted p-3">جاري تحميل النتائج...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </main>
 
     <!-- Modal for Adding Question -->

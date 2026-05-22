@@ -9,7 +9,7 @@ const databases = new Databases(client);
 
 const APPWRITE_DB_ID = '6a0f928a001394baa22e';
 const EXAMS_COLLECTION_ID = 'exams';
-const RESULTS_COLLECTION_ID = 'results';
+const RESULTS_COLLECTION_ID = 'result';
 
 const account = new Account(client);
 window.AppwriteAccount = account;

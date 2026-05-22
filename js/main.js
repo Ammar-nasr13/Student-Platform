@@ -993,6 +993,18 @@ function initQuizPageEvents() {
         const level = levelSelect.value;
         const subjectId = subjectSelect.value;
         const examIndex = examSelect.value;
+        
+        const studentNameInput = document.getElementById('student-name');
+        if (studentNameInput) {
+            const studentName = studentNameInput.value.trim();
+            if (!studentName || studentName.split(' ').length < 2) {
+                showToast("الرجاء كتابة اسمك الثنائي على الأقل قبل بدء الاختبار!", "warning");
+                studentNameInput.focus();
+                return;
+            }
+            window.currentStudentName = studentName;
+        }
+
         startQuiz(level, subjectId, examIndex);
     });
 }
@@ -1186,6 +1198,29 @@ function showQuizResults() {
 
     const totalQs = currentQuiz.questions.length;
     const scorePercent = Math.round((score / totalQs) * 100);
+
+    // ارسال النتيجة إلى قاعدة بيانات Appwrite
+    if (window.AppwriteDB && window.DB_CONFIG) {
+        const resultData = {
+            studentName: window.currentStudentName || "طالب مجهول",
+            examTitle: currentQuiz.title || "بدون عنوان",
+            subjectName: currentQuiz.subject_id || "غير معروف",
+            level: currentQuiz.level ? currentQuiz.level.toString() : "غير محدد",
+            score: score,
+            totalScore: totalQs
+        };
+        
+        window.AppwriteDB.createDocument(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.resultsCol,
+            window.AppwriteID.unique(),
+            resultData
+        ).then(() => {
+            console.log("تم حفظ النتيجة بنجاح في قاعدة البيانات.");
+        }).catch(err => {
+            console.error("خطأ أثناء حفظ النتيجة:", err);
+        });
+    }
 
     let feedbackMsg = '';
     let feedbackClass = '';

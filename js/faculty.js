@@ -250,11 +250,58 @@ window.deleteExam = async function(examId) {
             renderManageExams();
         } catch (error) {
             console.error("Appwrite Error:", error);
-            alert('حدث خطأ أثناء الحذف: ' + error.message);
+            alert('حدث خطأ أثناء تحميل الاختبارات: ' + error.message);
         }
     }
 };
 
+// Render student results table
+window.renderStudentResults = async function() {
+    const tbody = document.getElementById('manage-results-list');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i> جاري تحميل النتائج من الخادم...</td></tr>';
+    
+    try {
+        const response = await window.AppwriteDB.listDocuments(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.resultsCol,
+            [window.AppwriteQuery.orderDesc('$createdAt')]
+        );
+        
+        if (response.documents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد نتائج للطلاب حتى الآن.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        response.documents.forEach(res => {
+            const scorePercent = Math.round((res.score / res.totalScore) * 100) || 0;
+            let badgeClass = 'bg-danger';
+            if (scorePercent >= 85) badgeClass = 'bg-success';
+            else if (scorePercent >= 60) badgeClass = 'bg-warning text-dark';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold text-primary">${res.studentName || 'غير معروف'}</td>
+                <td>${res.examTitle || 'غير معروف'}</td>
+                <td><span class="badge bg-secondary">${res.subjectName || 'غير محدد'}</span></td>
+                <td class="fw-bold">${res.score} / ${res.totalScore}</td>
+                <td><span class="badge ${badgeClass} fs-6">${scorePercent}%</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (error) {
+        console.error("Appwrite Error:", error);
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger py-4 text-center">حدث خطأ أثناء جلب النتائج، تأكد من إنشاء جدول result وإضافة الحقول المطلوبة (studentName, examTitle, subjectName, score, totalScore)</td></tr>`;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(renderManageExams, 300);
+    // Only load exams and results if we are on the add_exam page
+    if (document.getElementById('manage-exams-list')) {
+        renderManageExams();
+        renderStudentResults();
+    }
 });
