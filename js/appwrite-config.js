@@ -2,7 +2,7 @@
 const { Client, Databases, ID, Query, Account } = Appwrite;
 
 const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://appwrite.etihadalmdina.com/v1')
     .setProject('6a0f923e00138d15d172');
 
 const databases = new Databases(client);
