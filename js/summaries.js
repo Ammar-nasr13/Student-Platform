@@ -89,6 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setBtnLoading(submitBtn, true);
 
             try {
+                // التأكد من وجود جلسة (Session) لتجنب خطأ الصلاحيات
+                try {
+                    await window.AppwriteAccount.get();
+                } catch (sessionError) {
+                    console.log("No active session found, creating anonymous session...");
+                    await window.AppwriteAccount.createAnonymousSession();
+                }
+
                 // رفع الملف إلى Storage
                 const uploadedFile = await window.AppwriteStorage.createFile(
                     window.DB_CONFIG.summariesBucket,
@@ -207,7 +215,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error fetching summaries:", error);
-            content.innerHTML = '<div class="col-12 text-center text-danger py-4">فشل في جلب البيانات، يرجى المحاولة لاحقاً.</div>';
+            content.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="fs-1 text-muted mb-3"><i class="fa-solid fa-folder-open"></i></div>
+                    <h5 class="text-muted">عذراً، لا توجد ملخصات متاحة حالياً أو جاري تحديث البيانات.</h5>
+                </div>
+            `;
         } finally {
             loading.classList.add('d-none');
             content.classList.remove('d-none');

@@ -44,7 +44,8 @@
     <!-- Bootstrap 5 RTL CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <!-- Custom Style CSS -->
     <link rel="stylesheet" href="css/style.css">
 
@@ -84,7 +85,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <div id="auth-gateway" class="auth-gateway-overlay">
         <div class="auth-modal">
             <div class="text-center mb-4">
-                <img src="assets/logo.webp" alt="شعار المنصة" class="auth-logo mb-3" style="max-width: 120px;">
+                <img src="assets/logo.webp" alt="شعار المنصة" class="auth-logo mb-3" width="120" height="120" style="max-width: 120px;">
                 <h3 class="fw-bold text-primary">أهلاً بك في منصة الطلاب</h3>
                 <p class="text-muted small">الرجاء تحديد صفتك للدخول إلى المنصة</p>
             </div>
@@ -123,7 +124,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none me-0" style="max-width: calc(100% - 120px);" href="index.html">
-                <img src="assets/logo.webp" alt="شعار القسم" class="navbar-brand-logo flex-shrink-0" style="width: 60px; height: auto;">
+                <img src="assets/logo.webp" alt="شعار القسم" class="navbar-brand-logo flex-shrink-0" width="60" height="60" style="width: 60px; height: auto;">
                 <div class="d-flex flex-column justify-content-center" style="min-width: 0;">
                     <span class="d-block lh-sm text-white fw-bold mb-1 text-truncate" style="font-size: 1.1rem;">تكنولوجيا صناعة السياحة والضيافة</span>
                     <small class="fw-light text-white-50 lh-sm text-truncate" style="font-size: 0.8rem;">كلية السياحة والفنادق - جامعة المنيا</small>
@@ -160,7 +161,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         </ul>
                     </li>
                     <li class="nav-link-item"><a class="nav-link" href="exams.html">الاختبارات التفاعلية</a></li>
-                    <li class="nav-link-item"><a class="nav-link" href="summaries.html">الملخصات الطلابية</a></li>
+                    <li class="nav-link-item"><a class="nav-link" href="summaries.html">الملخصات</a></li>
                 </ul>
                 <div class="d-flex ms-lg-3 align-items-center">
                     <!-- زر المظهر الفاتح والمظلم للشاشات الكبيرة -->
@@ -189,10 +190,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         <!-- لوحة ضوابط وتعليمات الامتحانات -->
                         <div class="exam-rules-board text-right">
                             <div class="board-header">
-                                <span class="board-title">
+                                <h2 class="board-title">
                                     <i class="fa-solid fa-circle-exclamation text-white opacity-75"></i>
                                     ضوابط وتعليمات الامتحانات
-                                </span>
+                                </h2>
                                 <span class="badge-urgent">هام جداً</span>
                             </div>
                             <ul class="rules-list">
@@ -407,7 +408,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="mb-3">
-                        <img src="assets/logo.webp" alt="شعار القسم" class="footer-logo">
+                        <img src="assets/logo.webp" alt="شعار القسم" class="footer-logo" width="65" height="65">
                         <h5 class="fw-bold text-white mb-0">قسم تكنولوجيا صناعة السياحة والضيافة</h5>
                     </div>
                     <p class="text-white-50 small mb-3">منصة طلابية متخصصة تجمع كل ما يحتاجه طالب كلية السياحة والفنادق بجامعة المنيا لتسهيل التحصيل العلمي والاطلاع على مستجدات المقررات والامتحانات.</p>
