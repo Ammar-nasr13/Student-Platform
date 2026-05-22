@@ -1250,3 +1250,24 @@ function updateUIForFaculty() {
       o && ((o.innerHTML = i), (o.disabled = !1));
     }
   }));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const togglePassword = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById("faculty-password");
+    const toggleIcon = document.getElementById("toggle-password-icon");
+    
+    if (togglePassword && passwordInput && toggleIcon) {
+        togglePassword.addEventListener("click", () => {
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+            
+            if (type === "text") {
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            } else {
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            }
+        });
+    }
+  });
