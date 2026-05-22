@@ -8,28 +8,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* ألوان الوضع الفاتح (الافتراضي) - كحلي وأبيض وأسود */
-    --primary-color: #0f2b46;       /* كحلي أكاديمي فاخر */
-    --primary-light: #1b3d60;       /* كحلي فاتح */
-    --accent-color: #0f2b46;        /* كحلي كعنصر تمييز أساسي */
-    --accent-hover: #000000;        /* أسود عند التمرير */
-    --dark-bg: #0b0f19;             /* خلفية سوداء للفوتر */
+    /* ألوان الوضع الفاتح (الافتراضي) - كحلي وأبيض وأسود فقط */
+    --primary-color: #1a365d;       /* كحلي هادئ جداً */
+    --primary-light: #2c5282;       /* كحلي أفتح قليلاً */
+    --accent-color: #ffffff;        /* أبيض بدلاً من الذهبي */
+    --accent-hover: #e2e8f0;        /* رمادي فاتح جداً (أبيض مطفي) عند التمرير */
+    --dark-bg: #0b1120;             /* خلفية سوداء كحلية للفوتر */
     --light-bg: #f8fafc;            /* خلفية فاتحة مريحة */
     --white: #ffffff;
     --text-dark: #000000;           /* أسود خالص للنصوص */
     --text-muted: #4b5563;          /* رمادي للنصوص المساعدة */
-    --card-border: rgba(15, 43, 70, 0.08);
+    --card-border: rgba(26, 54, 93, 0.08);
     --input-bg: #ffffff;
     --input-border: #cbd5e1;
     --input-text: #000000;
     
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 10px 15px -3px rgba(15, 43, 70, 0.06), 0 4px 6px -2px rgba(15, 43, 70, 0.04);
-    --shadow-lg: 0 20px 25px -5px rgba(15, 43, 70, 0.1), 0 10px 10px -5px rgba(15, 43, 70, 0.04);
+    --shadow-md: 0 10px 15px -3px rgba(26, 54, 93, 0.08), 0 4px 6px -2px rgba(26, 54, 93, 0.04);
+    --shadow-lg: 0 20px 25px -5px rgba(26, 54, 93, 0.12), 0 10px 10px -5px rgba(26, 54, 93, 0.06);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ألوان الوضع الداكن (Dark Mode Variables) - كحلي وأبيض وأسود */
+/* ألوان الوضع الداكن (Dark Mode Variables) */
 body.dark-theme {
     --primary-color: #ffffff;       /* أبيض للنصوص الرئيسية والعناصر البارزة */
     --primary-light: #cbd5e1;       /* رمادي فاتح */
@@ -107,16 +107,16 @@ body {
 
 /* شريط التنقل المتطور Navbar */
 .navbar {
-    background: rgba(15, 43, 70, 0.95) !important;
-    backdrop-filter: blur(10px);
-    border-bottom: 2px solid var(--accent-color);
+    background: #1a365d !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
     padding: 0.8rem 1rem;
     transition: var(--transition);
     z-index: 1030;
 }
 
 body.dark-theme .navbar {
-    background: rgba(7, 17, 26, 0.95) !important;
+    background: #0b1120 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .navbar-brand {
@@ -173,14 +173,14 @@ body.dark-theme .navbar {
 /* البطل الرئيسي Hero Section */
 .hero-section {
     position: relative;
-    background: linear-gradient(135deg, #0f2b46 0%, #1b3d60 100%);
+    background: linear-gradient(rgba(26, 54, 93, 0.6), rgba(26, 54, 93, 0.6)), url('../assets/background.png') no-repeat center center / cover;
     color: #ffffff;
-    padding: 8rem 0 6rem 0;
+    padding: 4rem 0 1rem 0;
     overflow: hidden;
 }
 
 body.dark-theme .hero-section {
-    background: linear-gradient(135deg, #07111a 0%, #0c1c2b 100%);
+    background: linear-gradient(rgba(11, 17, 32, 0.7), rgba(11, 17, 32, 0.7)), url('../assets/background.png') no-repeat center center / cover;
 }
 
 .hero-section::before {
@@ -205,7 +205,6 @@ body.dark-theme .hero-section {
 
 .hero-title span {
     color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(15, 43, 70, 0.2);
 }
 
 .hero-subtitle {
@@ -215,64 +214,111 @@ body.dark-theme .hero-section {
     animation: fadeInUp 1s ease;
 }
 
-/* أزرار مخصصة */
+/* أزرار مخصصة (White/Navy) */
 .btn-gold {
-    background-color: #0f2b46;
-    color: #ffffff !important;
+    background-color: var(--white);
+    color: var(--primary-color) !important;
     font-weight: 700;
-    border: 2px solid #0f2b46;
+    border: 2px solid var(--white);
     padding: 0.75rem 2rem;
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(15, 43, 70, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
 }
 
 body.dark-theme .btn-gold {
-    background-color: #ffffff;
-    color: #000000 !important;
-    border-color: #ffffff;
+    background-color: var(--white);
+    color: var(--primary-color) !important;
+    border-color: var(--white);
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
 }
 
 .btn-gold:hover {
-    background-color: #000000;
-    border-color: #000000;
-    color: #ffffff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--primary-color) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 body.dark-theme .btn-gold:hover {
-    background-color: #e2e8f0;
-    border-color: #e2e8f0;
-    color: #000000 !important;
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--primary-color) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
 }
+
+.btn-navy-solid {
+    background-color: #1a365d;
+    color: #ffffff !important;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(26, 54, 93, 0.2);
+    transition: var(--transition);
+}
+
+.btn-navy-solid:hover {
+    background-color: #0f2b46;
+    color: #ffffff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
+}
+
+body.dark-theme .btn-navy-solid {
+    background-color: #2a4365;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .btn-navy-solid:hover {
+    background-color: #3b5b88;
+}
+
 
 .btn-outline-gold {
     background: transparent;
-    color: #0f2b46 !important;
+    color: var(--primary-color) !important;
     font-weight: 700;
-    border: 2px solid #0f2b46;
+    border: 2px solid var(--primary-color);
     padding: 0.75rem 2rem;
     border-radius: 50px;
     transition: var(--transition);
 }
 
 body.dark-theme .btn-outline-gold {
-    color: #ffffff !important;
-    border-color: #ffffff;
+    color: var(--white) !important;
+    border-color: var(--white);
 }
 
 .btn-outline-gold:hover {
-    background-color: #0f2b46;
-    color: #ffffff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(15, 43, 70, 0.2);
+    background-color: var(--primary-color);
+    color: var(--white) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 body.dark-theme .btn-outline-gold:hover {
-    background-color: #ffffff;
-    color: #000000 !important;
+    background-color: var(--white);
+    color: var(--primary-color) !important;
+    transform: translateY(-3px);
+}
+
+/* بطاقة الرؤية (Vision Card) */
+.custom-vision-card {
+    background-color: var(--white);
+    border: 1px solid var(--card-border);
+    transition: var(--transition);
+}
+
+.custom-vision-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg) !important;
+}
+
+body.dark-theme .custom-vision-card {
+    background-color: var(--light-bg);
 }
 
 /* بطاقات المستويات (Dashboard Cards) */
@@ -300,11 +346,11 @@ body.dark-theme .btn-outline-gold:hover {
     right: 0;
     width: 100%;
     height: 6px;
-    background: linear-gradient(90deg, #0f2b46, var(--accent-color));
+    background: #1a365d;
 }
 
 body.dark-theme .level-card::before {
-    background: linear-gradient(90deg, #0e2338, var(--accent-color));
+    background: #2a4365;
 }
 
 .level-card:hover {
@@ -314,33 +360,58 @@ body.dark-theme .level-card::before {
 }
 
 .level-card .card-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50px;
-    background: rgba(15, 43, 70, 0.1);
-    color: #0f2b46;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1a365d;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
     transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(26, 54, 93, 0.2);
 }
 
 body.dark-theme .level-card .card-icon {
-    color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    background: #2a4365;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .level-card:hover .card-icon {
     background: #0f2b46;
-    color: var(--accent-color);
+    color: #ffffff;
     transform: scale(1.1) rotate(5deg);
 }
 
 body.dark-theme .level-card:hover .card-icon {
-    background: var(--accent-color);
-    color: #030a10;
+    background: #3b5b88;
+    color: #ffffff;
+}
+
+/* أزرار الكروت */
+.level-card .btn-gold {
+    background-color: #1a365d !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(26, 54, 93, 0.2) !important;
+}
+
+.level-card .btn-gold:hover {
+    background-color: #0f2b46 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(26, 54, 93, 0.3) !important;
+}
+
+body.dark-theme .level-card .btn-gold {
+    background-color: #2a4365 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .level-card .btn-gold:hover {
+    background-color: #3b5b88 !important;
 }
 
 /* التنسيق الداخلي لصفحات المستويات */
@@ -892,7 +963,7 @@ body.dark-theme .progress-bar-fill {
         font-size: 2rem;
     }
     .hero-section {
-        padding: 6rem 0 4rem 0;
+        padding: 3rem 0 1rem 0;
     }
     .custom-tabs .nav-link {
         padding: 0.5rem 0.8rem !important;
@@ -1043,7 +1114,7 @@ body.dark-theme .timeline-flow-step:hover .timeline-flow-circle {
 }
 
 /* ==========================================================================
-   إلغاء التنسيقات الذهبية المتبقية وتحويلها إلى الكحلي والأبيض والأسود
+   إلغاء التنسيقات الذهبية وتوحيدها للكحلي/الأبيض
    ========================================================================== */
 
 /* ألوان النصوص */
@@ -1051,55 +1122,64 @@ body.dark-theme .timeline-flow-step:hover .timeline-flow-circle {
 .text-warning,
 .navbar-brand span,
 .hero-title span,
-.level-card .card-icon,
 .quiz-header .text-warning,
 .display-1.text-gold,
 .display-1 .text-warning,
 .course-card .fs-4.text-warning,
 .breadcrumb-item a.text-warning {
-    color: var(--primary-light) !important;
+    color: var(--primary-color) !important;
 }
 
+/* الاستثناءات للنصوص الموجودة على خلفية كحلية (مثل الهيدر) */
+.navbar-brand span,
+.hero-title span,
 body.dark-theme .text-gold,
 body.dark-theme .text-warning,
 body.dark-theme .navbar-brand span,
 body.dark-theme .hero-title span,
-body.dark-theme .level-card .card-icon,
 body.dark-theme .quiz-header .text-warning,
 body.dark-theme .display-1.text-gold,
 body.dark-theme .display-1 .text-warning,
 body.dark-theme .course-card .fs-4.text-warning,
 body.dark-theme .breadcrumb-item a.text-warning {
-    color: var(--primary-color) !important; /* أبيض في الداكن */
+    color: var(--white) !important;
 }
 
 /* ألوان الخلفيات والحدود */
 .bg-gold,
 .bg-warning,
-.progress-bar.bg-warning,
+.progress-bar.bg-warning {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+}
+
 .bg-warning.bg-opacity-10,
 .bg-gold.bg-opacity-10 {
-    background-color: #0f2b46 !important;
-    color: #ffffff !important;
+    background-color: rgba(26, 54, 93, 0.1) !important;
+    color: var(--primary-color) !important;
 }
 
 body.dark-theme .bg-gold,
 body.dark-theme .bg-warning,
-body.dark-theme .progress-bar.bg-warning,
+body.dark-theme .progress-bar.bg-warning {
+    background-color: var(--white) !important;
+    color: var(--primary-color) !important;
+}
+
 body.dark-theme .bg-warning.bg-opacity-10,
 body.dark-theme .bg-gold.bg-opacity-10 {
-    background-color: #ffffff !important;
-    color: #000000 !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--white) !important;
 }
 
 .border-warning,
 .border-gold {
-    border-color: #0f2b46 !important;
+    border-color: var(--primary-color) !important;
 }
 
 body.dark-theme .border-warning,
 body.dark-theme .border-gold {
-    border-color: #ffffff !important;
+    border-color: var(--white) !important;
 }
 
 /* بطاقات المستويات عند التحويم */
@@ -1214,7 +1294,7 @@ body.dark-theme .alert-warning {
 /* 2. الهيرو (Hero Section) والمحتويات التي بداخله */
 .hero-title span {
     color: #ffffff !important; /* جعل كلمة "تكنولوجيا صناعة السياحة والضيافة" باللون الأبيض لتكون مقروءة */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
+    text-shadow: none !important;
 }
 
 .hero-section .bg-glass .text-warning,
@@ -1687,4 +1767,113 @@ body.dark-theme .auth-modal .text-dark {
 
 .auth-gateway-overlay.fade-out .auth-modal {
     transform: translateY(-30px) scale(0.95);
+}
+
+/* --- Hero Section Professional UI Enhancements --- */
+.hero-title-glow {
+    font-size: 3.8rem !important;
+    font-weight: 900 !important;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 
+                 0 0 30px rgba(13, 110, 253, 0.6), 
+                 0 0 45px rgba(13, 110, 253, 0.4);
+    line-height: 1.4 !important;
+    letter-spacing: -1px;
+}
+.hero-subtitle {
+    font-size: 1.25rem !important;
+    color: #d1e3ff;
+    line-height: 1.8 !important;
+    opacity: 0.9;
+}
+.glow-button {
+    background: linear-gradient(45deg, #ffffff, #e6f0ff);
+    color: #0f2b46 !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 
+                inset 0 0 10px rgba(255, 255, 255, 0.8);
+    border: none !important;
+    transition: all 0.3s ease !important;
+}
+.glow-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 
+                0 0 15px rgba(13, 110, 253, 0.6) !important;
+}
+.hero-container {
+    position: relative;
+}
+.hero-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(13, 110, 253, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* --- إضافات التجاوب والشاشات المختلفة (Responsive & Smoothness) --- */
+html {
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 991px) {
+    .hero-title-glow, .hero-title {
+        font-size: 2.5rem !important;
+    }
+    .hero-subtitle {
+        font-size: 1.1rem !important;
+    }
+    .hero-section {
+        padding: 3rem 0 1rem 0;
+    }
+    .level-card, .course-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title-glow, .hero-title {
+        font-size: 2rem !important;
+        text-align: center;
+    }
+    .hero-subtitle {
+        font-size: 1rem !important;
+        text-align: center;
+    }
+    .auth-modal {
+        padding: 1.5rem;
+        width: 95%;
+    }
+    .option-btn {
+        min-height: 50px;
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+    .navbar-collapse {
+        background: var(--primary-color);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    body.dark-theme .navbar-collapse {
+        background: #0c1c2b;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title-glow, .hero-title {
+        font-size: 1.7rem !important;
+    }
+    .btn-gold, .btn-outline-gold, .glow-button {
+        width: 100%;
+        margin-bottom: 10px;
+        display: block;
+        text-align: center;
+    }
+    .level-card, .course-card {
+        padding: 1.2rem;
+    }
 }

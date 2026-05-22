@@ -1321,9 +1321,9 @@ window.loginFaculty = async function() {
         const errStr = String(err).toLowerCase();
         
         if (errStr.includes('fetch') || errStr.includes('network')) {
-            errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1 mb-2 fs-5"></i><br><b>تم رفض الاتصال (CORS Error)</b><br><small>يرجى إضافة الدومين الحالي للموقع (الرابط بالكامل) داخل قسم <b>Platforms</b> في لوحة تحكم Appwrite.</small>';
+            errorEl.innerHTML = '<i class="fa-solid fa-wifi me-1 mb-1 fs-5"></i><br><b>تعذر الاتصال بالخادم</b><br><small>يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</small>';
         } else if (errStr.includes('session')) {
-            errorEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i> أنت مسجل الدخول بالفعل! جاري توجيهك...';
+            errorEl.innerHTML = '<i class="fa-solid fa-circle-check me-1 mb-1 fs-6"></i><br>أنت مسجل الدخول بالفعل، جاري توجيهك...';
             setTimeout(() => {
                 localStorage.setItem('is_faculty', 'true');
                 errorEl.classList.add('d-none');
@@ -1332,7 +1332,7 @@ window.loginFaculty = async function() {
             }, 1500);
             return;
         } else {
-            errorEl.innerHTML = '<i class="fa-solid fa-circle-xmark me-1 mb-1 fs-6"></i><br>بيانات الدخول غير صحيحة، أو الحساب غير موجود.';
+            errorEl.innerHTML = '<i class="fa-solid fa-circle-xmark me-1 mb-1 fs-6"></i><br>البريد الإلكتروني أو كلمة المرور غير صحيحة.';
         }
         
         errorEl.classList.remove('d-none');

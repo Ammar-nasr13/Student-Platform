@@ -1,0 +1,31 @@
+<header class="hero-section text-center text-md-start d-flex align-items-center">
+<div class="container">
+<div class="row align-items-center">
+<div class="col-md-6 col-lg-7 mb-5 mb-md-0 animated-fade-in">
+<h1 class="hero-title">منصة الطلاب لقسم <br><span>تكنولوجيا صناعة السياحة والضيافة</span></h1>
+<p class="hero-subtitle">تهدف لتسهيل الوصول للمقررات الدراسية، جداول الامتحانات، وبنوك الأسئلة التفاعلية لمساعدة زملائنا الطلاب في مسيرتهم الأكاديمية.</p>
+<div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start">
+<a href="#levels" class="btn btn-gold btn-lg"><i class="fa-solid fa-graduation-cap me-2"></i>تصفح المستويات الدراسية</a>
+</div>
+</div>
+<div class="col-md-6 col-lg-5 text-center animated-fade-in" style="animation-delay: 0.2s;">
+<div class="position-relative d-inline-block w-100">
+<!-- لوحة ضوابط وتعليمات الامتحانات -->
+<div class="exam-rules-board text-right">
+<div class="board-header">
+<span class="board-title">
+<i class="fa-solid fa-circle-exclamation text-white opacity-75"></i>
+ضوابط وتعليمات الامتحانات
+</span>
+<span class="badge-urgent">هام جداً</span>
+</div>
+<ul class="rules-list">
+<li class="rules-item">
+<div class="glow-icon-wrapper glow-icon-green">
+<i class="fa-regular fa-clock"></i>
+</div>
+<div class="rules-content">
+<h4 class="rules-title-text">مواعيد الحضور ودخول اللجان</h4>
+<p class="rules-desc-text">تبدأ الامتحانات الساعة 10:00 صباحاً. يبدأ الحضور ودخول اللجان من الساعة 9:30 صباحاً، ويمنع تماماً دخول أي طالب بعد الساعة 10:00 صباحاً.</p>
+</div>
+</li>

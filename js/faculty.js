@@ -187,7 +187,14 @@ if (addExamForm) {
     });
 }
 
-window.logoutFaculty = function() {
+window.logoutFaculty = async function() {
+    try {
+        if (window.AppwriteAccount) {
+            await window.AppwriteAccount.deleteSession('current');
+        }
+    } catch(err) {
+        console.error(err);
+    }
     localStorage.removeItem('is_faculty');
     window.location.href = 'index.html';
 };
