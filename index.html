@@ -85,8 +85,38 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-W5QFKH8F');</script>
 <!-- End Google Tag Manager -->
+<style>
+.beta-badge {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    animation: pulse-beta 2s infinite;
+}
+@keyframes pulse-beta {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+</style>
 </head>
 <body>
+    <!-- Beta Badge -->
+    <div class="beta-badge">
+        <i class="fa-solid fa-flask"></i> نسخة تجريبية (Beta)
+    </div>
 
     <!-- شاشة التحميل المسبق (Preloader UX) -->
     <div id="preloader">
