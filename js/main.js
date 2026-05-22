@@ -1186,24 +1186,20 @@ function updateUIForFaculty() {
       n = document.getElementById("auth-error"),
       modal = document.getElementById("auth-faculty-login"),
       s = document.querySelectorAll("#auth-faculty-login button");
-      
     modal.classList.remove("shake");
     void modal.offsetWidth;
-
     if (!e || !t) {
         n.innerHTML = '<i class="fa-solid fa-circle-exclamation me-1 mb-1 fs-6"></i><br>الرجاء إدخال البريد الإلكتروني وكلمة المرور.';
         n.classList.remove("d-none");
         modal.classList.add("shake");
         return;
     }
-
     if (!e.includes('@')) {
         n.innerHTML = '<i class="fa-solid fa-circle-exclamation me-1 mb-1 fs-6"></i><br>صيغة البريد الإلكتروني غير صحيحة.';
         n.classList.remove("d-none");
         modal.classList.add("shake");
         return;
     }
-
     let o = null;
     s.forEach((btn) => {
       btn.textContent.includes("تسجيل") && (o = btn);
@@ -1250,17 +1246,14 @@ function updateUIForFaculty() {
       o && ((o.innerHTML = i), (o.disabled = !1));
     }
   }));
-
   document.addEventListener("DOMContentLoaded", () => {
     const togglePassword = document.getElementById("toggle-password");
     const passwordInput = document.getElementById("faculty-password");
     const toggleIcon = document.getElementById("toggle-password-icon");
-    
     if (togglePassword && passwordInput && toggleIcon) {
         togglePassword.addEventListener("click", () => {
             const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
             passwordInput.setAttribute("type", type);
-            
             if (type === "text") {
                 toggleIcon.classList.remove("fa-eye-slash");
                 toggleIcon.classList.add("fa-eye");
