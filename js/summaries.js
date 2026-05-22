@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                Swal.fire('تنبيه', 'حجم الملف يتجاوز 10 ميغابايت.', 'warning');
+            if (file.size > 100 * 1024 * 1024) { // 100MB limit
+                Swal.fire('تنبيه', 'حجم الملف يتجاوز 100 ميغابايت.', 'warning');
                 return;
             }
 
@@ -153,42 +153,48 @@ document.addEventListener('DOMContentLoaded', () => {
             if (subjects.length === 0) {
                 content.innerHTML = '<div class="col-12 text-center text-muted py-4">لا توجد مواد لهذا المستوى.</div>';
             } else {
+                content.innerHTML = '';
+                let hasSummaries = false;
+
                 subjects.forEach(subject => {
                     const subjectSummaries = documents.filter(doc => doc.subject_id === subject.id);
                     
-                    const col = document.createElement('div');
-                    col.className = 'col-md-6 col-lg-4';
-                    
-                    let summariesHtml = '';
                     if (subjectSummaries.length === 0) {
-                        summariesHtml = '<p class="text-muted small text-center mb-0 mt-3">لا توجد ملخصات مرفوعة بعد.</p>';
-                    } else {
-                        summariesHtml = '<ul class="list-group list-group-flush mt-3">';
-                        subjectSummaries.forEach(doc => {
-                            const fileUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${doc.file_id}/view?project=6a0f923e00138d15d172`;
-                            
-                            // زر الحذف للهيئة فقط
-                            let deleteBtnHtml = '';
-                            if (isFaculty) {
-                                deleteBtnHtml = `<button class="btn btn-sm btn-outline-danger ms-2 delete-summary-btn" data-doc-id="${doc.$id}" data-file-id="${doc.file_id}" title="حذف الملخص"><i class="fa-solid fa-trash"></i></button>`;
-                            }
-
-                            summariesHtml += `
-                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 border-light">
-                                    <div>
-                                        <div class="fw-bold text-dark"><i class="fa-solid fa-file-pdf text-danger me-2"></i> ملخص بواسطة: ${doc.student_name}</div>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-primary rounded-circle" title="عرض الملف">
-                                            <i class="fa-solid fa-download"></i>
-                                        </a>
-                                        ${deleteBtnHtml}
-                                    </div>
-                                </li>
-                            `;
-                        });
-                        summariesHtml += '</ul>';
+                        return; // لا تظهر المقرر إذا لم يكن به ملخصات
                     }
+                    
+                    hasSummaries = true;
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6 col-lg-4 mb-4';
+                    
+                    let summariesHtml = '<ul class="list-group list-group-flush mt-3">';
+                    subjectSummaries.forEach(doc => {
+                        const fileUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${doc.file_id}/view?project=6a0f923e00138d15d172`;
+                        
+                        // زر الحذف للهيئة فقط
+                        let deleteBtnHtml = '';
+                        if (isFaculty) {
+                            deleteBtnHtml = `<button class="btn btn-sm btn-outline-danger ms-2 delete-summary-btn" data-doc-id="${doc.$id}" data-file-id="${doc.file_id}" title="حذف الملخص"><i class="fa-solid fa-trash"></i></button>`;
+                        }
+
+                        let dateStr = doc.$createdAt ? new Date(doc.$createdAt).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' }) : '';
+
+                        summariesHtml += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 border-light">
+                                <div>
+                                    <div class="fw-bold text-dark"><i class="fa-solid fa-file-pdf text-danger me-2"></i> بواسطة: ${doc.student_name}</div>
+                                    ${dateStr ? `<small class="text-muted"><i class="fa-regular fa-clock me-1"></i> ${dateStr}</small>` : ''}
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-primary rounded-circle" title="عرض الملف">
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+                                    ${deleteBtnHtml}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    summariesHtml += '</ul>';
 
                     col.innerHTML = `
                         <div class="card h-100 border-0 shadow-sm" style="background-color: #f8f9fa;">
@@ -202,6 +208,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     content.appendChild(col);
                 });
+
+                if (!hasSummaries) {
+                    content.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <div class="fs-1 text-muted mb-3"><i class="fa-solid fa-folder-open"></i></div>
+                            <h5 class="text-muted">لم يتم رفع أي ملخصات في هذا المستوى حتى الآن.</h5>
+                        </div>
+                    `;
+                }
 
                 // تفعيل أحداث أزرار الحذف (إن وجدت)
                 document.querySelectorAll('.delete-summary-btn').forEach(btn => {
