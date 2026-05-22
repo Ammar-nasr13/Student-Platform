@@ -244,19 +244,66 @@ async function renderManageExams() {
 }
 
 window.deleteExam = async function(examId) {
-    if (confirm('هل أنت متأكد من حذف هذا الاختبار نهائياً؟ لا يمكن التراجع عن هذه الخطوة.')) {
-        try {
-            await window.AppwriteDB.deleteDocument(
-                window.DB_CONFIG.dbId,
-                window.DB_CONFIG.examsCol,
-                examId
-            );
-            alert('تم حذف الاختبار بنجاح!');
-            renderManageExams();
-        } catch (error) {
-            console.error("Appwrite Error:", error);
-            alert('حدث خطأ أثناء تحميل الاختبارات: ' + error.message);
-        }
+    if (typeof Swal !== 'undefined') {
+        const result = await Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "هل أنت متأكد من حذف هذا الاختبار نهائياً؟ لا يمكن التراجع عن هذه الخطوة.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم، احذف',
+            cancelButtonText: 'إلغاء'
+        });
+        if (!result.isConfirmed) return;
+    } else {
+        if (!confirm('هل أنت متأكد من حذف هذا الاختبار نهائياً؟ لا يمكن التراجع عن هذه الخطوة.')) return;
+    }
+
+    try {
+        await window.AppwriteDB.deleteDocument(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.examsCol,
+            examId
+        );
+        if (typeof Swal !== 'undefined') Swal.fire('تم الحذف!', 'تم حذف الاختبار بنجاح.', 'success');
+        else alert('تم حذف الاختبار بنجاح!');
+        renderManageExams();
+    } catch (error) {
+        console.error("Appwrite Error:", error);
+        if (typeof Swal !== 'undefined') Swal.fire('خطأ', 'حدث خطأ أثناء تحميل الاختبارات: ' + error.message, 'error');
+        else alert('حدث خطأ أثناء تحميل الاختبارات: ' + error.message);
+    }
+};
+
+window.deleteResult = async function(resultId) {
+    if (typeof Swal !== 'undefined') {
+        const res = await Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "هل تريد حقاً حذف نتيجة هذا الطالب؟",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم، احذف',
+            cancelButtonText: 'إلغاء'
+        });
+        if (!res.isConfirmed) return;
+    } else {
+        if (!confirm('هل تريد حقاً حذف نتيجة هذا الطالب؟')) return;
+    }
+
+    try {
+        await window.AppwriteDB.deleteDocument(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.resultsCol,
+            resultId
+        );
+        if (typeof Swal !== 'undefined') Swal.fire('تم الحذف!', 'تم حذف نتيجة الطالب بنجاح.', 'success');
+        renderStudentResults();
+    } catch (error) {
+        console.error("Appwrite Error:", error);
+        if (typeof Swal !== 'undefined') Swal.fire('خطأ', 'حدث خطأ أثناء حذف النتيجة: ' + error.message, 'error');
     }
 };
 
@@ -296,7 +343,10 @@ window.renderStudentResults = async function() {
                 <td>${res.examTitle || 'غير معروف'}</td>
                 <td><span class="badge bg-secondary">${res.subjectName || 'غير محدد'}</span></td>
                 <td class="fw-bold">${res.score} / ${res.totalScore}</td>
-                <td><span class="badge ${badgeClass} fs-6">${scorePercent}%</span></td>
+                <td>
+                    <span class="badge ${badgeClass} fs-6">${scorePercent}%</span>
+                    <button class="btn btn-sm btn-outline-danger ms-2 border-0" onclick="event.stopPropagation(); deleteResult('${res.$id}')" title="حذف النتيجة"><i class="fa-solid fa-trash"></i></button>
+                </td>
             `;
             tbody.appendChild(tr);
         });

@@ -1018,7 +1018,7 @@ function downloadExamPDF(level, subjectId, examIndex) {
 
     let printWin = window.open('', '_blank');
     let html = `
-    <html dir="rtl" lang="ar">
+    <html dir="ltr" lang="en">
     <head>
         <title>${data.title} - ${subjectName}</title>
         <style>
@@ -1027,11 +1027,11 @@ function downloadExamPDF(level, subjectId, examIndex) {
             .header img { max-height: 80px; }
             .header h1 { color: #0f2b46; margin: 10px 0; }
             .header h3 { color: #555; margin: 5px 0; }
-            .question-box { margin-bottom: 25px; page-break-inside: avoid; }
-            .question-text { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-            .options-list { margin-right: 20px; }
-            .option-item { margin-bottom: 8px; font-size: 16px; }
-            .circle { display: inline-block; width: 15px; height: 15px; border: 1px solid #333; border-radius: 50%; margin-left: 10px; position: relative; top: 2px; }
+            .question-box { margin-bottom: 25px; page-break-inside: avoid; text-align: left; }
+            .question-text { font-size: 18px; font-weight: bold; margin-bottom: 10px; font-family: sans-serif; }
+            .options-list { margin-left: 20px; text-align: left; }
+            .option-item { margin-bottom: 8px; font-size: 16px; font-family: sans-serif; }
+            .circle { display: inline-block; width: 15px; height: 15px; border: 1px solid #333; border-radius: 50%; margin-right: 10px; position: relative; top: 2px; }
             .essay-lines { margin-top: 15px; border-bottom: 1px dashed #ccc; height: 30px; width: 100%; }
             .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #888; }
             @media print {
@@ -1109,7 +1109,7 @@ function startQuiz(level, subjectId, examIndex) {
     showToast("بدأ الاختبار التفاعلي ⏱️، بالتوفيق!", "info");
 
     resetTimer();
-    loadQuestion();
+    renderAllQuestions();
 }
 
 function resetTimer() {
@@ -1124,8 +1124,9 @@ function resetTimer() {
         updateTimerUI();
         if (timeLeft <= 0) {
             clearInterval(quizTimer);
-            showToast("انتهى وقت السؤال! ⏰", "warning");
-            submitAnswer(-1); // -1 تعني لم يجب
+            if (typeof Swal !== 'undefined') Swal.fire('انتهى الوقت!', 'تم إغلاق الاختبار وحساب نتيجتك.', 'warning');
+            else showToast("انتهى وقت السؤال! ⏰", "warning");
+            processExamSubmission();
         }
     }, 1000);
 }
@@ -1149,129 +1150,141 @@ function updateTimerUI() {
     }
 }
 
-function loadQuestion() {
+window.renderAllQuestions = function() {
     if (!currentQuiz) return;
-    
-    const question = currentQuiz.questions[currentQuestionIndex];
     const totalQs = currentQuiz.questions.length;
-
-    // تحديث شريط التقدم والعداد
-    document.getElementById('question-number').textContent = `السؤال ${currentQuestionIndex + 1} من ${totalQs}`;
-    const progressPercent = ((currentQuestionIndex) / totalQs) * 100;
-    document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
-
-    // عرض نص السؤال
-    const qArea = document.getElementById('question-area');
-    qArea.innerHTML = `
-        <div class="question-text">${question.q}</div>
-        <div class="options-list" id="options-container"></div>
-    `;
-
-    // عرض الخيارات أو مربع النص
-    const container = document.getElementById('options-container');
     
-    if (question.type === 'essay') {
-        const textarea = document.createElement('textarea');
-        textarea.className = 'form-control mt-3 animated-fade-in';
-        textarea.rows = 4;
-        textarea.placeholder = 'اكتب إجابتك هنا...';
-        textarea.id = 'essay-answer-input';
-        container.appendChild(textarea);
-        
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-primary w-100 mt-3 fw-bold';
-        btn.textContent = 'تأكيد الإجابة';
-        btn.addEventListener('click', () => submitAnswer('essay_submitted'));
-        container.appendChild(btn);
-    } else {
-        question.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn animated-fade-in';
-            btn.innerHTML = `<span class="badge bg-secondary me-2">${idx + 1}</span> ${opt}`;
-            btn.addEventListener('click', () => submitAnswer(idx));
-            container.appendChild(btn);
-        });
-    }
-}
+    document.getElementById('question-number').textContent = `كل الأسئلة (${totalQs})`;
+    document.getElementById('quiz-progress-bar').style.width = `100%`;
 
-function submitAnswer(selectedIndex) {
-    clearInterval(quizTimer);
-    const question = currentQuiz.questions[currentQuestionIndex];
-    const correctIdx = question.correct;
-
-    if (question.type === 'essay') {
-        const textInput = document.getElementById('essay-answer-input');
-        if (textInput) {
-            textInput.disabled = true;
-            userAnswers.push(textInput.value); // Save essay text
-        } else {
-            userAnswers.push(selectedIndex);
-        }
-        
-        const submitBtn = document.querySelector('#options-container .btn-primary');
-        if (submitBtn) submitBtn.disabled = true;
-        
-        showToast("تم تسجيل الإجابة بنجاح!", "success");
-        score++; // Essay counts as correct for the sake of the automated score
-    } else {
-        userAnswers.push(selectedIndex);
-        const buttons = document.querySelectorAll('#options-container .option-btn');
-
-        buttons.forEach((btn, idx) => {
-            btn.disabled = true;
-            if (idx === correctIdx) {
-                btn.classList.add('correct'); // تلوين الإجابة الصحيحة بالأخضر
-            }
-            if (idx === selectedIndex && selectedIndex !== correctIdx) {
-                btn.classList.add('incorrect'); // تلوين إجابة الطالب الخاطئة بالأحمر
-            }
-        });
-
-        if (selectedIndex === correctIdx) {
-            score++;
-            showToast("إجابة صحيحة! 🎉", "success");
-        } else {
-            if (selectedIndex !== -1) {
-                showToast("إجابة خاطئة ❌", "warning");
-            }
-        }
-    }
-
-    // عرض التفسير أو الإجابة الصحيحة
     const qArea = document.getElementById('question-area');
-    if (question.explain && question.explain !== "undefined") {
-        const explanationDiv = document.createElement('div');
-        explanationDiv.className = 'alert alert-info mt-3 animated-fade-in shadow-sm rounded-3 border-0 border-end border-4 border-info';
-        explanationDiv.innerHTML = `
-            <div class="d-flex align-items-center mb-2">
-                <i class="fa-solid fa-lightbulb text-warning fs-5 me-2"></i>
-                <strong class="text-info fs-6">معلومة وشرح:</strong>
-            </div>
-            <p class="m-0 text-dark fw-medium lh-lg">${question.explain}</p>
+    let html = '';
+    
+    currentQuiz.questions.forEach((q, idx) => {
+        html += `
+            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${idx}" dir="ltr" style="text-align: left;">
+                <div class="question-text fw-bold fs-5 mb-3" style="font-family: sans-serif;">${idx + 1}. ${q.q}</div>
+                <div class="options-list d-flex flex-column gap-2" id="q-opts-${idx}">
         `;
-        qArea.appendChild(explanationDiv);
-    }
-
-    // إضافة زر الانتقال التالي
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn w-100 mt-3 py-2 fw-bold shadow-sm text-white';
-    nextBtn.style.backgroundColor = '#0f2b46';
-    nextBtn.style.borderRadius = '8px';
-    
-    const isLast = (currentQuestionIndex === currentQuiz.questions.length - 1);
-    nextBtn.textContent = isLast ? 'عرض النتيجة النهائية' : 'السؤال التالي';
-    
-    nextBtn.addEventListener('click', () => {
-        if (isLast) {
-            showQuizResults();
+        
+        if (q.type === 'essay') {
+            html += `<textarea class="form-control" rows="4" placeholder="اكتب إجابتك هنا..." id="essay-ans-${idx}"></textarea>`;
         } else {
-            currentQuestionIndex++;
-            resetTimer();
-            loadQuestion();
+            q.options.forEach((opt, optIdx) => {
+                html += `
+                    <label class="btn btn-outline-secondary text-start w-100 option-label d-flex align-items-center" style="cursor: pointer; font-family: sans-serif;">
+                        <input type="radio" name="q-${idx}" value="${optIdx}" class="me-3 ms-1" style="transform: scale(1.2);"> 
+                        <span class="badge bg-secondary me-3 ms-1">${optIdx + 1}</span> <span>${opt}</span>
+                    </label>
+                `;
+            });
+        }
+        
+        html += `
+                </div>
+                <div class="explanation-area mt-3 d-none" id="q-exp-${idx}"></div>
+            </div>
+        `;
+    });
+    
+    html += `
+        <button class="btn w-100 py-3 fw-bold fs-5 shadow-sm text-white" id="submit-full-exam-btn" style="background-color: #0f2b46; border-radius: 8px;">
+            إنهاء الاختبار وحفظ النتيجة <i class="fa-solid fa-check-circle ms-2"></i>
+        </button>
+    `;
+    
+    qArea.innerHTML = html;
+    
+    document.getElementById('submit-full-exam-btn').addEventListener('click', submitFullExam);
+};
+
+window.submitFullExam = function() {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'تأكيد الإنهاء',
+            text: 'هل أنت متأكد من رغبتك في إنهاء الاختبار وحفظ الإجابات؟',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0f2b46',
+            confirmButtonText: 'نعم، قم بالإنهاء',
+            cancelButtonText: 'تراجع'
+        }).then(result => {
+            if (result.isConfirmed) processExamSubmission();
+        });
+    } else {
+        if(confirm('هل أنت متأكد من رغبتك في إنهاء الاختبار؟')) {
+            processExamSubmission();
+        }
+    }
+};
+
+window.processExamSubmission = function() {
+    clearInterval(quizTimer);
+    score = 0;
+    userAnswers = [];
+    
+    currentQuiz.questions.forEach((q, idx) => {
+        let studentAns;
+        if (q.type === 'essay') {
+            studentAns = document.getElementById(`essay-ans-${idx}`).value.trim();
+            userAnswers.push(studentAns);
+            score++; 
+            document.getElementById(`essay-ans-${idx}`).disabled = true;
+            
+            if (q.explain && q.explain !== "undefined") {
+                const expArea = document.getElementById(`q-exp-${idx}`);
+                expArea.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info"><i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>Answer:</strong><p class="mb-0 mt-2 text-dark lh-lg">${q.explain}</p></div>`;
+                expArea.classList.remove('d-none');
+            }
+        } else {
+            const selectedRadio = document.querySelector(`input[name="q-${idx}"]:checked`);
+            studentAns = selectedRadio ? parseInt(selectedRadio.value) : -1;
+            userAnswers.push(studentAns);
+            
+            const optsContainer = document.getElementById(`q-opts-${idx}`);
+            const labels = optsContainer.querySelectorAll('.option-label');
+            
+            labels.forEach((lbl, optIdx) => {
+                lbl.classList.remove('btn-outline-secondary');
+                const radio = lbl.querySelector('input');
+                radio.disabled = true;
+                
+                if (optIdx === q.correct) {
+                    lbl.classList.add('bg-success', 'text-white', 'border-success'); 
+                }
+                
+                if (optIdx === studentAns && studentAns !== q.correct) {
+                    lbl.classList.add('bg-danger', 'text-white', 'border-danger'); 
+                }
+                
+                if (optIdx !== q.correct && optIdx !== studentAns) {
+                    lbl.classList.add('bg-light', 'text-muted');
+                }
+            });
+            
+            if (studentAns === q.correct) score++;
+            
+            if (q.explain && q.explain !== "undefined") {
+                const expArea = document.getElementById(`q-exp-${idx}`);
+                expArea.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2"><i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>Answer:</strong><p class="mb-0 mt-2 text-dark lh-lg">${q.explain}</p></div>`;
+                expArea.classList.remove('d-none');
+            }
         }
     });
     
-    qArea.appendChild(nextBtn);
+    const submitBtn = document.getElementById('submit-full-exam-btn');
+    submitBtn.innerHTML = 'الذهاب إلى النتيجة النهائية <i class="fa-solid fa-arrow-left ms-2"></i>';
+    submitBtn.style.backgroundColor = '#198754'; // success
+    submitBtn.removeEventListener('click', submitFullExam);
+    submitBtn.addEventListener('click', showQuizResults);
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (typeof Swal !== 'undefined') {
+        Swal.fire('اكتمل التصحيح!', 'تم تصحيح جميع الأسئلة تلقائياً. راجع أخطاءك ثم انتقل للنتيجة النهائية.', 'success');
+    } else {
+        showToast("تم التصحيح!", "success");
+    }
 }
 
 function showQuizResults() {
