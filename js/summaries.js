@@ -171,10 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     subjectSummaries.forEach(doc => {
                         const fileUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${doc.file_id}/view?project=6a0f923e00138d15d172`;
                         
-                        // زر الحذف للهيئة فقط
-                        let deleteBtnHtml = '';
+                        // أزرار التحكم للهيئة فقط
+                        let actionsHtml = '';
                         if (isFaculty) {
-                            deleteBtnHtml = `<button class="btn btn-sm btn-outline-danger ms-2 delete-summary-btn" data-doc-id="${doc.$id}" data-file-id="${doc.file_id}" title="حذف الملخص"><i class="fa-solid fa-trash"></i></button>`;
+                            actionsHtml = `
+                                <button class="btn btn-sm btn-outline-warning ms-1 edit-summary-btn" data-doc-id="${doc.$id}" data-student-name="${doc.student_name}" data-subject-id="${doc.subject_id}" data-file-id="${doc.file_id}" title="تعديل تفاصيل الملف"><i class="fa-solid fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger ms-1 delete-summary-btn" data-doc-id="${doc.$id}" data-file-id="${doc.file_id}" title="حذف الملخص"><i class="fa-solid fa-trash"></i></button>
+                            `;
                         }
 
                         let dateStr = doc.$createdAt ? new Date(doc.$createdAt).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' }) : '';
@@ -189,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-primary rounded-circle" title="عرض الملف">
                                         <i class="fa-solid fa-download"></i>
                                     </a>
-                                    ${deleteBtnHtml}
+                                    ${actionsHtml}
                                 </div>
                             </li>
                         `;
@@ -218,12 +221,61 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
-                // تفعيل أحداث أزرار الحذف (إن وجدت)
+                // تفعيل أحداث الأزرار للهيئة
                 document.querySelectorAll('.delete-summary-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const docId = btn.getAttribute('data-doc-id');
                         const fileId = btn.getAttribute('data-file-id');
                         await deleteSummary(docId, fileId, level);
+                    });
+                });
+
+                document.querySelectorAll('.edit-summary-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const docId = btn.getAttribute('data-doc-id');
+                        const currentStudentName = btn.getAttribute('data-student-name') || '';
+                        const currentSubjectId = btn.getAttribute('data-subject-id');
+                        
+                        const { value: formValues } = await Swal.fire({
+                            title: 'تعديل تفاصيل الملف',
+                            html:
+                                `<label class="d-block text-start mb-1 fw-bold">اسم المقرر:</label>
+                                <select id="swal-edit-subject" class="swal2-select w-100 mb-3" style="font-size: 1rem;">
+                                    ${subjects.map(s => `<option value="${s.id}" ${s.id === currentSubjectId ? 'selected' : ''}>${s.name}</option>`).join('')}
+                                </select>
+                                <label class="d-block text-start mb-1 fw-bold">اسم الناشر:</label>
+                                <input id="swal-edit-student" class="swal2-input w-100 m-0" placeholder="اسم الطالب" value="${currentStudentName}">`,
+                            focusConfirm: false,
+                            showCancelButton: true,
+                            confirmButtonText: 'حفظ التعديلات',
+                            cancelButtonText: 'إلغاء',
+                            preConfirm: () => {
+                                return {
+                                    subject_id: document.getElementById('swal-edit-subject').value,
+                                    student_name: document.getElementById('swal-edit-student').value.trim() || 'طالب'
+                                }
+                            }
+                        });
+
+                        if (formValues) {
+                            try {
+                                Swal.fire({ title: 'جاري التعديل...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                                await window.AppwriteDB.updateDocument(
+                                    window.DB_CONFIG.dbId,
+                                    window.DB_CONFIG.summariesCol,
+                                    docId,
+                                    {
+                                        subject_id: formValues.subject_id,
+                                        student_name: formValues.student_name
+                                    }
+                                );
+                                Swal.fire('تم التعديل!', 'تم تحديث البيانات بنجاح.', 'success');
+                                fetchAndRenderSummaries(level);
+                            } catch (error) {
+                                console.error('Edit error:', error);
+                                Swal.fire('خطأ!', 'حدث خطأ أثناء التعديل.', 'error');
+                            }
+                        }
                     });
                 });
             }
