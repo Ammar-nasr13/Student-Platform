@@ -1318,7 +1318,23 @@ window.loginFaculty = async function() {
         
     } catch (err) {
         console.error('Auth Error:', err);
-        errorEl.textContent = 'سبب الرفض من السيرفر: ' + err.message;
+        const errStr = String(err).toLowerCase();
+        
+        if (errStr.includes('fetch') || errStr.includes('network')) {
+            errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1 mb-2 fs-5"></i><br><b>تم رفض الاتصال (CORS Error)</b><br><small>يرجى إضافة الدومين الحالي للموقع (الرابط بالكامل) داخل قسم <b>Platforms</b> في لوحة تحكم Appwrite.</small>';
+        } else if (errStr.includes('session')) {
+            errorEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i> أنت مسجل الدخول بالفعل! جاري توجيهك...';
+            setTimeout(() => {
+                localStorage.setItem('is_faculty', 'true');
+                errorEl.classList.add('d-none');
+                closeAuthGateway();
+                updateUIForFaculty();
+            }, 1500);
+            return;
+        } else {
+            errorEl.innerHTML = '<i class="fa-solid fa-circle-xmark me-1 mb-1 fs-6"></i><br>بيانات الدخول غير صحيحة، أو الحساب غير موجود.';
+        }
+        
         errorEl.classList.remove('d-none');
     } finally {
         if (loginBtn) {
