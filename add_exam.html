@@ -244,10 +244,35 @@
                     <div id="area-essay" class="d-none">
                         <div class="alert alert-info small">الأسئلة المقالية سيتم توفير مساحة نصية للطالب للإجابة عليها، ويقوم الأستاذ بمراجعتها لاحقاً.</div>
                     </div>
+
+                    <!-- Explanation Area -->
+                    <div id="area-explain" class="mt-4 border-top pt-3">
+                        <label class="form-label fw-bold" style="color: #0f2b46;"><i class="fa-solid fa-lightbulb text-warning me-1"></i> معلومة وشرح (اختياري):</label>
+                        <p class="text-muted small mb-2">أضف إجابة نموذجية أو شرح إضافي يظهر للطالب بعد الإجابة على السؤال.</p>
+                        <textarea class="form-control border-info" id="q-explain" rows="3" placeholder="اكتب الشرح هنا..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer border-0 bg-light rounded-bottom-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <button type="button" class="btn btn-primary fw-bold" onclick="saveQuestion()">إضافة للقائمة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Student Details -->
+    <div class="modal fade" id="studentDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header text-white border-0 d-flex justify-content-between align-items-center bg-success">
+                    <h5 class="modal-title fw-bold m-0">تفاصيل إجابات الطالب <i class="fa-solid fa-user-graduate ms-2"></i></h5>
+                    <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal" style="margin-left: 0 !important; margin-right: auto !important;"></button>
+                </div>
+                <div class="modal-body p-4" id="student-details-body">
+                    <!-- Content injected by JS -->
+                </div>
+                <div class="modal-footer border-0 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">إغلاق</button>
                 </div>
             </div>
         </div>

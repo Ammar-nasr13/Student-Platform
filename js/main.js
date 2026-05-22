@@ -969,6 +969,8 @@ function initQuizPageEvents() {
     
     examSelect.addEventListener('change', () => {
         startBtn.disabled = !examSelect.value;
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        if (downloadPdfBtn) downloadPdfBtn.disabled = !examSelect.value;
     });
 
     startBtn.addEventListener('click', () => {
@@ -989,6 +991,94 @@ function initQuizPageEvents() {
 
         startQuiz(level, subjectId, examIndex);
     });
+
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
+    if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', () => {
+            const level = levelSelect.value;
+            const subjectId = subjectSelect.value;
+            const examIndex = examSelect.value;
+            downloadExamPDF(level, subjectId, examIndex);
+        });
+    }
+}
+
+function downloadExamPDF(level, subjectId, examIndex) {
+    const examsList = window.currentSubjectExams || [];
+    let data = examsList[examIndex];
+    if (!data) return;
+    
+    let questions = data.questions;
+    if (typeof questions === 'string') {
+        questions = JSON.parse(questions);
+    }
+    
+    const subjectSelect = document.getElementById('quiz-subject-select');
+    let subjectName = subjectSelect.options[subjectSelect.selectedIndex].text;
+
+    let printWin = window.open('', '_blank');
+    let html = `
+    <html dir="rtl" lang="ar">
+    <head>
+        <title>${data.title} - ${subjectName}</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; }
+            .header { text-align: center; border-bottom: 2px solid #0f2b46; padding-bottom: 20px; margin-bottom: 30px; }
+            .header img { max-height: 80px; }
+            .header h1 { color: #0f2b46; margin: 10px 0; }
+            .header h3 { color: #555; margin: 5px 0; }
+            .question-box { margin-bottom: 25px; page-break-inside: avoid; }
+            .question-text { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+            .options-list { margin-right: 20px; }
+            .option-item { margin-bottom: 8px; font-size: 16px; }
+            .circle { display: inline-block; width: 15px; height: 15px; border: 1px solid #333; border-radius: 50%; margin-left: 10px; position: relative; top: 2px; }
+            .essay-lines { margin-top: 15px; border-bottom: 1px dashed #ccc; height: 30px; width: 100%; }
+            .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #888; }
+            @media print {
+                @page { margin: 1.5cm; }
+                body { padding: 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>جامعة المنيا - كلية السياحة والفنادق</h1>
+            <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>
+            <h2>${subjectName} - ${data.title}</h2>
+        </div>
+        <div class="content">
+    `;
+    
+    questions.forEach((q, idx) => {
+        html += \`<div class="question-box">
+                    <div class="question-text">\${idx + 1}. \${q.q}</div>
+                    <div class="options-list">\`;
+        
+        if (q.type === 'mcq' || q.type === 'tf') {
+            q.options.forEach(opt => {
+                html += \`<div class="option-item"><span class="circle"></span> \${opt}</div>\`;
+            });
+        } else if (q.type === 'essay') {
+            html += \`<div class="essay-lines"></div><div class="essay-lines"></div><div class="essay-lines"></div>\`;
+        }
+        
+        html += \`   </div>
+                 </div>\`;
+    });
+    
+    html += `
+        </div>
+        <div class="footer">
+            تم إنشاء هذا الاختبار عبر منصة الطلاب - قسم تكنولوجيا السياحة والضيافة
+        </div>
+        <script>
+            window.onload = function() { window.print(); }
+        </script>
+    </body>
+    </html>`;
+    
+    printWin.document.write(html);
+    printWin.document.close();
 }
 
 function startQuiz(level, subjectId, examIndex) {
@@ -1109,11 +1199,14 @@ function submitAnswer(selectedIndex) {
     const question = currentQuiz.questions[currentQuestionIndex];
     const correctIdx = question.correct;
 
-    userAnswers.push(selectedIndex);
-
     if (question.type === 'essay') {
         const textInput = document.getElementById('essay-answer-input');
-        if (textInput) textInput.disabled = true;
+        if (textInput) {
+            textInput.disabled = true;
+            userAnswers.push(textInput.value); // Save essay text
+        } else {
+            userAnswers.push(selectedIndex);
+        }
         
         const submitBtn = document.querySelector('#options-container .btn-primary');
         if (submitBtn) submitBtn.disabled = true;
@@ -1121,6 +1214,7 @@ function submitAnswer(selectedIndex) {
         showToast("تم تسجيل الإجابة بنجاح!", "success");
         score++; // Essay counts as correct for the sake of the automated score
     } else {
+        userAnswers.push(selectedIndex);
         const buttons = document.querySelectorAll('#options-container .option-btn');
 
         buttons.forEach((btn, idx) => {
@@ -1145,16 +1239,24 @@ function submitAnswer(selectedIndex) {
 
     // عرض التفسير أو الإجابة الصحيحة
     const qArea = document.getElementById('question-area');
-    const explanationDiv = document.createElement('div');
-    explanationDiv.className = 'alert alert-info mt-3 animated-fade-in';
-    explanationDiv.innerHTML = `
-        <strong>💡 معلومة وشرح:</strong> ${question.explain}
-    `;
-    qArea.appendChild(explanationDiv);
+    if (question.explain && question.explain !== "undefined") {
+        const explanationDiv = document.createElement('div');
+        explanationDiv.className = 'alert alert-info mt-3 animated-fade-in shadow-sm rounded-3 border-0 border-end border-4 border-info';
+        explanationDiv.innerHTML = `
+            <div class="d-flex align-items-center mb-2">
+                <i class="fa-solid fa-lightbulb text-warning fs-5 me-2"></i>
+                <strong class="text-info fs-6">معلومة وشرح:</strong>
+            </div>
+            <p class="m-0 text-dark fw-medium lh-lg">${question.explain}</p>
+        `;
+        qArea.appendChild(explanationDiv);
+    }
 
     // إضافة زر الانتقال التالي
     const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn btn-gold w-100 mt-3 py-2 fw-bold';
+    nextBtn.className = 'btn w-100 mt-3 py-2 fw-bold shadow-sm text-white';
+    nextBtn.style.backgroundColor = '#0f2b46';
+    nextBtn.style.borderRadius = '8px';
     
     const isLast = (currentQuestionIndex === currentQuiz.questions.length - 1);
     nextBtn.textContent = isLast ? 'عرض النتيجة النهائية' : 'السؤال التالي';
@@ -1189,7 +1291,8 @@ function showQuizResults() {
             subjectName: currentQuiz.subject_id || "غير معروف",
             level: currentQuiz.level ? currentQuiz.level.toString() : "غير محدد",
             score: score,
-            totalScore: totalQs
+            totalScore: totalQs,
+            details: JSON.stringify({ userAnswers: userAnswers, quiz: currentQuiz })
         };
         
         window.AppwriteDB.createDocument(
@@ -1198,9 +1301,21 @@ function showQuizResults() {
             window.AppwriteID.unique(),
             resultData
         ).then(() => {
-            console.log("تم حفظ النتيجة بنجاح في قاعدة البيانات.");
+            console.log("تم حفظ النتيجة مع التفاصيل بنجاح.");
         }).catch(err => {
-            console.error("خطأ أثناء حفظ النتيجة:", err);
+            console.error("خطأ أثناء حفظ النتيجة بالتفاصيل، محاولة الحفظ بدون التفاصيل...", err);
+            // Fallback in case "details" attribute doesn't exist yet in the database
+            delete resultData.details;
+            window.AppwriteDB.createDocument(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.resultsCol,
+                window.AppwriteID.unique(),
+                resultData
+            ).then(() => {
+                console.log("تم حفظ النتيجة المصغرة بنجاح.");
+            }).catch(e => {
+                console.error("فشل الحفظ النهائي:", e);
+            });
         });
     }
 
