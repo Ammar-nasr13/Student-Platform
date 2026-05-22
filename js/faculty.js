@@ -187,19 +187,7 @@ if (addExamForm) {
     });
 }
 
-window.logoutFaculty = async function() {
-    try {
-        if (window.AppwriteAccount) {
-            await window.AppwriteAccount.deleteSession('current');
-        }
-    } catch(err) {
-        console.error(err);
-    }
-    localStorage.removeItem('is_faculty');
-    window.location.href = 'index.html';
-};
-
-
+// Logout logic moved to main.js to be globally accessible
 // Render uploaded exams table
 async function renderManageExams() {
     const tbody = document.getElementById('manage-exams-list');

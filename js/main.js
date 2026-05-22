@@ -1269,6 +1269,11 @@ function checkAuthSession() {
 
 window.selectRole = function(role) {
     if (role === 'student') {
+        // If they choose student, make sure they are completely logged out of faculty role
+        localStorage.removeItem('is_faculty');
+        const navAddExam = document.getElementById('nav-add-exam');
+        if (navAddExam) navAddExam.remove();
+        
         closeAuthGateway();
     } else if (role === 'faculty') {
         // If already logged in as faculty, skip the password screen and just enter
@@ -1279,6 +1284,30 @@ window.selectRole = function(role) {
             document.getElementById('auth-role-selection').classList.add('d-none');
             document.getElementById('auth-faculty-login').classList.remove('d-none');
         }
+    }
+};
+
+window.logoutFaculty = async function() {
+    try {
+        if (window.AppwriteAccount) {
+            await window.AppwriteAccount.deleteSession('current');
+        }
+    } catch(err) {
+        console.error("Logout error:", err);
+    }
+    localStorage.removeItem('is_faculty');
+    // Remove UI button and show gateway
+    const navAddExam = document.getElementById('nav-add-exam');
+    if (navAddExam) navAddExam.remove();
+    
+    // Show gateway if on index
+    const gateway = document.getElementById('auth-gateway');
+    if (gateway) {
+        gateway.classList.remove('d-none', 'fade-out');
+        document.getElementById('auth-role-selection').classList.remove('d-none');
+        document.getElementById('auth-faculty-login').classList.add('d-none');
+    } else {
+        window.location.href = 'index.html';
     }
 };
 
