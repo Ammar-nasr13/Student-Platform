@@ -336,6 +336,19 @@ function initLevelPagesEvents() {
             showToast(`تمت إضافة [${t}] إلى المفضلة ⭐`, "success")),
           localStorage.setItem("fav_courses", JSON.stringify(o)));
       }));
+    // Open syllabus modal on card click
+    e.style.cursor = "pointer";
+    e.addEventListener("click", () => {
+      openSyllabusModal(n);
+    });
+
+    // Prevent propagation on download buttons
+    e.querySelectorAll("a.btn-primary, a.btn-sm").forEach((btn) => {
+      btn.addEventListener("click", (evt) => {
+        evt.stopPropagation();
+      });
+    });
+
     const o = e.querySelector(".d-flex.gap-2");
     if (o) {
       let e = o.querySelector(".complete-toggle-btn");
@@ -349,6 +362,7 @@ function initLevelPagesEvents() {
           (e.innerHTML = '<i class="fa-solid fa-circle-check"></i> مكتمل')),
           e.addEventListener("click", (s) => {
             s.preventDefault();
+            s.stopPropagation();
             "true" === localStorage.getItem(`complete_${n}`)
               ? (localStorage.setItem(`complete_${n}`, "false"),
                 e.classList.remove("is-complete"),

@@ -148,8 +148,6 @@ function initQuizPageEvents() {
     }),
     n.addEventListener("change", () => {
       s.disabled = !n.value;
-      const e = document.getElementById("download-pdf-btn");
-      e && (e.disabled = !n.value);
     }),
     s.addEventListener("click", () => {
       const s = e.value,
@@ -170,36 +168,6 @@ function initQuizPageEvents() {
       }
       startQuiz(s, o, i);
     }));
-  const o = document.getElementById("download-pdf-btn");
-  o &&
-    o.addEventListener("click", () => {
-      downloadExamPDF(e.value, t.value, n.value);
-    });
-}
-function downloadExamPDF(e, t, n) {
-  let s = (window.currentSubjectExams || [])[n];
-  if (!s) return;
-  let o = s.questions;
-  "string" == typeof o && (o = JSON.parse(o));
-  const i = document.getElementById("quiz-subject-select");
-  let a = i.options[i.selectedIndex].text,
-    l = window.open("", "_blank"),
-    d = `\n    <html dir="ltr" lang="en">\n    <head>\n        <title>${s.title} - ${a}</title>\n        <style>\n            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; }\n            .header { text-align: center; border-bottom: 2px solid #0f2b46; padding-bottom: 20px; margin-bottom: 30px; }\n            .header img { max-height: 80px; }\n            .header h1 { color: #0f2b46; margin: 10px 0; }\n            .header h3 { color: #555; margin: 5px 0; }\n            .question-box { margin-bottom: 25px; page-break-inside: avoid; text-align: left; }\n            .question-text { font-size: 18px; font-weight: bold; margin-bottom: 10px; font-family: sans-serif; }\n            .options-list { margin-left: 20px; text-align: left; }\n            .option-item { margin-bottom: 8px; font-size: 16px; font-family: sans-serif; }\n            .circle { display: inline-block; width: 15px; height: 15px; border: 1px solid #333; border-radius: 50%; margin-right: 10px; position: relative; top: 2px; }\n            .essay-lines { margin-top: 15px; border-bottom: 1px dashed #ccc; height: 30px; width: 100%; }\n            .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #888; }\n            @media print {\n                @page { margin: 1.5cm; }\n                body { padding: 0; }\n            }\n        </style>\n    </head>\n    <body>\n        <div class="header">\n            <h1>جامعة المنيا - كلية السياحة والفنادق</h1>\n            <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>\n            <h2>${a} - ${s.title}</h2>\n        </div>\n        <div class="content">\n    `;
-  (o.forEach((e, t) => {
-    ((d += `<div class="question-box">\n                    <div class="question-text">${t + 1}. ${e.q}</div>\n                    <div class="options-list">`),
-      "mcq" === e.type || "tf" === e.type
-        ? e.options.forEach((e) => {
-            d += `<div class="option-item"><span class="circle"></span> ${e}</div>`;
-          })
-        : "essay" === e.type &&
-          (d +=
-            '<div class="essay-lines"></div><div class="essay-lines"></div><div class="essay-lines"></div>'),
-      (d += "   </div>\n                 </div>"));
-  }),
-    (d +=
-      '\n        </div>\n        <div class="footer">\n            تم إنشاء هذا الاختبار عبر منصة الطلاب - قسم تكنولوجيا السياحة والضيافة\n        </div>\n        <script>\n            window.onload = function() { window.print(); }\n        <\/script>\n    </body>\n    </html>'),
-    l.document.write(d),
-    l.document.close());
 }
 function startQuiz(e, t, n) {
   let s = (window.currentSubjectExams || [])[n];
@@ -256,6 +224,30 @@ function downloadSolvedExamPDF() {
   let questions = currentQuiz.questions;
   if (typeof questions === "string") {
     questions = JSON.parse(questions);
+  }
+  
+  // Security check: Verify if all questions were answered
+  let allAnswered = true;
+  questions.forEach((q, idx) => {
+    const uAns = userAnswers[idx];
+    if (q.type === 'mcq' || q.type === 'tf') {
+      if (uAns === undefined || uAns === null || uAns === -1) {
+        allAnswered = false;
+      }
+    } else if (q.type === 'essay') {
+      if (!uAns || uAns.trim() === "") {
+        allAnswered = false;
+      }
+    }
+  });
+
+  if (!allAnswered) {
+    if ("undefined" != typeof Swal) {
+      Swal.fire("تنبيه", "عذراً، لا يمكن تحميل أو طباعة ملف PDF إلا بعد إنهاء حل جميع الأسئلة بالكامل.", "error");
+    } else {
+      alert("عذراً، لا يمكن تحميل أو طباعة ملف PDF إلا بعد إنهاء حل جميع الأسئلة بالكامل.");
+    }
+    return;
   }
   
   const levelText = currentQuiz.level ? `المستوى ${currentQuiz.level}` : "";
@@ -420,8 +412,30 @@ function showQuizResults() {
             }));
       });
   }
-  let s = "",
-    o = "";
+  let allAnswered = true;
+  if (currentQuiz && currentQuiz.questions) {
+    currentQuiz.questions.forEach((q, idx) => {
+      const uAns = userAnswers[idx];
+      if (q.type === 'mcq' || q.type === 'tf') {
+        if (uAns === undefined || uAns === null || uAns === -1) {
+          allAnswered = false;
+        }
+      } else if (q.type === 'essay') {
+        if (!uAns || uAns.trim() === "") {
+          allAnswered = false;
+        }
+      }
+    });
+  }
+
+  let pdfBtnHTML = '';
+  if (allAnswered) {
+    pdfBtnHTML = `<button class="btn btn-success px-4 py-2" onclick="downloadSolvedExamPDF()"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات PDF</button>`;
+  } else {
+    pdfBtnHTML = `<button class="btn btn-secondary px-4 py-2" disabled title="يجب حل جميع الأسئلة بالكامل أولاً"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات غير متاح</button>
+                  <div class="w-100 text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i> تحميل ملف الـ PDF متاح فقط بعد حل جميع أسئلة الاختبار بالكامل (انتهى وقت الاختبار قبل إتمام الإجابات).</div>`;
+  }
+
   (n >= 85
     ? ((s = "ممتاز جداً! أنت مستعد تماماً للامتحانات النهائية 🌟"),
       (o = "alert-success"))
@@ -431,7 +445,7 @@ function showQuizResults() {
       : ((s =
           "تحتاج إلى قراءة المادة والمحاضرات بشكل أكبر. حاول مرة أخرى لرفع مستواك 📚"),
         (o = "alert-danger")),
-    (e.innerHTML = `\n        <div class="text-center p-4">\n            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>\n            <h3 class="fw-bold text-primary">اكتمل الاختبار!</h3>\n            <p class="fs-5 text-muted mb-4">لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong></p>\n            \n            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">\n                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" \n                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">\n                     ${n}%\n                </div>\n            </div>\n\n            <div class="alert ${o} py-3 mb-4">\n                ${s}\n            </div>\n\n            <div class="d-flex gap-2 flex-wrap justify-content-center">\n                <button class="btn btn-success px-4 py-2" onclick="downloadSolvedExamPDF()"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات PDF</button>\n                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>إعادة الاختبار</button>\n                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>شاشة الاختيار</button>\n            </div>\n        </div>\n    `));
+    (e.innerHTML = `\n        <div class="text-center p-4">\n            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>\n            <h3 class="fw-bold text-primary">اكتمل الاختبار!</h3>\n            <p class="fs-5 text-muted mb-4">لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong></p>\n            \n            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">\n                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" \n                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">\n                     ${n}%\n                </div>\n            </div>\n\n            <div class="alert ${o} py-3 mb-4">\n                ${s}\n            </div>\n\n            <div class="d-flex gap-2 flex-wrap justify-content-center align-items-center">\n                ${pdfBtnHTML}\n                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>إعادة الاختبار</button>\n                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>شاشة الاختيار</button>\n            </div>\n        </div>\n    `));
 }
 function restartQuiz() {
   (document.getElementById("quiz-result").classList.add("d-none"),
@@ -477,6 +491,35 @@ window.renderAllQuestions = function () {
         .addEventListener("click", submitFullExam));
   }
 window.submitFullExam = function () {
+    if (!currentQuiz) return;
+    
+    // Check if there are any unanswered questions
+    let unansweredCount = 0;
+    currentQuiz.questions.forEach((e, t) => {
+      if ("essay" === e.type) {
+        const val = document.getElementById(`essay-ans-${t}`).value.trim();
+        if (!val) unansweredCount++;
+      } else {
+        const radio = document.querySelector(`input[name="q-${t}"]:checked`);
+        if (!radio) unansweredCount++;
+      }
+    });
+
+    if (unansweredCount > 0) {
+      if ("undefined" != typeof Swal) {
+        Swal.fire({
+          title: "لم تكتمل الإجابات",
+          text: `يرجى الإجابة على جميع الأسئلة أولاً! (متبقي ${unansweredCount} سؤال بدون إجابة) لتتمكن من إنهاء الاختبار وتحميل ملف الـ PDF.`,
+          icon: "warning",
+          confirmButtonColor: "#0f2b46",
+          confirmButtonText: "موافق، سأكمل الحل"
+        });
+      } else {
+        alert(`يرجى الإجابة على جميع الأسئلة أولاً! (متبقي ${unansweredCount} سؤال بدون إجابة) لتتمكن من إنهاء الاختبار وتحميل ملف الـ PDF.`);
+      }
+      return;
+    }
+
     "undefined" != typeof Swal
       ? Swal.fire({
           title: "تأكيد الإنهاء",
@@ -560,7 +603,6 @@ window.processExamSubmission = function () {
 
 // Attach variables and functions to window for global access
 window.initQuizPageEvents = initQuizPageEvents;
-window.downloadExamPDF = downloadExamPDF;
 window.downloadSolvedExamPDF = downloadSolvedExamPDF;
 window.startQuiz = startQuiz;
 window.resetTimer = resetTimer;
