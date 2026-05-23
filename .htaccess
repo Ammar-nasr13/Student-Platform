@@ -57,7 +57,7 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-    <filesMatch ".(webp|css|js|png|jpg|jpeg|gif|ico|woff2)$">
+    <FilesMatch "\.(webp|css|js|png|jpg|jpeg|gif|ico|woff2)$">
         Header set Cache-Control "max-age=31536000, public"
-    </filesMatch>
+    </FilesMatch>
 </IfModule>
