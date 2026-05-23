@@ -251,6 +251,130 @@ function updateTimerUI() {
       : e.classList.remove("text-danger", "fw-bold");
   }
 }
+function downloadSolvedExamPDF() {
+  if (!currentQuiz) return;
+  let questions = currentQuiz.questions;
+  if (typeof questions === "string") {
+    questions = JSON.parse(questions);
+  }
+  
+  const levelText = currentQuiz.level ? `المستوى ${currentQuiz.level}` : "";
+  const studentName = window.currentStudentName || "طالب مجهول";
+  const dateStr = new Date().toLocaleDateString('ar-EG', { dateStyle: 'long' });
+  const finalScore = `${score} من ${questions.length}`;
+  const percentage = Math.round((score / questions.length) * 100);
+
+  let win = window.open("", "_blank");
+  let html = `
+    <html dir="rtl" lang="ar">
+    <head>
+        <title>تقرير نتائج الاختبار - ${currentQuiz.title}</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; direction: rtl; text-align: right; }
+            .header { text-align: center; border-bottom: 3px double #0f2b46; padding-bottom: 20px; margin-bottom: 30px; }
+            .header h1 { color: #0f2b46; margin: 10px 0; font-size: 24px; }
+            .header h3 { color: #555; margin: 5px 0; font-size: 18px; }
+            .meta-info { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+            .meta-item { font-size: 15px; }
+            .meta-item strong { color: #0f2b46; }
+            .score-badge { font-size: 18px; font-weight: bold; color: #198754; text-align: center; margin-bottom: 30px; padding: 10px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9; }
+            .question-box { margin-bottom: 30px; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+            .question-text { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; }
+            .options-list { margin-right: 20px; list-style: none; padding: 0; }
+            .option-item { margin-bottom: 8px; font-size: 15px; padding: 8px 12px; border-radius: 4px; display: flex; align-items: center; }
+            .option-correct { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; font-weight: bold; }
+            .option-incorrect { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+            .option-unselected { color: #555; }
+            .explain-box { margin-top: 12px; background-color: #e2f0d9; border-right: 4px solid #70ad47; padding: 10px 15px; font-size: 14px; border-radius: 0 4px 4px 0; }
+            .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 15px; }
+            @media print {
+                @page { margin: 1.5cm; }
+                body { padding: 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>جامعة المنيا - كلية السياحة والفنادق</h1>
+            <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>
+            <h2>تقرير نتائج الاختبار: ${currentQuiz.title}</h2>
+        </div>
+        
+        <div class="meta-info">
+            <div class="meta-item"><strong>اسم الطالب:</strong> ${studentName}</div>
+            <div class="meta-item"><strong>المستوى:</strong> ${levelText}</div>
+            <div class="meta-item"><strong>التاريخ:</strong> ${dateStr}</div>
+        </div>
+
+        <div class="score-badge">
+            النتيجة النهائية: ${finalScore} (${percentage}%)
+        </div>
+
+        <div class="content">
+  `;
+
+  questions.forEach((q, idx) => {
+    const userAnswerIdx = userAnswers[idx];
+    const correctIdx = q.correct;
+    
+    html += `
+        <div class="question-box">
+            <div class="question-text">${idx + 1}. ${q.q}</div>
+            <ul class="options-list">
+    `;
+
+    if (q.type === 'mcq' || q.type === 'tf') {
+      q.options.forEach((opt, optIdx) => {
+        let classStr = "option-unselected";
+        let marker = "";
+        
+        if (optIdx === correctIdx) {
+          classStr = "option-correct";
+          marker = " [الإجابة الصحيحة ✔️]";
+        } else if (optIdx === userAnswerIdx && userAnswerIdx !== correctIdx) {
+          classStr = "option-incorrect";
+          marker = " [إجابتك ❌]";
+        }
+
+        html += `<li class="option-item ${classStr}">${opt}${marker}</li>`;
+      });
+    } else if (q.type === 'essay') {
+      html += `
+        <div style="margin-top: 10px; font-style: italic; color: #555;">
+            <strong>إجابتك:</strong> ${userAnswerIdx || "لم يتم كتابة إجابة"}
+        </div>
+      `;
+    }
+
+    html += `</ul>`;
+
+    if (q.explain && q.explain !== "undefined") {
+      html += `
+        <div class="explain-box">
+            <strong>الشرح / التفسير:</strong> ${q.explain}
+        </div>
+      `;
+    }
+
+    html += `</div>`;
+  });
+
+  html += `
+        </div>
+        <div class="footer">
+            تم إنشاء وتصحيح هذا التقرير عبر المنصة التعليمية لقسم تكنولوجيا السياحة والضيافة - جامعة المنيا
+        </div>
+        <script>
+            window.onload = function() { window.print(); }
+        <\/script>
+    </body>
+    </html>
+  `;
+
+  win.document.write(html);
+  win.document.close();
+}
+
 function showQuizResults() {
   document.getElementById("quiz-play").classList.add("d-none");
   const e = document.getElementById("quiz-result");
@@ -307,7 +431,7 @@ function showQuizResults() {
       : ((s =
           "تحتاج إلى قراءة المادة والمحاضرات بشكل أكبر. حاول مرة أخرى لرفع مستواك 📚"),
         (o = "alert-danger")),
-    (e.innerHTML = `\n        <div class="text-center p-4">\n            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>\n            <h3 class="fw-bold text-primary">اكتمل الاختبار!</h3>\n            <p class="fs-5 text-muted mb-4">لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong></p>\n            \n            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">\n                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" \n                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">\n                     ${n}%\n                </div>\n            </div>\n\n            <div class="alert ${o} py-3 mb-4">\n                ${s}\n            </div>\n\n            <div class="d-flex gap-3 justify-content-center">\n                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>إعادة الاختبار</button>\n                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>شاشة الاختيار</button>\n            </div>\n        </div>\n    `));
+    (e.innerHTML = `\n        <div class="text-center p-4">\n            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>\n            <h3 class="fw-bold text-primary">اكتمل الاختبار!</h3>\n            <p class="fs-5 text-muted mb-4">لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong></p>\n            \n            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">\n                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" \n                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">\n                     ${n}%\n                </div>\n            </div>\n\n            <div class="alert ${o} py-3 mb-4">\n                ${s}\n            </div>\n\n            <div class="d-flex gap-2 flex-wrap justify-content-center">\n                <button class="btn btn-success px-4 py-2" onclick="downloadSolvedExamPDF()"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات PDF</button>\n                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>إعادة الاختبار</button>\n                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>شاشة الاختيار</button>\n            </div>\n        </div>\n    `));
 }
 function restartQuiz() {
   (document.getElementById("quiz-result").classList.add("d-none"),
@@ -437,6 +561,7 @@ window.processExamSubmission = function () {
 // Attach variables and functions to window for global access
 window.initQuizPageEvents = initQuizPageEvents;
 window.downloadExamPDF = downloadExamPDF;
+window.downloadSolvedExamPDF = downloadSolvedExamPDF;
 window.startQuiz = startQuiz;
 window.resetTimer = resetTimer;
 window.updateTimerUI = updateTimerUI;

@@ -79,8 +79,74 @@ body.dark-theme .table-responsive::-webkit-scrollbar-thumb {
     scrollbar-color: var(--primary-light) rgba(0, 0, 0, 0.05) !important;
     -webkit-overflow-scrolling: touch !important;
     border-radius: 12px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
 }
 body.dark-theme .table-responsive {
     scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Responsive tables and quiz page optimizations on mobile */
+@media (max-width: 768px) {
+    .table-custom {
+        min-width: 650px !important;
+    }
+    
+    .quiz-body {
+        padding: 1.25rem !important;
+    }
+    .quiz-header {
+        padding: 1.25rem !important;
+    }
+    .question-block {
+        padding: 1.25rem 1rem !important;
+        margin-bottom: 2rem !important;
+    }
+    .question-text {
+        font-size: 1.1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    .option-label {
+        display: flex !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        padding: 12px 15px !important;
+        font-size: 0.95rem !important;
+        gap: 10px !important;
+    }
+    .option-label input[type="radio"] {
+        margin-top: 4px !important;
+        flex-shrink: 0 !important;
+    }
+    .option-label span.badge {
+        flex-shrink: 0 !important;
+    }
+
+    /* Additional Mobile Polish Rules */
+    .page-header {
+        padding: 3rem 0 2.5rem 0 !important;
+        margin-bottom: 1.5rem !important;
+    }
+    .page-header h1 {
+        font-size: 1.6rem !important;
+    }
+    .page-header .lead {
+        font-size: 0.95rem !important;
+    }
+    .navbar-nav {
+        gap: 6px !important;
+    }
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0.8rem !important;
+        margin: 0 !important;
+    }
+    .navbar-collapse .dropdown-menu {
+        border: none !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        margin-top: 5px !important;
+        padding: 0.5rem !important;
+    }
 }
 

@@ -9,7 +9,8 @@ function hidePreloader() {
     }, 500));
 }
 function highlightActiveNavLink() {
-  const e = window.location.pathname.split("/").pop();
+  let e = window.location.pathname.split("/").pop();
+  if (!e || e === "/") e = "index.html";
   document.querySelectorAll(".navbar-nav .nav-link").forEach((t) => {
     const n = t.getAttribute("href");
     e === n ? t.classList.add("active") : t.classList.remove("active");
