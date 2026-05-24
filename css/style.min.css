@@ -1818,3 +1818,30 @@ body.dark-theme .table-responsive  {
         font-size: 1.35rem !important;
     }
 }
+
+/* Level Selection Buttons Styles */
+.level-select-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
+    border: 2px solid transparent !important;
+}
+.level-select-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+.level-select-btn.active-level {
+    transform: scale(1.04) translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    border-color: #ffffff !important;
+}
+body.dark-theme .level-select-btn.active-level {
+    border-color: #ffffff !important;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1) !important;
+}
+.level-buttons-container.has-active .level-select-btn:not(.active-level) {
+    opacity: 0.55 !important;
+    filter: grayscale(15%) !important;
+}
+

@@ -33,6 +33,7 @@ window.updateQuestionUI = function() {
     document.getElementById('area-mcq').classList.add('d-none');
     document.getElementById('area-tf').classList.add('d-none');
     document.getElementById('area-essay').classList.add('d-none');
+    document.getElementById('area-complete').classList.add('d-none');
 
     if (type === 'mcq') {
         document.getElementById('area-mcq').classList.remove('d-none');
@@ -40,6 +41,8 @@ window.updateQuestionUI = function() {
         document.getElementById('area-tf').classList.remove('d-none');
     } else if (type === 'essay') {
         document.getElementById('area-essay').classList.remove('d-none');
+    } else if (type === 'complete') {
+        document.getElementById('area-complete').classList.remove('d-none');
     }
 };
 
@@ -52,7 +55,8 @@ window.saveQuestion = function() {
     }
 
     const type = document.getElementById('q-type').value;
-    let questionObj = { type: type, q: text };
+    const direction = document.getElementById('exam-direction') ? document.getElementById('exam-direction').value : 'rtl';
+    let questionObj = { type: type, q: text, direction: direction };
 
     const explainText = document.getElementById('q-explain') ? document.getElementById('q-explain').value.trim() : "";
 
@@ -82,6 +86,15 @@ window.saveQuestion = function() {
     else if (type === 'essay') {
         questionObj.explain = explainText || "تم إنشاء السؤال بواسطة أستاذ المادة.";
     }
+    else if (type === 'complete') {
+        const correctAns = document.getElementById('complete-correct').value.trim();
+        if (!correctAns) {
+            alert('الرجاء كتابة الإجابة الصحيحة لأكمل العبارة');
+            return;
+        }
+        questionObj.correctAnswer = correctAns;
+        questionObj.explain = explainText || `الإجابة الصحيحة هي: ${correctAns}`;
+    }
 
     currentExamQuestions.push(questionObj);
     
@@ -90,6 +103,7 @@ window.saveQuestion = function() {
     document.querySelectorAll('.mcq-option').forEach(input => input.value = '');
     document.querySelector('input[name="mcq-correct"][value="0"]').checked = true;
     document.getElementById('tf-true').checked = true;
+    if (document.getElementById('complete-correct')) document.getElementById('complete-correct').value = '';
     if (document.getElementById('q-explain')) document.getElementById('q-explain').value = '';
     
     // close modal
@@ -115,6 +129,14 @@ function renderQuestionsList() {
         if (q.type === 'mcq') typeBadge = '<span class="badge bg-primary">اختيارات</span>';
         if (q.type === 'tf') typeBadge = '<span class="badge bg-info text-dark">صح وخطأ</span>';
         if (q.type === 'essay') typeBadge = '<span class="badge bg-secondary">مقالي</span>';
+        if (q.type === 'complete') typeBadge = '<span class="badge bg-warning text-dark">أكمل</span>';
+
+        let correctAnswerHtml = '';
+        if (q.type === 'mcq' || q.type === 'tf') {
+            correctAnswerHtml = `<div class="text-success small fw-bold">الإجابة الصحيحة: ${q.options[q.correct]}</div>`;
+        } else if (q.type === 'complete') {
+            correctAnswerHtml = `<div class="text-success small fw-bold">الإجابة الصحيحة: ${q.correctAnswer}</div>`;
+        }
 
         const item = document.createElement('div');
         item.className = 'border p-3 rounded-3 bg-light position-relative';
@@ -123,7 +145,7 @@ function renderQuestionsList() {
                 <h6 class="fw-bold mb-0">${index + 1}. ${q.q}</h6>
                 ${typeBadge}
             </div>
-            ${q.type !== 'essay' ? `<div class="text-success small fw-bold">الإجابة الصحيحة: ${q.options[q.correct]}</div>` : ''}
+            ${correctAnswerHtml}
             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" onclick="deleteQuestion(${index})" title="حذف السؤال"><i class="fa-solid fa-trash"></i></button>
         `;
         list.appendChild(item);
@@ -395,6 +417,14 @@ window.showStudentDetails = function(res) {
                     <div class="fw-bold">${studentAns || 'لم يجب'}</div>
                 </div>`;
             isCorrect = true; // Essay is manually graded but we highlight it neutrally
+        } else if (q.type === 'complete') {
+            isCorrect = (studentAns && studentAns.trim().toLowerCase() === q.correctAnswer.toLowerCase());
+            ansHtml = `
+                <div class="mt-2 p-2 rounded ${isCorrect ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} fw-bold border border-2 ${isCorrect ? 'border-success' : 'border-danger'}">
+                    <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'} me-2"></i> ${studentAns || 'لم يجب'}
+                </div>
+                ${!isCorrect ? `<div class="mt-1 text-success small fw-bold"><i class="fa-solid fa-check-circle me-1"></i> الإجابة الصحيحة: ${q.correctAnswer}</div>` : ''}
+            `;
         } else {
             isCorrect = (studentAns === q.correct);
             let ansText = studentAns !== undefined && studentAns !== -1 && q.options[studentAns] ? q.options[studentAns] : 'لم يجب أو إجابة ملغاة';

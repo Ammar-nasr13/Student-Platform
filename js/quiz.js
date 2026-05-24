@@ -171,54 +171,79 @@ function initQuizPageEvents() {
 }
 function startQuiz(e, t, n) {
   let s = (window.currentSubjectExams || [])[n];
-  s
-    ? ("string" == typeof s.questions &&
-        (s.questions = JSON.parse(s.questions)),
-      (currentQuiz = s),
-      (currentQuestionIndex = 0),
-      (score = 0),
-      (userAnswers = []),
-      document.getElementById("quiz-setup").classList.add("d-none"),
-      document.getElementById("quiz-play").classList.remove("d-none"),
-      (document.getElementById("quiz-title").textContent = currentQuiz.title),
-      showToast("بدأ الاختبار التفاعلي ⏱️، بالتوفيق!", "info"),
-      resetTimer(),
-      renderAllQuestions())
-    : showToast("عذراً، هذا الاختبار غير متوفر حالياً.", "warning");
+  if (!s) {
+    showToast("عذراً، هذا الاختبار غير متوفر حالياً.", "warning");
+    return;
+  }
+  
+  if (typeof s.questions === "string") {
+    s.questions = JSON.parse(s.questions);
+  }
+  currentQuiz = s;
+  currentQuestionIndex = 0;
+  score = 0;
+  userAnswers = [];
+  
+  document.getElementById("quiz-setup").classList.add("d-none");
+  document.getElementById("quiz-play").classList.remove("d-none");
+  document.getElementById("quiz-title").textContent = currentQuiz.title;
+  
+  const direction = (s.questions && s.questions[0] && s.questions[0].direction) ? s.questions[0].direction : 'rtl';
+  showToast(direction === 'rtl' ? "بدء الاختبار التفاعلي، بالتوفيق!" : "Interactive quiz started, good luck!", "info");
+  
+  resetTimer();
+  renderAllQuestions();
 }
+
 function resetTimer() {
   clearInterval(quizTimer);
+  const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
   const e = 60 === currentQuiz.duration;
-  ((timeLeft = e ? 3600 : 45),
-    updateTimerUI(),
-    (quizTimer = setInterval(() => {
-      (timeLeft--,
-        updateTimerUI(),
-        timeLeft <= 0 &&
-          (clearInterval(quizTimer),
-          "undefined" != typeof Swal
-            ? Swal.fire(
-                "انتهى الوقت!",
-                "تم إغلاق الاختبار وحساب نتيجتك.",
-                "warning",
-              )
-            : showToast("انتهى وقت السؤال! ⏰", "warning"),
-          processExamSubmission()));
-    }, 1e3)));
+  timeLeft = e ? 3600 : 45;
+  updateTimerUI();
+  quizTimer = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) {
+      clearInterval(quizTimer);
+      if ("undefined" != typeof Swal) {
+        Swal.fire({
+          title: direction === 'rtl' ? "انتهى الوقت!" : "Time's up!",
+          text: direction === 'rtl' ? "تم إغلاق الاختبار وحساب نتيجتك." : "The exam has been closed and your score calculated.",
+          icon: "warning",
+          confirmButtonColor: "#0f2b46"
+        });
+      } else {
+        showToast(direction === 'rtl' ? "انتهى وقت الحل!" : "Solving time ended!", "warning");
+      }
+      processExamSubmission();
+    }
+  }, 1000);
 }
+
 function updateTimerUI() {
   const e = document.getElementById("quiz-timer");
   if (e) {
+    const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
     if (60 === currentQuiz.duration) {
       const t = Math.floor(timeLeft / 60),
         n = timeLeft % 60;
-      e.textContent = `الوقت المتبقي: ${t}:${n < 10 ? "0" : ""}${n} دقيقة`;
-    } else e.textContent = `الوقت المتبقي: ${timeLeft} ثانية`;
-    timeLeft <= 10
-      ? e.classList.add("text-danger", "fw-bold")
-      : e.classList.remove("text-danger", "fw-bold");
+      e.textContent = direction === 'rtl' 
+        ? `الوقت المتبقي: ${t}:${n < 10 ? "0" : ""}${n} دقيقة`
+        : `Time remaining: ${t}:${n < 10 ? "0" : ""}${n} minutes`;
+    } else {
+      e.textContent = direction === 'rtl'
+        ? `الوقت المتبقي: ${timeLeft} ثانية`
+        : `Time remaining: ${timeLeft} seconds`;
+    }
+    if (timeLeft <= 10) {
+      e.classList.add("text-danger", "fw-bold");
+    } else {
+      e.classList.remove("text-danger", "fw-bold");
+    }
   }
 }
+
 function downloadSolvedExamPDF() {
   if (!currentQuiz) return;
   let questions = currentQuiz.questions;
@@ -234,35 +259,42 @@ function downloadSolvedExamPDF() {
       if (uAns === undefined || uAns === null || uAns === -1) {
         allAnswered = false;
       }
-    } else if (q.type === 'essay') {
-      if (!uAns || uAns.trim() === "") {
+    } else if (q.type === 'essay' || q.type === 'complete') {
+      if (uAns === undefined || uAns === null || (typeof uAns === 'string' && uAns.trim() === "")) {
         allAnswered = false;
       }
     }
   });
 
+  const direction = (questions && questions[0] && questions[0].direction) ? questions[0].direction : 'rtl';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+
   if (!allAnswered) {
+    const alertMsg = direction === 'rtl' 
+      ? "عذراً، لا يمكن تحميل أو طباعة ملف PDF إلا بعد إنهاء حل جميع الأسئلة بالكامل."
+      : "Sorry, you cannot download or print the PDF unless you answer all questions in full.";
     if ("undefined" != typeof Swal) {
-      Swal.fire("تنبيه", "عذراً، لا يمكن تحميل أو طباعة ملف PDF إلا بعد إنهاء حل جميع الأسئلة بالكامل.", "error");
+      Swal.fire(direction === 'rtl' ? "تنبيه" : "Alert", alertMsg, "error");
     } else {
-      alert("عذراً، لا يمكن تحميل أو طباعة ملف PDF إلا بعد إنهاء حل جميع الأسئلة بالكامل.");
+      alert(alertMsg);
     }
     return;
   }
   
-  const levelText = currentQuiz.level ? `المستوى ${currentQuiz.level}` : "";
-  const studentName = window.currentStudentName || "طالب مجهول";
-  const dateStr = new Date().toLocaleDateString('ar-EG', { dateStyle: 'long' });
-  const finalScore = `${score} من ${questions.length}`;
+  const levelText = currentQuiz.level ? (direction === 'rtl' ? `المستوى ${currentQuiz.level}` : `Level ${currentQuiz.level}`) : "";
+  const studentName = window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student");
+  const dateStr = new Date().toLocaleDateString(direction === 'rtl' ? 'ar-EG' : 'en-US', { dateStyle: 'long' });
+  const finalScore = direction === 'rtl' ? `${score} من ${questions.length}` : `${score} out of ${questions.length}`;
   const percentage = Math.round((score / questions.length) * 100);
-
+ 
   let win = window.open("", "_blank");
   let html = `
-    <html dir="rtl" lang="ar">
+    <html dir="${direction}" lang="${direction === 'rtl' ? 'ar' : 'en'}">
     <head>
-        <title>تقرير نتائج الاختبار - ${currentQuiz.title}</title>
+        <meta charset="utf-8">
+        <title>${direction === 'rtl' ? 'تقرير نتائج الاختبار' : 'Exam Results Report'} - ${currentQuiz.title}</title>
         <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; direction: rtl; text-align: right; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; direction: ${direction}; text-align: ${textAlign}; }
             .header { text-align: center; border-bottom: 3px double #0f2b46; padding-bottom: 20px; margin-bottom: 30px; }
             .header h1 { color: #0f2b46; margin: 10px 0; font-size: 24px; }
             .header h3 { color: #555; margin: 5px 0; font-size: 18px; }
@@ -272,12 +304,12 @@ function downloadSolvedExamPDF() {
             .score-badge { font-size: 18px; font-weight: bold; color: #198754; text-align: center; margin-bottom: 30px; padding: 10px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9; }
             .question-box { margin-bottom: 30px; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 20px; }
             .question-text { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; }
-            .options-list { margin-right: 20px; list-style: none; padding: 0; }
+            .options-list { margin-${direction === 'rtl' ? 'right' : 'left'}: 20px; list-style: none; padding: 0; }
             .option-item { margin-bottom: 8px; font-size: 15px; padding: 8px 12px; border-radius: 4px; display: flex; align-items: center; }
             .option-correct { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; font-weight: bold; }
             .option-incorrect { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
             .option-unselected { color: #555; }
-            .explain-box { margin-top: 12px; background-color: #e2f0d9; border-right: 4px solid #70ad47; padding: 10px 15px; font-size: 14px; border-radius: 0 4px 4px 0; }
+            .explain-box { margin-top: 12px; background-color: #e2f0d9; border-${direction === 'rtl' ? 'right' : 'left'}: 4px solid #70ad47; padding: 10px 15px; font-size: 14px; border-radius: ${direction === 'rtl' ? '0 4px 4px 0' : '4px 0 0 4px'}; }
             .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 15px; }
             @media print {
                 @page { margin: 1.5cm; }
@@ -287,24 +319,24 @@ function downloadSolvedExamPDF() {
     </head>
     <body>
         <div class="header">
-            <h1>جامعة المنيا - كلية السياحة والفنادق</h1>
-            <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>
-            <h2>تقرير نتائج الاختبار: ${currentQuiz.title}</h2>
+            <h1>Minia University - Faculty of Tourism & Hotels</h1>
+            <h3>Tourism Industry & Hospitality Technology Department</h3>
+            <h2>${direction === 'rtl' ? 'تقرير نتائج الاختبار:' : 'Exam Results Report:'} ${currentQuiz.title}</h2>
         </div>
         
         <div class="meta-info">
-            <div class="meta-item"><strong>اسم الطالب:</strong> ${studentName}</div>
-            <div class="meta-item"><strong>المستوى:</strong> ${levelText}</div>
-            <div class="meta-item"><strong>التاريخ:</strong> ${dateStr}</div>
+            <div class="meta-item"><strong>${direction === 'rtl' ? 'اسم الطالب:' : 'Student Name:'}</strong> ${studentName}</div>
+            <div class="meta-item"><strong>${direction === 'rtl' ? 'المستوى:' : 'Level:'}</strong> ${levelText}</div>
+            <div class="meta-item"><strong>${direction === 'rtl' ? 'التاريخ:' : 'Date:'}</strong> ${dateStr}</div>
         </div>
-
+        
         <div class="score-badge">
-            النتيجة النهائية: ${finalScore} (${percentage}%)
+            ${direction === 'rtl' ? 'النتيجة النهائية:' : 'Final Result:'} ${finalScore} (${percentage}%)
         </div>
-
+ 
         <div class="content">
   `;
-
+ 
   questions.forEach((q, idx) => {
     const userAnswerIdx = userAnswers[idx];
     const correctIdx = q.correct;
@@ -312,49 +344,61 @@ function downloadSolvedExamPDF() {
     html += `
         <div class="question-box">
             <div class="question-text">${idx + 1}. ${q.q}</div>
-            <ul class="options-list">
     `;
-
+ 
     if (q.type === 'mcq' || q.type === 'tf') {
+      html += `<ul class="options-list">`;
       q.options.forEach((opt, optIdx) => {
         let classStr = "option-unselected";
         let marker = "";
         
         if (optIdx === correctIdx) {
           classStr = "option-correct";
-          marker = " [الإجابة الصحيحة ✔️]";
+          marker = direction === 'rtl' ? " [الإجابة الصحيحة ✔️]" : " [Correct Answer ✔️]";
         } else if (optIdx === userAnswerIdx && userAnswerIdx !== correctIdx) {
           classStr = "option-incorrect";
-          marker = " [إجابتك ❌]";
+          marker = direction === 'rtl' ? " [إجابتك ❌]" : " [Your Answer ❌]";
         }
-
+ 
         html += `<li class="option-item ${classStr}">${opt}${marker}</li>`;
       });
+      html += `</ul>`;
     } else if (q.type === 'essay') {
       html += `
         <div style="margin-top: 10px; font-style: italic; color: #555;">
-            <strong>إجابتك:</strong> ${userAnswerIdx || "لم يتم كتابة إجابة"}
+            <strong>${direction === 'rtl' ? 'إجابتك:' : 'Your Answer:'}</strong> ${userAnswerIdx || (direction === 'rtl' ? "لم يتم كتابة إجابة" : "No answer entered")}
         </div>
       `;
+    } else if (q.type === 'complete') {
+      const isCorrect = (userAnswerIdx && userAnswerIdx.trim().toLowerCase() === q.correctAnswer.toLowerCase());
+      html += `
+        <div style="margin-top: 10px; padding: 8px 12px; border-radius: 4px; border: 1px solid ${isCorrect ? '#badbcc' : '#f5c2c7'}; background-color: ${isCorrect ? '#d1e7dd' : '#f8d7da'}; color: ${isCorrect ? '#0f5132' : '#842029'}; font-weight: bold;">
+            ${direction === 'rtl' ? 'إجابتك:' : 'Your Answer:'} ${userAnswerIdx || (direction === 'rtl' ? 'لم يتم كتابة إجابة' : 'No answer entered')} ${isCorrect ? ' ✔️' : ' ❌'}
+        </div>
+        ${!isCorrect ? `
+        <div style="margin-top: 8px; font-weight: bold; color: #0f5132;">
+            ${direction === 'rtl' ? 'الإجابة الصحيحة:' : 'Correct Answer:'} ${q.correctAnswer}
+        </div>` : ''}
+      `;
     }
-
-    html += `</ul>`;
-
+ 
     if (q.explain && q.explain !== "undefined") {
       html += `
         <div class="explain-box">
-            <strong>الشرح / التفسير:</strong> ${q.explain}
+            <strong>${direction === 'rtl' ? 'الشرح / التفسير:' : 'Explanation:'}</strong> ${q.explain}
         </div>
       `;
     }
-
+ 
     html += `</div>`;
   });
-
+ 
   html += `
         </div>
         <div class="footer">
-            تم إنشاء وتصحيح هذا التقرير عبر المنصة التعليمية لقسم تكنولوجيا السياحة والضيافة - جامعة المنيا
+            ${direction === 'rtl' 
+              ? 'تم إنشاء وتصحيح هذا التقرير عبر المنصة التعليمية لقسم تكنولوجيا السياحة والضيافة - جامعة المنيا' 
+              : 'This report was generated and graded by the Educational Platform of Tourism Industry & Hospitality Technology Department - Minia University'}
         </div>
         <script>
             window.onload = function() { window.print(); }
@@ -362,7 +406,7 @@ function downloadSolvedExamPDF() {
     </body>
     </html>
   `;
-
+ 
   win.document.write(html);
   win.document.close();
 }
@@ -373,12 +417,15 @@ function showQuizResults() {
   e.classList.remove("d-none");
   const t = currentQuiz.questions.length,
     n = Math.round((score / t) * 100);
+    
+  const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
+  
   if (window.AppwriteDB && window.DB_CONFIG) {
     const e = {
-      studentName: window.currentStudentName || "طالب مجهول",
-      examTitle: currentQuiz.title || "بدون عنوان",
-      subjectName: currentQuiz.subject_id || "غير معروف",
-      level: currentQuiz.level ? currentQuiz.level.toString() : "غير محدد",
+      studentName: window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student"),
+      examTitle: currentQuiz.title || (direction === 'rtl' ? "بدون عنوان" : "Untitled"),
+      subjectName: currentQuiz.subject_id || (direction === 'rtl' ? "غير معروف" : "Unknown"),
+      level: currentQuiz.level ? currentQuiz.level.toString() : (direction === 'rtl' ? "غير محدد" : "Not specified"),
       score: score,
       totalScore: t,
       details: JSON.stringify({ userAnswers: userAnswers, quiz: currentQuiz }),
@@ -412,6 +459,7 @@ function showQuizResults() {
             }));
       });
   }
+  
   let allAnswered = true;
   if (currentQuiz && currentQuiz.questions) {
     currentQuiz.questions.forEach((q, idx) => {
@@ -420,32 +468,59 @@ function showQuizResults() {
         if (uAns === undefined || uAns === null || uAns === -1) {
           allAnswered = false;
         }
-      } else if (q.type === 'essay') {
-        if (!uAns || uAns.trim() === "") {
+      } else if (q.type === 'essay' || q.type === 'complete') {
+        if (uAns === undefined || uAns === null || (typeof uAns === 'string' && uAns.trim() === "")) {
           allAnswered = false;
         }
       }
     });
   }
-
+ 
   let pdfBtnHTML = '';
   if (allAnswered) {
-    pdfBtnHTML = `<button class="btn btn-success px-4 py-2" onclick="downloadSolvedExamPDF()"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات PDF</button>`;
+    pdfBtnHTML = `<button class="btn btn-success px-4 py-2" onclick="downloadSolvedExamPDF()"><i class="fas fa-file-pdf me-2"></i>${direction === 'rtl' ? 'تحميل الإجابات PDF' : 'Download Answers PDF'}</button>`;
   } else {
-    pdfBtnHTML = `<button class="btn btn-secondary px-4 py-2" disabled title="يجب حل جميع الأسئلة بالكامل أولاً"><i class="fas fa-file-pdf me-2"></i>تحميل الإجابات غير متاح</button>
-                  <div class="w-100 text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i> تحميل ملف الـ PDF متاح فقط بعد حل جميع أسئلة الاختبار بالكامل (انتهى وقت الاختبار قبل إتمام الإجابات).</div>`;
+    pdfBtnHTML = `<button class="btn btn-secondary px-4 py-2" disabled title="${direction === 'rtl' ? 'يجب حل جميع الأسئلة بالكامل أولاً' : 'Must answer all questions first'}"><i class="fas fa-file-pdf me-2"></i>${direction === 'rtl' ? 'تحميل الإجابات غير متاح' : 'Download PDF Unavailable'}</button>
+                  <div class="w-100 text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i> ${direction === 'rtl' ? 'تحميل ملف الـ PDF متاح فقط بعد حل جميع أسئلة الاختبار بالكامل (انتهى وقت الاختبار قبل إتمام الإجابات).' : 'PDF download is only available after answering all questions (time ran out before completion).'}</div>`;
   }
-
-  (n >= 85
-    ? ((s = "ممتاز جداً! أنت مستعد تماماً للامتحانات النهائية 🌟"),
-      (o = "alert-success"))
-    : n >= 60
-      ? ((s = "أداء جيد! يمكنك الحصول على نتيجة أفضل بمزيد من المراجعة 👍"),
-        (o = "alert-warning"))
-      : ((s =
-          "تحتاج إلى قراءة المادة والمحاضرات بشكل أكبر. حاول مرة أخرى لرفع مستواك 📚"),
-        (o = "alert-danger")),
-    (e.innerHTML = `\n        <div class="text-center p-4">\n            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>\n            <h3 class="fw-bold text-primary">اكتمل الاختبار!</h3>\n            <p class="fs-5 text-muted mb-4">لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong></p>\n            \n            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">\n                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" \n                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">\n                     ${n}%\n                </div>\n            </div>\n\n            <div class="alert ${o} py-3 mb-4">\n                ${s}\n            </div>\n\n            <div class="d-flex gap-2 flex-wrap justify-content-center align-items-center">\n                ${pdfBtnHTML}\n                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>إعادة الاختبار</button>\n                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>شاشة الاختيار</button>\n            </div>\n        </div>\n    `));
+ 
+  let feedbackText = "";
+  let feedbackClass = "";
+  if (n >= 85) {
+    feedbackText = direction === 'rtl' ? "ممتاز جداً! أنت مستعد تماماً للامتحانات النهائية 🌟" : "Excellent! You are fully prepared for the final exams 🌟";
+    feedbackClass = "alert-success";
+  } else if (n >= 60) {
+    feedbackText = direction === 'rtl' ? "أداء جيد! يمكنك الحصول على نتيجة أفضل بمزيد من المراجعة 👍" : "Good performance! You can get a better score with more review 👍";
+    feedbackClass = "alert-warning";
+  } else {
+    feedbackText = direction === 'rtl' ? "تحتاج إلى قراءة المادة والمحاضرات بشكل أكبر. حاول مرة أخرى لرفع مستواك 📚" : "You need to read the material and lectures more. Try again to improve your level 📚";
+    feedbackClass = "alert-danger";
+  }
+ 
+  e.innerHTML = `
+        <div class="text-center p-4" dir="${direction}">
+            <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>
+            <h3 class="fw-bold text-primary">${direction === 'rtl' ? 'اكتمل الاختبار!' : 'Quiz Completed!'}</h3>
+            <p class="fs-5 text-muted mb-4">${direction === 'rtl' ? `لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong>` : `You correctly answered <strong>${score}</strong> out of <strong>${t}</strong> questions`}</p>
+            
+            <div class="progress mb-4" style="height: 25px; border-radius: 50px;">
+                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" 
+                     role="progressbar" style="width: ${n}%;" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="100">
+                     ${n}%
+                </div>
+            </div>
+ 
+            <div class="alert ${feedbackClass} py-3 mb-4">
+                ${feedbackText}
+            </div>
+ 
+            <div class="d-flex gap-2 flex-wrap justify-content-center align-items-center">
+                ${pdfBtnHTML}
+                <button class="btn btn-gold px-4 py-2" onclick="restartQuiz()"><i class="fas fa-redo me-2"></i>${direction === 'rtl' ? 'إعادة الاختبار' : 'Retake Quiz'}</button>
+                <button class="btn btn-outline-dark px-4 py-2" onclick="goToSetup()"><i class="fas fa-home me-2"></i>${direction === 'rtl' ? 'شاشة الاختيار' : 'Setup Screen'}</button>
+            </div>
+        </div>
+    `;
 }
 function restartQuiz() {
   (document.getElementById("quiz-result").classList.add("d-none"),
@@ -460,7 +535,8 @@ function goToSetup() {
   (document.getElementById("quiz-result").classList.add("d-none"),
     document.getElementById("quiz-play").classList.add("d-none"),
     document.getElementById("quiz-setup").classList.remove("d-none"),
-    (document.getElementById("quiz-level-select").value = ""));
+    (document.getElementById("quiz-level-select").value = ""),
+    document.getElementById("quiz-level-select").dispatchEvent(new Event("change")));
   const e = document.getElementById("quiz-subject-select");
   ((e.innerHTML = '<option value="">-- اختر المادة --</option>'),
     (e.disabled = !0),
@@ -474,22 +550,30 @@ window.renderAllQuestions = function () {
       (document.getElementById("quiz-progress-bar").style.width = "100%"));
     const t = document.getElementById("question-area");
     let n = "";
+    
+    // Determine the direction of the exam (LTR or RTL)
+    const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
+    const textAlign = direction === 'rtl' ? 'right' : 'left';
+    
     (currentQuiz.questions.forEach((e, t) => {
-      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="ltr" style="text-align: left;">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: sans-serif;">${t + 1}. ${e.q}</div>\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
+      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${direction}" style="text-align: ${textAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${t + 1}. ${e.q}</div>\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
         "essay" === e.type
-          ? (n += `<textarea class="form-control" rows="4" placeholder="اكتب إجابتك هنا..." id="essay-ans-${t}"></textarea>`)
-          : e.options.forEach((e, s) => {
-              n += `\n                    <label class="btn btn-outline-secondary text-start w-100 option-label d-flex align-items-center" style="cursor: pointer; font-family: sans-serif;">\n                        <input type="radio" name="q-${t}" value="${s}" class="me-3 ms-1" style="transform: scale(1.2);"> \n                        <span class="badge bg-secondary me-3 ms-1">${s + 1}</span> <span>${e}</span>\n                    </label>\n                `;
-            }),
+          ? (n += `<textarea class="form-control" rows="4" placeholder="${direction === 'rtl' ? 'اكتب إجابتك هنا...' : 'Type your answer here...'}" id="essay-ans-${t}"></textarea>`)
+          : "complete" === e.type
+            ? (n += `<input type="text" class="form-control" placeholder="${direction === 'rtl' ? 'اكتب الكلمة أو العبارة المناسبة لإكمال الجملة...' : 'Type the correct answer to complete the sentence...'}" id="complete-ans-${t}">`)
+            : e.options.forEach((e, s) => {
+                n += `\n                    <label class="btn btn-outline-secondary text-start w-100 option-label d-flex align-items-center" style="cursor: pointer; font-family: Cairo, sans-serif;">\n                        <input type="radio" name="q-${t}" value="${s}" class="me-3 ms-1" style="transform: scale(1.2);"> \n                        <span class="badge bg-secondary me-3 ms-1">${s + 1}</span> <span>${e}</span>\n                    </label>\n                `;
+              }),
         (n += `\n                </div>\n                <div class="explanation-area mt-3 d-none" id="q-exp-${t}"></div>\n            </div>\n        `));
     }),
       (n +=
-        '\n        <button class="btn w-100 py-3 fw-bold fs-5 shadow-sm text-white" id="submit-full-exam-btn" style="background-color: #0f2b46; border-radius: 8px;">\n            إنهاء الاختبار وحفظ النتيجة <i class="fa-solid fa-check-circle ms-2"></i>\n        </button>\n    '),
+        `\n        <button class="btn w-100 py-3 fw-bold fs-5 shadow-sm text-white" id="submit-full-exam-btn" style="background-color: #0f2b46; border-radius: 8px;">\n            ${direction === 'rtl' ? 'إنهاء الاختبار وحفظ النتيجة' : 'Submit Exam & Save Result'} <i class="fa-solid fa-check-circle ms-2"></i>\n        </button>\n    `),
       (t.innerHTML = n),
       document
         .getElementById("submit-full-exam-btn")
         .addEventListener("click", submitFullExam));
-  }
+}
+
 window.submitFullExam = function () {
     if (!currentQuiz) return;
     
@@ -499,107 +583,162 @@ window.submitFullExam = function () {
       if ("essay" === e.type) {
         const val = document.getElementById(`essay-ans-${t}`).value.trim();
         if (!val) unansweredCount++;
+      } else if ("complete" === e.type) {
+        const val = document.getElementById(`complete-ans-${t}`).value.trim();
+        if (!val) unansweredCount++;
       } else {
         const radio = document.querySelector(`input[name="q-${t}"]:checked`);
         if (!radio) unansweredCount++;
       }
     });
 
+    const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
+
     if (unansweredCount > 0) {
+      const titleText = direction === 'rtl' ? "لم تكتمل الإجابات" : "Incomplete Answers";
+      const bodyText = direction === 'rtl' 
+        ? `يرجى الإجابة على جميع الأسئلة أولاً! (متبقي ${unansweredCount} سؤال بدون إجابة) لتتمكن من إنهاء الاختبار وتحميل ملف الـ PDF.`
+        : `Please answer all questions first! (${unansweredCount} unanswered questions remaining) to submit the exam and download the PDF.`;
+      const btnText = direction === 'rtl' ? "موافق، سأكمل الحل" : "OK, I will continue";
+      
       if ("undefined" != typeof Swal) {
         Swal.fire({
-          title: "لم تكتمل الإجابات",
-          text: `يرجى الإجابة على جميع الأسئلة أولاً! (متبقي ${unansweredCount} سؤال بدون إجابة) لتتمكن من إنهاء الاختبار وتحميل ملف الـ PDF.`,
+          title: titleText,
+          text: bodyText,
           icon: "warning",
           confirmButtonColor: "#0f2b46",
-          confirmButtonText: "موافق، سأكمل الحل"
+          confirmButtonText: btnText
         });
       } else {
-        alert(`يرجى الإجابة على جميع الأسئلة أولاً! (متبقي ${unansweredCount} سؤال بدون إجابة) لتتمكن من إنهاء الاختبار وتحميل ملف الـ PDF.`);
+        alert(bodyText);
       }
       return;
     }
 
+    const confirmTitle = direction === 'rtl' ? "تأكيد الإنهاء" : "Confirm Submission";
+    const confirmBody = direction === 'rtl' 
+      ? "هل أنت متأكد من رغبتك في إنهاء الاختبار وحفظ الإجابات؟" 
+      : "Are you sure you want to finish the exam and save your answers?";
+    const confirmBtn = direction === 'rtl' ? "نعم، قم بالإنهاء" : "Yes, Submit";
+    const cancelBtn = direction === 'rtl' ? "تراجع" : "Cancel";
+
     "undefined" != typeof Swal
       ? Swal.fire({
-          title: "تأكيد الإنهاء",
-          text: "هل أنت متأكد من رغبتك في إنهاء الاختبار وحفظ الإجابات؟",
+          title: confirmTitle,
+          text: confirmBody,
           icon: "question",
           showCancelButton: !0,
           confirmButtonColor: "#0f2b46",
-          confirmButtonText: "نعم، قم بالإنهاء",
-          cancelButtonText: "تراجع",
+          confirmButtonText: confirmBtn,
+          cancelButtonText: cancelBtn,
         }).then((e) => {
           e.isConfirmed && processExamSubmission();
         })
-      : confirm("هل أنت متأكد من رغبتك في إنهاء الاختبار؟") &&
+      : confirm(confirmBody) &&
         processExamSubmission();
-  }
+}
+
 window.processExamSubmission = function () {
-    (clearInterval(quizTimer),
-      (score = 0),
-      (userAnswers = []),
-      currentQuiz.questions.forEach((e, t) => {
+    clearInterval(quizTimer);
+    score = 0;
+    userAnswers = [];
+    
+    const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
+    
+    currentQuiz.questions.forEach((e, t) => {
         let n;
         if ("essay" === e.type) {
-          if (
-            ((n = document.getElementById(`essay-ans-${t}`).value.trim()),
-            userAnswers.push(n),
-            score++,
-            (document.getElementById(`essay-ans-${t}`).disabled = !0),
-            e.explain && "undefined" !== e.explain)
-          ) {
-            const n = document.getElementById(`q-exp-${t}`);
-            ((n.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info"><i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>Answer:</strong><p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p></div>`),
-              n.classList.remove("d-none"));
-          }
+            n = document.getElementById(`essay-ans-${t}`).value.trim();
+            userAnswers.push(n);
+            score++;
+            document.getElementById(`essay-ans-${t}`).disabled = true;
+            
+            if (e.explain && e.explain !== "undefined") {
+                const explainDiv = document.getElementById(`q-exp-${t}`);
+                explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info">
+                    <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الإجابة النموذجية:' : 'Model Answer:'}</strong>
+                    <p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>
+                </div>`;
+                explainDiv.classList.remove("d-none");
+            }
+        } else if ("complete" === e.type) {
+            const studentInput = document.getElementById(`complete-ans-${t}`);
+            n = studentInput.value.trim();
+            userAnswers.push(n);
+            studentInput.disabled = true;
+            
+            const isCorrect = (n.toLowerCase() === e.correctAnswer.toLowerCase());
+            if (isCorrect) {
+                score++;
+                studentInput.classList.add("is-valid", "bg-success-subtle", "text-success", "border-success");
+            } else {
+                studentInput.classList.add("is-invalid", "bg-danger-subtle", "text-danger", "border-danger");
+            }
+            
+            const explainDiv = document.getElementById(`q-exp-${t}`);
+            const correctText = direction === 'rtl' ? `الإجابة الصحيحة هي: ${e.correctAnswer}` : `Correct answer is: ${e.correctAnswer}`;
+            let expHtml = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2">
+                <i class="fa-solid fa-circle-info ms-2 text-primary"></i><strong>${correctText}</strong>`;
+            if (e.explain && e.explain !== "undefined") {
+                expHtml += `<p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>`;
+            }
+            expHtml += `</div>`;
+            explainDiv.innerHTML = expHtml;
+            explainDiv.classList.remove("d-none");
         } else {
-          const s = document.querySelector(`input[name="q-${t}"]:checked`);
-          ((n = s ? parseInt(s.value) : -1), userAnswers.push(n));
-          if (
-            (document
-              .getElementById(`q-opts-${t}`)
-              .querySelectorAll(".option-label")
-              .forEach((t, s) => {
+            const s = document.querySelector(`input[name="q-${t}"]:checked`);
+            n = s ? parseInt(s.value) : -1;
+            userAnswers.push(n);
+            
+            document.getElementById(`q-opts-${t}`).querySelectorAll(".option-label").forEach((t, s) => {
                 t.classList.remove("btn-outline-secondary");
-                ((t.querySelector("input").disabled = !0),
-                  s === e.correct &&
-                    t.classList.add(
-                      "bg-success",
-                      "text-white",
-                      "border-success",
-                    ),
-                  s === n &&
-                    n !== e.correct &&
-                    t.classList.add("bg-danger", "text-white", "border-danger"),
-                  s !== e.correct &&
-                    s !== n &&
-                    t.classList.add("bg-light", "text-muted"));
-              }),
-            n === e.correct && score++,
-            e.explain && "undefined" !== e.explain)
-          ) {
-            const n = document.getElementById(`q-exp-${t}`);
-            ((n.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2"><i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>Answer:</strong><p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p></div>`),
-              n.classList.remove("d-none"));
-          }
+                t.querySelector("input").disabled = true;
+                
+                if (s === e.correct) {
+                    t.classList.add("bg-success", "text-white", "border-success");
+                }
+                if (s === n && n !== e.correct) {
+                    t.classList.add("bg-danger", "text-white", "border-danger");
+                }
+                if (s !== e.correct && s !== n) {
+                    t.classList.add("bg-light", "text-muted");
+                }
+            });
+            
+            if (n === e.correct) score++;
+            
+            if (e.explain && e.explain !== "undefined") {
+                const explainDiv = document.getElementById(`q-exp-${t}`);
+                explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2">
+                    <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الشرح:' : 'Explanation:'}</strong>
+                    <p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>
+                </div>`;
+                explainDiv.classList.remove("d-none");
+            }
         }
-      }));
-    const e = document.getElementById("submit-full-exam-btn");
-    ((e.innerHTML =
-      'الذهاب إلى النتيجة النهائية <i class="fa-solid fa-arrow-left ms-2"></i>'),
-      (e.style.backgroundColor = "#198754"),
-      e.removeEventListener("click", submitFullExam),
-      e.addEventListener("click", showQuizResults),
-      window.scrollTo({ top: 0, behavior: "smooth" }),
-      "undefined" != typeof Swal
-        ? Swal.fire(
-            "اكتمل التصحيح!",
-            "تم تصحيح جميع الأسئلة تلقائياً. راجع أخطاءك ثم انتقل للنتيجة النهائية.",
-            "success",
-          )
-        : showToast("تم التصحيح!", "success"));
-  }
+    });
+
+    const eBtn = document.getElementById("submit-full-exam-btn");
+    eBtn.innerHTML = direction === 'rtl' 
+        ? 'الذهاب إلى النتيجة النهائية <i class="fa-solid fa-arrow-left ms-2"></i>'
+        : 'Go to Final Result <i class="fa-solid fa-arrow-left ms-2"></i>';
+    eBtn.style.backgroundColor = "#198754";
+    eBtn.removeEventListener("click", submitFullExam);
+    eBtn.addEventListener("click", showQuizResults);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    
+    if ("undefined" != typeof Swal) {
+        Swal.fire(
+            direction === 'rtl' ? "اكتمل التصحيح!" : "Correction Complete!",
+            direction === 'rtl' 
+                ? "تم تصحيح جميع الأسئلة تلقائياً. راجع أخطاءك ثم انتقل للنتيجة النهائية."
+                : "All questions have been graded automatically. Check your mistakes and go to the final result.",
+            "success"
+        );
+    } else {
+        showToast(direction === 'rtl' ? "تم التصحيح!" : "Graded!", "success");
+    }
+}
 
 // Attach variables and functions to window for global access
 window.initQuizPageEvents = initQuizPageEvents;

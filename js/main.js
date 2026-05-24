@@ -75,6 +75,44 @@ function showToast(e, t = "success") {
     }, 3500));
 }
 
+function initLevelSelectorButtons() {
+  const containers = document.querySelectorAll(".level-buttons-container");
+  containers.forEach((container) => {
+    const buttons = container.querySelectorAll(".level-select-btn");
+    const selectId = container.id.includes("summaries") ? "summaries-level-select" : "quiz-level-select";
+    const hiddenInput = document.getElementById(selectId);
+    
+    if (hiddenInput) {
+      hiddenInput.addEventListener("change", () => {
+        const val = hiddenInput.value;
+        if (!val) {
+          buttons.forEach((b) => b.classList.remove("active-level"));
+          container.classList.remove("has-active");
+        } else {
+          buttons.forEach((b) => {
+            if (b.getAttribute("data-level") === val) {
+              b.classList.add("active-level");
+            } else {
+              b.classList.remove("active-level");
+            }
+          });
+          container.classList.add("has-active");
+        }
+      });
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-level");
+        if (hiddenInput) {
+          hiddenInput.value = val;
+          hiddenInput.dispatchEvent(new Event("change"));
+        }
+      });
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     hidePreloader();
     initThemeMode();
@@ -82,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof initQuizPageEvents === "function") initQuizPageEvents();
     if (typeof initLevelPagesEvents === "function") initLevelPagesEvents();
     highlightActiveNavLink();
+    initLevelSelectorButtons();
 });
 
 // Attach to window for global access

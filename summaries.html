@@ -125,20 +125,28 @@
                             <h3 class="fw-bold text-primary mb-1">تصفح المقررات والملخصات</h3>
                             <p class="text-muted small">حدد المستوى الدراسي لعرض الملفات المتاحة.</p>
                         </div>
-                        <button class="btn btn-gold fw-bold px-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#addSummaryModal">
+                        <button class="btn btn-navy-solid fw-bold px-4 rounded-pill shadow-sm d-none" id="add-summary-btn-main" data-bs-toggle="modal" data-bs-target="#addSummaryModal">
                             <i class="fa-solid fa-cloud-arrow-up me-2"></i> إضافة ملخص جديد
                         </button>
                     </div>
 
                     <div class="row mb-4">
-                        <div class="col-md-6">
-                            <select class="form-select py-2 border-2" id="summaries-level-select">
-                                <option value="">-- حدد المستوى الدراسي --</option>
-                                <option value="1">المستوى الأول</option>
-                                <option value="2">المستوى الثاني</option>
-                                <option value="3">المستوى الثالث</option>
-                                <option value="4">المستوى الرابع</option>
-                            </select>
+                        <div class="col-12">
+                            <div class="row g-3 level-buttons-container justify-content-center" id="summaries-level-buttons-container">
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="1" style="background-color: #1a365d; border-radius: 12px; font-size: 1.1rem;">المستوى الأول</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="2" style="background-color: #198754; border-radius: 12px; font-size: 1.1rem;">المستوى الثاني</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="3" style="background-color: #0d6efd; border-radius: 12px; font-size: 1.1rem;">المستوى الثالث</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="4" style="background-color: #dc3545; border-radius: 12px; font-size: 1.1rem;">المستوى الرابع</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="summaries-level-select" value="">
                         </div>
                     </div>
 

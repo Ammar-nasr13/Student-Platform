@@ -1,11 +1,6 @@
 // js/summaries.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // إخفاء شاشة التحميل بعد التهيئة
-    if (typeof hidePreloader === 'function') hidePreloader();
-    if (typeof highlightActiveNavLink === 'function') highlightActiveNavLink();
-    if (typeof initThemeMode === 'function') initThemeMode();
-
     const levelSelect = document.getElementById('summaries-level-select');
     const container = document.getElementById('subjects-summaries-container');
     const placeholder = document.getElementById('summaries-placeholder');
@@ -19,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // التحقق من صلاحيات التدريس
     const isFaculty = localStorage.getItem('is_faculty') === 'true' || localStorage.getItem('currentRole') === 'faculty';
+
+    // إظهار زر إضافة الملخصات فقط لأعضاء هيئة التدريس
+    const addSummaryBtn = document.getElementById('add-summary-btn-main');
+    if (addSummaryBtn && isFaculty) {
+        addSummaryBtn.classList.remove('d-none');
+    }
 
     // 1. عند تغيير المستوى في الشاشة الرئيسية:
     if (levelSelect) {

@@ -129,9 +129,18 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-primary">عنوان الاختبار:</label>
-                    <input type="text" id="exam-title" class="form-control" placeholder="مثال: ميدتيرم، أو اختبار تجريبي (الفصل الأول)" required>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-primary">عنوان الاختبار:</label>
+                        <input type="text" id="exam-title" class="form-control" placeholder="مثال: ميدتيرم، أو اختبار تجريبي (الفصل الأول)" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-primary">اتجاه كتابة الاختبار (اللغة):</label>
+                        <select class="form-select" id="exam-direction" required>
+                            <option value="rtl" selected>عربي (من اليمين لليسار - RTL)</option>
+                            <option value="ltr">إنجليزي (من اليسار لليمين - LTR)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="alert alert-warning small fw-bold">
@@ -231,6 +240,7 @@
                             <option value="mcq">اختيار من متعدد (4 خيارات)</option>
                             <option value="tf">صح أو خطأ</option>
                             <option value="essay">مقالي</option>
+                            <option value="complete">أكمل العبارة</option>
                         </select>
                     </div>
                     
@@ -278,6 +288,12 @@
                     <!-- Essay Area -->
                     <div id="area-essay" class="d-none">
                         <div class="alert alert-info small">الأسئلة المقالية سيتم توفير مساحة نصية للطالب للإجابة عليها، ويقوم الأستاذ بمراجعتها لاحقاً.</div>
+                    </div>
+
+                    <!-- Complete Area -->
+                    <div id="area-complete" class="d-none">
+                        <label class="form-label fw-bold">الكلمة أو الجملة الصحيحة (الإجابة النموذجية):</label>
+                        <input type="text" class="form-control" id="complete-correct" placeholder="اكتب الكلمة أو العبارة الصحيحة هنا">
                     </div>
 
                     <!-- Explanation Area -->

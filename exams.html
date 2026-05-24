@@ -132,18 +132,26 @@
 
                     <div class="row g-3 mb-4">
                         <!-- اختيار المستوى -->
-                        <div class="col-md-6">
-                            <label for="quiz-level-select" class="form-label fw-bold text-primary">المستوى الدراسي:</label>
-                            <select class="form-select py-2 border-2" id="quiz-level-select">
-                                <option value="">-- اختر المستوى الدراسي --</option>
-                                <option value="1">المستوى الأول</option>
-                                <option value="2">المستوى الثاني</option>
-                                <option value="3">المستوى الثالث</option>
-                                <option value="4">المستوى الرابع</option>
-                            </select>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-primary">المستوى الدراسي:</label>
+                            <div class="row g-3 level-buttons-container justify-content-center mb-3" id="quiz-level-buttons-container">
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="1" style="background-color: #1a365d; border-radius: 12px; font-size: 1.1rem;">المستوى الأول</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="2" style="background-color: #198754; border-radius: 12px; font-size: 1.1rem;">المستوى الثاني</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="3" style="background-color: #0d6efd; border-radius: 12px; font-size: 1.1rem;">المستوى الثالث</button>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <button type="button" class="btn text-white py-3 px-4 fw-bold w-100 level-select-btn" data-level="4" style="background-color: #dc3545; border-radius: 12px; font-size: 1.1rem;">المستوى الرابع</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="quiz-level-select" value="">
                         </div>
                         <!-- اختيار المادة (ديناميكي) -->
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label for="quiz-subject-select" class="form-label fw-bold text-primary">المادة الدراسية:</label>
                             <select class="form-select py-2 border-2" id="quiz-subject-select" disabled>
                                 <option value="">-- حدد المادة --</option>
