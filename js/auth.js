@@ -17,7 +17,7 @@ function updateUIForFaculty() {
     const e = document.querySelector(".navbar-nav");
     if (e && !document.getElementById("nav-add-exam")) {
       const t = document.createElement("li");
-      ((t.className = "nav-item ms-lg-3 mt-3 mt-lg-0"),
+      ((t.className = "nav-item ms-xl-3 mt-3 mt-xl-0"),
         (t.id = "nav-add-exam"),
         (t.innerHTML =
           '<a href="add_exam.html" class="btn btn-warning fw-bold px-3 rounded-pill text-dark shadow-sm"><i class="fa-solid fa-plus-circle me-1"></i> إضافة اختبار</a>'),

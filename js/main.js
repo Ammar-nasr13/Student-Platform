@@ -113,6 +113,21 @@ function initLevelSelectorButtons() {
   });
 }
 
+function loadAdsScript() {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector('script[src="js/ads.js"]')) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'js/ads.js';
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load ads script."));
+    document.body.appendChild(script);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     hidePreloader();
     initThemeMode();
@@ -121,6 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof initLevelPagesEvents === "function") initLevelPagesEvents();
     highlightActiveNavLink();
     initLevelSelectorButtons();
+    
+    // Load and initialize Ads Engine dynamically
+    loadAdsScript().then(() => {
+        if (typeof initAppwriteAds === "function") {
+            initAppwriteAds();
+        }
+    }).catch((err) => console.warn("Ads Engine: ", err));
 });
 
 // Attach to window for global access

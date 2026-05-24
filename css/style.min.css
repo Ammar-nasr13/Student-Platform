@@ -1845,3 +1845,319 @@ body.dark-theme .level-select-btn.active-level {
     filter: grayscale(15%) !important;
 }
 
+/* Style levels dropdown items inside navbar */
+#levelsDropdown + .dropdown-menu {
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    background-color: #1e293b !important;
+    min-width: 180px;
+}
+#levelsDropdown + .dropdown-menu .dropdown-item {
+    border-radius: 8px;
+    margin: 6px 4px;
+    padding: 10px 16px;
+    font-weight: bold;
+    color: #fff !important;
+    text-align: center;
+    transition: all 0.2s ease;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#levelsDropdown + .dropdown-menu li:nth-child(1) .dropdown-item {
+    background: #1a365d !important; /* Level 1: Navy */
+}
+#levelsDropdown + .dropdown-menu li:nth-child(2) .dropdown-item {
+    background: #198754 !important; /* Level 2: Green */
+}
+#levelsDropdown + .dropdown-menu li:nth-child(3) .dropdown-item {
+    background: #0d6efd !important; /* Level 3: Blue */
+}
+#levelsDropdown + .dropdown-menu li:nth-child(4) .dropdown-item {
+    background: #dc3545 !important; /* Level 4: Red */
+}
+#levelsDropdown + .dropdown-menu .dropdown-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    filter: brightness(1.15);
+}
+
+/* Prevent navbar items from wrapping on any screen size */
+.navbar > .container, .navbar > .container-fluid {
+    flex-wrap: nowrap !important;
+}
+.navbar-collapse {
+    flex-wrap: nowrap !important;
+}
+.navbar-nav {
+    flex-wrap: nowrap !important;
+}
+.navbar-nav .nav-link-item, .navbar-nav .nav-item {
+    white-space: nowrap !important;
+}
+.navbar-brand, .navbar-brand div, .navbar-brand span, .navbar-brand small {
+    white-space: nowrap !important;
+}
+.navbar .btn {
+    white-space: nowrap !important;
+}
+
+/* Adjust sizes for laptop screens to prevent collision */
+@media (min-width: 1200px) and (max-width: 1350px) {
+    .navbar-brand span {
+        font-size: 0.95rem !important;
+    }
+    .navbar-brand small {
+        font-size: 0.7rem !important;
+    }
+    .navbar-brand-logo {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    .nav-link {
+        font-size: 0.82rem !important;
+        padding: 0.4rem 0.6rem !important;
+        margin: 0 0.1rem !important;
+    }
+    .navbar-nav {
+        gap: 2px !important;
+    }
+    .navbar .btn-gold, .navbar .btn-sm, .navbar .btn-warning {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Premium Ads Overlay & Interstitial Popup Styles */
+.ad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.65); /* Elegant semi-transparent slate */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeInAd 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    direction: rtl;
+    text-align: right;
+}
+
+.ad-overlay.fade-out-ad {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+@keyframes fadeInAd {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ad-glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    padding: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-theme .ad-glass-card {
+    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ad-glass-card.animate-pop {
+    animation: popInAd 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popInAd {
+    from {
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.ad-card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.ad-badge {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #000000;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.ad-card-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.ad-card-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+}
+
+.ad-card-body {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #000000;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ad-media-wrapper {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ad-media-content {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.ad-card-body:hover .ad-media-content {
+    transform: scale(1.03);
+}
+
+/* Video adjustments */
+.video-wrapper video {
+    background-color: #000;
+}
+
+.ad-video-unmute-btn {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.ad-video-unmute-btn:hover {
+    background: rgba(15, 23, 42, 0.85);
+    transform: scale(1.1);
+}
+
+.ad-action-banner {
+    background: linear-gradient(90deg, rgba(26, 54, 93, 0.95), rgba(15, 43, 70, 0.95));
+    color: #ffffff;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease;
+}
+
+.ad-card-body:hover .ad-action-banner {
+    background: linear-gradient(90deg, #1b3d60, #0f2b46);
+}
+
+/* Skip Button & Footer styling */
+.ad-card-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.ad-skip-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+}
+
+.ad-skip-button.active-skip {
+    background: #ffffff;
+    color: #0f2b46 !important;
+    border-color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.ad-skip-button.active-skip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.45);
+}
+
+/* Spinner indicator */
+.ad-spinner-circle {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: ad-spin-anim 0.8s linear infinite;
+    display: inline-block;
+}
+
+@keyframes ad-spin-anim {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustment */
+@media (max-width: 480px) {
+    .ad-glass-card {
+        padding: 16px;
+    }
+    .ad-media-wrapper {
+        height: 200px;
+    }
+    .ad-card-title {
+        font-size: 1.15rem;
+    }
+}
+
