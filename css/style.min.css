@@ -1847,40 +1847,106 @@ body.dark-theme .level-select-btn.active-level {
 
 /* Style levels dropdown items inside navbar */
 #levelsDropdown + .dropdown-menu {
-    border-radius: 12px;
-    padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    background-color: #1e293b !important;
-    min-width: 180px;
+    border-radius: 18px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+    background-color: #0b1329 !important; /* Dark rich navy slate */
+    min-width: 260px !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    gap: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
+
 #levelsDropdown + .dropdown-menu .dropdown-item {
-    border-radius: 8px;
-    margin: 6px 4px;
-    padding: 10px 16px;
-    font-weight: bold;
-    color: #fff !important;
-    text-align: center;
-    transition: all 0.2s ease;
-    border: none !important;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 12px !important;
+    margin: 0 !important;
+    padding: 12px 20px !important;
+    font-weight: 700 !important;
+    font-size: 1.02rem !important;
+    color: #ffffff !important;
+    text-align: right !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
+
+/* Add premium icons on the right (before text in RTL) */
+#levelsDropdown + .dropdown-menu li:nth-child(1) .dropdown-item::before {
+    content: "\f19d";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-left: 12px;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(2) .dropdown-item::before {
+    content: "\f5da";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-left: 12px;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(3) .dropdown-item::before {
+    content: "\f1c0";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-left: 12px;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(4) .dropdown-item::before {
+    content: "\f3ed";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-left: 12px;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Vibrant level gradient backgrounds */
 #levelsDropdown + .dropdown-menu li:nth-child(1) .dropdown-item {
-    background: #1a365d !important; /* Level 1: Navy */
+    background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%) !important; /* Level 1: Navy */
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2) !important;
 }
 #levelsDropdown + .dropdown-menu li:nth-child(2) .dropdown-item {
-    background: #198754 !important; /* Level 2: Green */
+    background: linear-gradient(135deg, #15803d 0%, #14532d 100%) !important; /* Level 2: Green */
+    box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2) !important;
 }
 #levelsDropdown + .dropdown-menu li:nth-child(3) .dropdown-item {
-    background: #0d6efd !important; /* Level 3: Blue */
+    background: linear-gradient(135deg, #0d6efd 0%, #1e40af 100%) !important; /* Level 3: Blue */
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2) !important;
 }
 #levelsDropdown + .dropdown-menu li:nth-child(4) .dropdown-item {
-    background: #dc3545 !important; /* Level 4: Red */
+    background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%) !important; /* Level 4: Red */
+    box-shadow: 0 4px 10px rgba(185, 28, 28, 0.2) !important;
 }
-#levelsDropdown + .dropdown-menu .dropdown-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    filter: brightness(1.15);
+
+/* Premium hover reactions */
+#levelsDropdown + .dropdown-menu li:nth-child(1) .dropdown-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(2) .dropdown-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(21, 128, 61, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(3) .dropdown-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+#levelsDropdown + .dropdown-menu li:nth-child(4) .dropdown-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(185, 28, 28, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
 /* Prevent navbar items from wrapping on any screen size */

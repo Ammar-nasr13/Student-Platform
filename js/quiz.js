@@ -81,6 +81,27 @@ window.subjectsByLevel = {
   };
 
 function initQuizPageEvents() {
+  if (localStorage.getItem("is_faculty") === "true" || localStorage.getItem("currentRole") === "faculty") {
+    const setupCard = document.getElementById("quiz-setup");
+    if (setupCard) {
+      setupCard.innerHTML = `
+        <div class="text-center py-5">
+          <div class="fs-1 text-danger mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h3 class="fw-bold text-primary mb-3">خاصية غير متاحة لأعضاء هيئة التدريس</h3>
+          <p class="text-muted mb-4 fs-5">عذراً، بدء وحل الاختبارات التفاعلية متاح فقط للطلاب لتقييم مستواهم الدراسي.</p>
+          <div class="alert alert-warning border-0 border-start border-4 border-warning text-right mb-4 mx-auto" style="max-width: 500px;">
+            <i class="fa-solid fa-circle-info ms-2"></i> بصفتك عضو هيئة تدريس، يمكنك إضافة وإدارة الاختبارات من لوحة التحكم الخاصة بك.
+          </div>
+          <div class="d-flex gap-3 justify-content-center">
+            <a href="add_exam.html" class="btn btn-navy-solid px-4 py-2" style="background-color: #0f2b46; color: white; border-radius: 8px; text-decoration: none;"><i class="fa-solid fa-plus-circle me-2"></i>إضافة اختبار جديد</a>
+            <a href="index.html" class="btn btn-outline-dark px-4 py-2" style="border-radius: 8px; text-decoration: none;"><i class="fa-solid fa-home me-2"></i>الصفحة الرئيسية</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+  }
+
   const e = document.getElementById("quiz-level-select"),
     t = document.getElementById("quiz-subject-select"),
     n = document.getElementById("quiz-exam-select"),
@@ -150,6 +171,21 @@ function initQuizPageEvents() {
       s.disabled = !n.value;
     }),
     s.addEventListener("click", () => {
+      if (localStorage.getItem("is_faculty") === "true" || localStorage.getItem("currentRole") === "faculty") {
+        const errorMsg = "عذراً، بدء وحل الاختبارات التفاعلية متاح فقط للطلاب! بصفتك عضو هيئة تدريس، يمكنك فقط إدارة أو إضافة الاختبارات.";
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: "تنبيه الصلاحية",
+            text: errorMsg,
+            icon: "warning",
+            confirmButtonColor: "#0f2b46",
+            confirmButtonText: "موافق"
+          });
+        } else {
+          showToast(errorMsg, "warning");
+        }
+        return;
+      }
       const s = e.value,
         o = t.value,
         i = n.value,
@@ -170,6 +206,21 @@ function initQuizPageEvents() {
     }));
 }
 function startQuiz(e, t, n) {
+  if (localStorage.getItem("is_faculty") === "true" || localStorage.getItem("currentRole") === "faculty") {
+    const errorMsg = "عذراً، بدء وحل الاختبارات التفاعلية متاح فقط للطلاب! بصفتك عضو هيئة تدريس، يمكنك فقط إدارة أو إضافة الاختبارات.";
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        title: "تنبيه الصلاحية",
+        text: errorMsg,
+        icon: "warning",
+        confirmButtonColor: "#0f2b46",
+        confirmButtonText: "موافق"
+      });
+    } else {
+      showToast(errorMsg, "warning");
+    }
+    return;
+  }
   let s = (window.currentSubjectExams || [])[n];
   if (!s) {
     showToast("عذراً، هذا الاختبار غير متوفر حالياً.", "warning");
