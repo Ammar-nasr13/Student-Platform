@@ -2026,9 +2026,9 @@ body.dark-theme .level-select-btn.active-level {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(15, 23, 42, 0.65); /* Elegant semi-transparent slate */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background-color: rgba(8, 13, 28, 0.75); /* Rich immersive dark slate */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -2056,19 +2056,27 @@ body.dark-theme .level-select-btn.active-level {
     width: 100%;
     max-width: 520px;
     padding: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(13, 110, 253, 0.15);
     color: #ffffff;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.dark-theme .ad-glass-card {
-    background: rgba(15, 23, 42, 0.35);
+    background: rgba(15, 23, 42, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 50px rgba(0, 0, 0, 0.4);
 }
 
 .ad-glass-card.animate-pop {
     animation: popInAd 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ad-glass-card.fade-out-card {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 1, 1);
 }
 
 @keyframes popInAd {
@@ -2088,16 +2096,33 @@ body.dark-theme .ad-glass-card {
     margin-bottom: 16px;
 }
 
+.ad-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 .ad-badge {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: #000000;
     font-size: 0.72rem;
     font-weight: 800;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 50px;
     display: inline-flex;
     align-items: center;
-    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.ad-counter {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
 }
 
 .ad-card-title {
@@ -2152,7 +2177,7 @@ body.dark-theme .ad-glass-card {
     position: absolute;
     bottom: 16px;
     left: 16px;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 23, 42, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
     width: 38px;
@@ -2164,18 +2189,36 @@ body.dark-theme .ad-glass-card {
     justify-content: center;
     backdrop-filter: blur(4px);
     transition: all 0.2s ease;
-    z-index: 5;
+    z-index: 15;
 }
 
 .ad-video-unmute-btn:hover {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.9);
     transform: scale(1.1);
+}
+
+/* Progress bar countdown indicator */
+.ad-progress-bar-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 12;
+}
+
+.ad-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #e0a904);
+    width: 100%;
+    transition: width 1s linear;
 }
 
 .ad-action-banner {
     background: linear-gradient(90deg, rgba(26, 54, 93, 0.95), rgba(15, 43, 70, 0.95));
     color: #ffffff;
-    padding: 10px 16px;
+    padding: 12px 16px;
     font-size: 0.85rem;
     font-weight: 700;
     display: flex;
@@ -2200,7 +2243,7 @@ body.dark-theme .ad-glass-card {
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.6);
     border-radius: 50px;
-    padding: 10px 24px;
+    padding: 10px 28px;
     font-size: 0.85rem;
     font-weight: 700;
     display: inline-flex;
