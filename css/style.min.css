@@ -1856,8 +1856,12 @@ body.dark-theme .level-select-btn.active-level {
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
     gap: 10px !important;
-    display: flex !important;
+    display: none !important;
     flex-direction: column !important;
+}
+
+#levelsDropdown + .dropdown-menu.show {
+    display: flex !important;
 }
 
 #levelsDropdown + .dropdown-menu .dropdown-item {
