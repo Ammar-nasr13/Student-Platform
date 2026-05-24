@@ -19,6 +19,7 @@
     <meta property="og:title" content="المنصة التعليمية لطلاب قسم تكنولوجيا صناعة السياحة والضيافة">
     <meta property="og:description" content="منصة طلابية متخصصة تجمع كل ما يحتاجه طالب كلية السياحة والفنادق بجامعة المنيا لتسهيل التحصيل العلمي والاطلاع على مستجدات المقررات والامتحانات.">
     <meta property="og:image" content="https://tourism-tech.online/assets/logo.webp">
+    <meta property="og:site_name" content="تكنولوجيا صناعة السياحة والضيافة">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -30,6 +31,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/webp" href="assets/logo.webp">
     <link rel="apple-touch-icon" href="assets/logo.webp">
+    <meta name="application-name" content="تكنولوجيا صناعة السياحة والضيافة">
 
     <!-- Preconnect & Performance (Speed SEO) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,19 +55,28 @@
 
     <!-- Structured Data (Schema.org) JSON-LD -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "CollegeOrUniversity",
-      "name": "قسم تكنولوجيا صناعة السياحة والضيافة - جامعة المنيا",
-      "url": "https://tourism-tech.online/",
-      "logo": "https://tourism-tech.online/assets/logo.webp",
-      "description": "المنصة التعليمية لطلاب قسم تكنولوجيا صناعة السياحة والضيافة لتسهيل العملية التعليمية.",
-      "parentOrganization": {
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "تكنولوجيا صناعة السياحة والضيافة",
+        "alternateName": ["tourism-tech.online", "منصة تكنولوجيا صناعة السياحة والضيافة"],
+        "url": "https://tourism-tech.online/"
+      },
+      {
+        "@context": "https://schema.org",
         "@type": "CollegeOrUniversity",
-        "name": "جامعة المنيا",
-        "url": "https://www.minia.edu.eg/"
+        "name": "قسم تكنولوجيا صناعة السياحة والضيافة - جامعة المنيا",
+        "url": "https://tourism-tech.online/",
+        "logo": "https://tourism-tech.online/assets/logo.webp",
+        "description": "المنصة التعليمية لطلاب قسم تكنولوجيا صناعة السياحة والضيافة لتسهيل العملية التعليمية.",
+        "parentOrganization": {
+          "@type": "CollegeOrUniversity",
+          "name": "جامعة المنيا",
+          "url": "https://www.minia.edu.eg/"
+        }
       }
-    }
+    ]
     </script>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YH1FPW7KTY"></script>
@@ -424,24 +435,77 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="p-4 rounded-4 custom-vision-card shadow-sm">
-                        <h4 class="fw-bold text-primary mb-4 text-center border-bottom pb-3"><i class="fa-solid fa-bullhorn text-primary me-2"></i>رؤية قسم تكنولوجيا صناعة السياحة والضيافة</h4>
-                        <p class="text-muted lh-lg" style="text-align: justify;">
-                            يسعى قسم تكنولوجيا صناعة السياحة والضيافة بكلية السياحة والفنادق بجامعة المنيا إلى إعداد خريجين رياديين مؤهلين بالمعارف النظرية والمهارات التكنولوجية والعملية اللازمة للمنافسة في سوق العمل السياحي والفندقي محلياً وإقليمياً. ويتم ذلك من خلال توظيف أحدث أساليب التعليم والتدريب الميداني والتقني الموجه لتحقيق معايير الجودة الشاملة والاستدامة البيئية لقطاع الضيافة.
-                        </p>
-                        <div class="d-flex justify-content-around mt-4 pt-3 border-top border-light">
-                            <div class="text-center">
-                                <span class="d-block text-primary fw-bold fs-5">ريادة</span>
-                                <small class="text-muted">تعليم تقني ريادي</small>
+                    <div class="p-4 rounded-4 custom-vision-card shadow-sm h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="fw-bold text-primary mb-4 text-center border-bottom pb-3">
+                                <i class="fa-solid fa-bullseye text-primary me-2"></i>تعريف بالبرنامج الأكاديمي
+                            </h4>
+                            
+                            <!-- التبويبات للرؤية والرسالة والأهداف -->
+                            <ul class="nav nav-pills custom-vision-tabs justify-content-center mb-4 gap-2" id="visionTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active py-2 px-3 fw-bold rounded-3" id="vision-tab-btn" data-bs-toggle="pill" data-bs-target="#vision-panel" type="button" role="tab" aria-controls="vision-panel" aria-selected="true">
+                                        <i class="fa-solid fa-eye me-1"></i>الرؤية
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-2 px-3 fw-bold rounded-3" id="mission-tab-btn" data-bs-toggle="pill" data-bs-target="#mission-panel" type="button" role="tab" aria-controls="mission-panel" aria-selected="false">
+                                        <i class="fa-solid fa-envelope-open-text me-1"></i>الرسالة
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-2 px-3 fw-bold rounded-3" id="goals-tab-btn" data-bs-toggle="pill" data-bs-target="#goals-panel" type="button" role="tab" aria-controls="goals-panel" aria-selected="false">
+                                        <i class="fa-solid fa-list-check me-1"></i>الأهداف
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content px-1" id="visionTabContent" style="min-height: 250px;">
+                                <!-- تبويب الرؤية -->
+                                <div class="tab-pane fade show active" id="vision-panel" role="tabpanel" aria-labelledby="vision-tab-btn">
+                                    <div class="text-center py-4">
+                                        <div class="fs-1 text-warning mb-3"><i class="fa-solid fa-compass"></i></div>
+                                        <h5 class="fw-bold text-primary mb-3">الرؤية</h5>
+                                        <p class="text-muted lh-lg fs-5">"التميز والريادة في تكنولوجيا السياحة والضيافة"</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- تبويب الرسالة -->
+                                <div class="tab-pane fade" id="mission-panel" role="tabpanel" aria-labelledby="mission-tab-btn">
+                                    <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-quote-right me-2 text-warning"></i>الرسالة</h5>
+                                    <p class="text-muted lh-lg" style="text-align: justify; font-size: 0.95rem;">
+                                        يلتزم برنامج تكنولوجيا صناعة السياحة والضيافة بإعداد خريج قادر على المنافسة في سوق العمل من خلال مقررات متخصصة في مجال تكنولوجيا السياحة والضيافة، وتقديم بحث علمي متميز يساهم في الارتقاء بصناعة السياحة والضيافة ويواكب التحول الرقمي والتطور التكنولوجي السريع، ويساهم في خدمة وتطوير المجتمع محلياً وإقليمياً من خلال ريادة الأعمال والابتكار والاستدامة في إطار من القيم والأخلاق.
+                                    </p>
+                                </div>
+                                
+                                <!-- تبويب الأهداف -->
+                                <div class="tab-pane fade" id="goals-panel" role="tabpanel" aria-labelledby="goals-tab-btn">
+                                    <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-bullseye me-2 text-warning"></i>أهداف البرنامج</h5>
+                                    <ul class="text-muted list-unstyled p-0 m-0" style="text-align: right; font-size: 0.9rem; line-height: 1.6;">
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> توظيف أحدث التقنيات في إدارة وتشغيل المنشآت السياحية والفندقية.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> إعداد خريج قادر على المنافسة في سوق العمل المحلي والإقليمي والدولي.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> تعزيز ثقافة الابتكار وريادة الأعمال في مجالات السياحة والضيافة.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> تقديم تعليم أكاديمي تطبيقي قائم على معايير الجودة والاعتماد الأكاديمي.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> دمج التكنولوجيا والابتكار في العملية التعليمية والتدريب الميداني.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> تعزيز قيم المهنية والأخلاقيات والمسؤولية المجتمعية والاستدامة في صناعة السياحة والضيافة.</li>
+                                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2 ms-1"></i> بناء شراكات استراتيجية مع مؤسسات القطاع السياحي والفندقي لتعزيز فرص التدريب والتوظيف.</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="text-center">
-                                <span class="d-block text-primary fw-bold fs-5">مهارة</span>
-                                <small class="text-muted">تدريب عملي ميداني</small>
+                        </div>
+                        
+                        <!-- المنسق -->
+                        <div class="mt-4 pt-3 border-top border-light d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </div>
+                                <div class="text-right">
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">منسق البرنامج</small>
+                                    <span class="fw-bold text-primary" style="font-size: 0.9rem;">أ.د/ أسماء عبدالرؤوف خلف</span>
+                                </div>
                             </div>
-                            <div class="text-center">
-                                <span class="d-block text-primary fw-bold fs-5">تميز</span>
-                                <small class="text-muted">تأهيل لسوق العمل</small>
-                            </div>
+                            <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-bold" style="font-size: 0.75rem;">برنامج معتمد</span>
                         </div>
                     </div>
                 </div>
