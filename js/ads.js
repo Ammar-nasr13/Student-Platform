@@ -1,70 +1,80 @@
 /**
- * Platform Interstitial Ads Engine - Premium Carousel Queue Version
- * Fetches active ads from Appwrite, filters by user frequency cap, and displays a premium pop-up queue.
+ * Platform Interstitial Ads Engine - Premium Floating Corner Version
+ * Fetches active ads from Appwrite, filters by user frequency cap, and displays a floating queue on the homepage.
  */
 
 async function initAppwriteAds() {
+  // 1. Only run on the homepage
+  const path = window.location.pathname.split("/").pop();
+  const isHomepage = (!path || path === "index.html" || path === "");
+  if (!isHomepage) {
+    return;
+  }
+
   if (!window.AppwriteDB || !window.DB_CONFIG || !window.DB_CONFIG.adsCol) {
     console.warn("Ads Engine: Appwrite DB or configuration is missing.");
     return;
   }
 
-  try {
-    // 1. Fetch active ads from the database
-    const response = await window.AppwriteDB.listDocuments(
-      window.DB_CONFIG.dbId,
-      window.DB_CONFIG.adsCol,
-      [window.AppwriteQuery.equal("isActive", true)]
-    );
-
-    const ads = response.documents;
-    if (!ads || ads.length === 0) {
-      return;
-    }
-
-    // 2. Load and clean up local frequency capping logs
-    const now = Date.now();
-    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
-    let impressions = {};
-    
+  // Delay the advertisement loading and display by 10 seconds after user enters the website
+  setTimeout(async () => {
     try {
-      impressions = JSON.parse(localStorage.getItem("platform_ads_impressions")) || {};
-    } catch (e) {
-      impressions = {};
-    }
+      // 2. Fetch active ads from the database
+      const response = await window.AppwriteDB.listDocuments(
+        window.DB_CONFIG.dbId,
+        window.DB_CONFIG.adsCol,
+        [window.AppwriteQuery.equal("isActive", true)]
+      );
 
-    // Clean up expired impressions (older than 7 days)
-    for (const adId in impressions) {
-      if (now - impressions[adId].weekStart > oneWeekMs) {
-        delete impressions[adId];
+      const ads = response.documents;
+      if (!ads || ads.length === 0) {
+        return;
       }
+
+      // 3. Load and clean up local frequency capping logs
+      const now = Date.now();
+      const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+      let impressions = {};
+      
+      try {
+        impressions = JSON.parse(localStorage.getItem("platform_ads_impressions")) || {};
+      } catch (e) {
+        impressions = {};
+      }
+
+      // Clean up expired impressions (older than 7 days)
+      for (const adId in impressions) {
+        if (now - impressions[adId].weekStart > oneWeekMs) {
+          delete impressions[adId];
+        }
+      }
+
+      // 4. Filter eligible ads
+      const eligibleAds = ads.filter((ad) => {
+        const log = impressions[ad.$id];
+        if (!log) return true; // Never seen this week
+        return log.count < ad.weeklyFrequency; // Below cap
+      });
+
+      if (eligibleAds.length === 0) {
+        return; // No ads available for show this week
+      }
+
+      // 5. Start displaying ads queue one after another on the bottom-left
+      startAdsQueue(eligibleAds, impressions);
+    } catch (error) {
+      console.log("Ads Engine: No active advertisements found or ads collection not initialized.", error);
     }
-
-    // 3. Filter eligible ads
-    const eligibleAds = ads.filter((ad) => {
-      const log = impressions[ad.$id];
-      if (!log) return true; // Never seen this week
-      return log.count < ad.weeklyFrequency; // Below cap
-    });
-
-    if (eligibleAds.length === 0) {
-      return; // No ads available for show this week
-    }
-
-    // 4. Start displaying ads queue one after another
-    startAdsQueue(eligibleAds, impressions);
-  } catch (error) {
-    console.log("Ads Engine: No active advertisements found or ads collection not initialized.", error);
-  }
+  }, 10000);
 }
 
 function startAdsQueue(ads, impressions) {
   if (document.getElementById("ad-overlay-container")) return;
 
-  // Prevent scroll on main body to avoid user scrolling underneath the ad
-  document.body.style.overflow = "hidden";
+  // Note: We DO NOT lock scrolling anymore (document.body.style.overflow = "hidden" is removed)
+  // because the ad floats on the side and the user can browse normally.
 
-  // Create overlay container
+  // Create overlay container (which floats at the bottom-left)
   const overlay = document.createElement("div");
   overlay.id = "ad-overlay-container";
   overlay.className = "ad-overlay";
@@ -72,6 +82,13 @@ function startAdsQueue(ads, impressions) {
 
   let currentIdx = 0;
   let timer = null;
+
+  // Helper to validate Appwrite Storage file IDs
+  function isValidId(id) {
+    if (id === undefined || id === null) return false;
+    const str = String(id).trim();
+    return str !== "" && str !== "undefined" && str !== "null";
+  }
 
   // Error handler for image issues (e.g. wrong permissions or invalid file IDs)
   window.handleAdImageError = function(img, mediaId) {
@@ -89,20 +106,22 @@ function startAdsQueue(ads, impressions) {
 
   function renderCurrentAd() {
     const ad = ads[currentIdx];
+    console.log("Ads Engine Debug: Current ad data:", ad);
     
-    // Resolve dynamic Storage view URL if mediaId is provided, fallback to mediaUrl
-    const mediaUrl = ad.mediaId 
-      ? `https://appwrite.etihadalmdina.com/v1/storage/buckets/${(window.DB_CONFIG && window.DB_CONFIG.adsBucket) || '6a106b7a00140b147774'}/files/${ad.mediaId}/view?project=6a0f923e00138d15d172`
-      : ad.mediaUrl;
-
+    // Check if videoId/imageId are valid IDs in the database
+    const hasVideo = isValidId(ad.videoId);
+    const hasImage = isValidId(ad.imageId);
+    
     let mediaHtml = "";
-    if (ad.mediaType === "video") {
+    
+    if (hasVideo) {
+      const videoUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${(window.DB_CONFIG && window.DB_CONFIG.adsBucket) || '6a106b7a00140b147774'}/files/${ad.videoId}/view?project=6a0f923e00138d15d172`;
       mediaHtml = `
         <div class="ad-media-wrapper video-wrapper">
           <video id="ad-media-video" class="ad-media-content" autoplay muted playsinline loop>
-            <source src="${mediaUrl}" type="video/mp4">
-            <source src="${mediaUrl}" type="video/ogg">
-            <source src="${mediaUrl}" type="video/webm">
+            <source src="${videoUrl}" type="video/mp4">
+            <source src="${videoUrl}" type="video/ogg">
+            <source src="${videoUrl}" type="video/webm">
             Your browser does not support the video tag.
           </video>
           <button class="ad-video-unmute-btn" id="ad-video-mute-toggle" title="كتم/تشغيل الصوت">
@@ -113,9 +132,14 @@ function startAdsQueue(ads, impressions) {
           </div>
         </div>`;
     } else {
+      // Fallback image if imageId is defined, otherwise use abstract card design
+      const imageUrl = hasImage 
+        ? `https://appwrite.etihadalmdina.com/v1/storage/buckets/${(window.DB_CONFIG && window.DB_CONFIG.adsBucket) || '6a106b7a00140b147774'}/files/${ad.imageId}/view?project=6a0f923e00138d15d172`
+        : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800";
+        
       mediaHtml = `
         <div class="ad-media-wrapper image-wrapper">
-          <img src="${mediaUrl}" alt="${ad.title}" class="ad-media-content" loading="lazy" onerror="handleAdImageError(this, '${ad.mediaId}')">
+          <img src="${imageUrl}" alt="${ad.title}" class="ad-media-content" loading="lazy" onerror="handleAdImageError(this, '${ad.imageId || ''}')">
           <div class="ad-progress-bar-container">
             <div class="ad-progress-bar" id="ad-progress-bar" style="width: 100%;"></div>
           </div>
@@ -127,17 +151,7 @@ function startAdsQueue(ads, impressions) {
 
     overlay.innerHTML = `
       <div class="ad-glass-card animate-pop" id="ad-card-content">
-        <!-- Header info -->
-        <div class="ad-card-header">
-          <div class="ad-header-top">
-            <span class="ad-badge"><i class="fa-solid fa-rectangle-ad me-1"></i> إعلان ممول</span>
-            ${ads.length > 1 ? `<span class="ad-counter">إعلان ${currentIdx + 1} من ${ads.length}</span>` : ''}
-          </div>
-          <h4 class="ad-card-title mt-2 mb-1">${ad.title}</h4>
-          <p class="ad-card-desc mb-3">${ad.description}</p>
-        </div>
-
-        <!-- Main ad contents clickable (direct to actionUrl) -->
+        <!-- 1. Main ad contents (Image/Video) at the top of the card -->
         <div class="ad-card-body" id="ad-click-target" style="${ad.actionUrl ? 'cursor: pointer;' : ''}">
           ${mediaHtml}
           ${ad.actionUrl ? `
@@ -147,7 +161,17 @@ function startAdsQueue(ads, impressions) {
           </div>` : ''}
         </div>
 
-        <!-- Footer countdown & skip button -->
+        <!-- 2. Header info (Title and Description) in the middle -->
+        <div class="ad-card-header mt-3">
+          <div class="ad-header-top">
+            <span class="ad-badge"><i class="fa-solid fa-rectangle-ad me-1"></i> إعلان ممول</span>
+            ${ads.length > 1 ? `<span class="ad-counter">إعلان ${currentIdx + 1} من ${ads.length}</span>` : ''}
+          </div>
+          <h4 class="ad-card-title mt-2 mb-1">${ad.title}</h4>
+          <p class="ad-card-desc mb-0">${ad.description}</p>
+        </div>
+
+        <!-- 3. Footer countdown & skip button at the bottom -->
         <div class="ad-card-footer mt-3">
           <button id="ad-skip-btn" class="ad-skip-button" disabled>
             <span class="ad-spinner-circle" id="ad-spinner"></span>
@@ -246,7 +270,6 @@ function startAdsQueue(ads, impressions) {
           overlay.classList.add("fade-out-ad");
           setTimeout(() => {
             overlay.remove();
-            document.body.style.overflow = ""; // Restore scrolling
           }, 400);
         }
       });
@@ -257,15 +280,14 @@ function startAdsQueue(ads, impressions) {
   renderCurrentAd();
 }
 
-// Mock function to test the premium ad popup visually from browser console
-window.testPremiumAdPopup = function(type = 'image') {
+// Mock function to test the premium ad popup visually from browser console (triggers immediately without delay)
+window.testPremiumAdPopup = function() {
   const mockAds = [
     {
       $id: "mock_ad_test_1",
       title: "تطبيق متاحف جامعة المنيا",
-      description: "تطبيق متحفي يحتوي على متاحف جامعة المنيا ويجمع بين التاريخ والفن والطبيعة.",
-      mediaUrl: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=1000",
-      mediaType: "image",
+      description: "تطبيق متحفي يحتوي على متاحف جامعة المنيا ويجمع بين التاريخ والفن والطبيعة المتميزة.",
+      imageId: "mock_image_id_1", // Test fallback logic
       duration: 5,
       weeklyFrequency: 99,
       actionUrl: "https://mu.edu.eg"
@@ -274,8 +296,7 @@ window.testPremiumAdPopup = function(type = 'image') {
       $id: "mock_ad_test_2",
       title: "مكتبة المنصة الأكاديمية",
       description: "احصل على جميع ملخصات المحاضرات والكتب والأسئلة الخاصة بالامتحانات لمختلف المستويات مجاناً.",
-      mediaUrl: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?q=80&w=1000",
-      mediaType: "image",
+      imageId: "mock_image_id_2",
       duration: 5,
       weeklyFrequency: 99,
       actionUrl: "https://mu.edu.eg"
