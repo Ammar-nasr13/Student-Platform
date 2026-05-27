@@ -17,7 +17,7 @@ async function initAppwriteAds() {
   }
 
   // Delay the advertisement loading and display by 10 seconds after user enters the website
-  setTimeout(async () => {
+  setTimeout(async () => { // 5 ثواني انتظار قبل ظهور الإعلان
     try {
       // 2. Fetch active ads from the database
       const response = await window.AppwriteDB.listDocuments(
@@ -31,44 +31,37 @@ async function initAppwriteAds() {
         return;
       }
 
-      // 3. Load and clean up local frequency capping logs
-      const now = Date.now();
-      const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
-      let impressions = {};
-      
+      // 3. Load the "last shown" timestamps from localStorage
+      //    Ads will show once, then again only after 1 hour (3600000ms).
+      let adTimestamps = {};
       try {
-        impressions = JSON.parse(localStorage.getItem("platform_ads_impressions")) || {};
+        adTimestamps = JSON.parse(localStorage.getItem("platform_ads_timestamps")) || {};
       } catch (e) {
-        impressions = {};
+        adTimestamps = {};
       }
 
-      // Clean up expired impressions (older than 7 days)
-      for (const adId in impressions) {
-        if (now - impressions[adId].weekStart > oneWeekMs) {
-          delete impressions[adId];
-        }
-      }
+      const now = Date.now();
+      const HOUR_MS = 3600000;
 
-      // 4. Filter eligible ads
+      // 4. Filter ads that have not been shown in the last hour
       const eligibleAds = ads.filter((ad) => {
-        const log = impressions[ad.$id];
-        if (!log) return true; // Never seen this week
-        return log.count < ad.weeklyFrequency; // Below cap
+        const lastShown = adTimestamps[ad.$id] || 0;
+        return (now - lastShown) >= HOUR_MS;
       });
 
       if (eligibleAds.length === 0) {
-        return; // No ads available for show this week
+        return;
       }
 
       // 5. Start displaying ads queue one after another on the bottom-left
-      startAdsQueue(eligibleAds, impressions);
+      startAdsQueue(eligibleAds, adTimestamps);
     } catch (error) {
       console.log("Ads Engine: No active advertisements found or ads collection not initialized.", error);
     }
-  }, 10000);
+  }, 5000); // 5 ثواني
 }
 
-function startAdsQueue(ads, impressions) {
+function startAdsQueue(ads, adTimestamps) {
   if (document.getElementById("ad-overlay-container")) return;
 
   // Note: We DO NOT lock scrolling anymore (document.body.style.overflow = "hidden" is removed)
@@ -246,13 +239,9 @@ function startAdsQueue(ads, impressions) {
       skipBtn.addEventListener("click", () => {
         clearInterval(timer);
 
-        // Save impression count to localStorage
-        const now = Date.now();
-        if (!impressions[ad.$id]) {
-          impressions[ad.$id] = { count: 0, weekStart: now };
-        }
-        impressions[ad.$id].count++;
-        localStorage.setItem("platform_ads_impressions", JSON.stringify(impressions));
+        // Save the timestamp of when this ad was last shown — will show again after cooldown
+        adTimestamps[ad.$id] = Date.now();
+        localStorage.setItem("platform_ads_timestamps", JSON.stringify(adTimestamps));
 
         // Go to next ad or close modal
         if (currentIdx < ads.length - 1) {
