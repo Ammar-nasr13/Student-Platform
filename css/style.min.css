@@ -2222,9 +2222,9 @@ body.dark-theme .level-select-btn.active-level {
     .navbar-brand span, .navbar-brand span.text-truncate {
         font-size: 0.68rem !important;
     }
-    /* الوصف الصغير يختفي تحت 576px لتوفير المساحة */
     .navbar-brand small, .navbar-brand small.text-truncate {
-        display: none !important;
+        font-size: 0.58rem !important;
+        display: block !important;
     }
     .navbar-brand-logo {
         width: 34px !important;
@@ -2235,6 +2235,10 @@ body.dark-theme .level-select-btn.active-level {
     .navbar-brand span, .navbar-brand span.text-truncate {
         font-size: 0.62rem !important;
     }
+    .navbar-brand small, .navbar-brand small.text-truncate {
+        font-size: 0.55rem !important;
+        display: block !important;
+    }
     .navbar-brand-logo {
         width: 30px !important;
         height: 30px !important;
@@ -2244,6 +2248,10 @@ body.dark-theme .level-select-btn.active-level {
 @media (max-width: 360px) {
     .navbar-brand span, .navbar-brand span.text-truncate {
         font-size: 0.57rem !important;
+    }
+    .navbar-brand small, .navbar-brand small.text-truncate {
+        font-size: 0.52rem !important;
+        display: block !important;
     }
     .navbar-brand-logo {
         width: 28px !important;
