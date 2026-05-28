@@ -259,22 +259,42 @@ if (addExamForm) {
         saveBtn.disabled = true;
 
         try {
-            await window.AppwriteDB.createDocument(
-                window.DB_CONFIG.dbId, 
-                window.DB_CONFIG.examsCol, 
-                window.AppwriteID.unique(), 
-                examData
-            );
-            
-            if (typeof Swal !== 'undefined') {
-                await Swal.fire({
-                    title: 'نجاح!',
-                    text: 'تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!',
-                    icon: 'success',
-                    confirmButtonText: 'حسناً'
-                });
+            if (window.editingExamId) {
+                await window.AppwriteDB.updateDocument(
+                    window.DB_CONFIG.dbId, 
+                    window.DB_CONFIG.examsCol, 
+                    window.editingExamId, 
+                    examData
+                );
+                
+                if (typeof Swal !== 'undefined') {
+                    await Swal.fire({
+                        title: 'نجاح!',
+                        text: 'تم تحديث الاختبار بنجاح!',
+                        icon: 'success',
+                        confirmButtonText: 'حسناً'
+                    });
+                } else {
+                    alert('تم تحديث الاختبار بنجاح!');
+                }
             } else {
-                alert('تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!');
+                await window.AppwriteDB.createDocument(
+                    window.DB_CONFIG.dbId, 
+                    window.DB_CONFIG.examsCol, 
+                    window.AppwriteID.unique(), 
+                    examData
+                );
+                
+                if (typeof Swal !== 'undefined') {
+                    await Swal.fire({
+                        title: 'نجاح!',
+                        text: 'تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!',
+                        icon: 'success',
+                        confirmButtonText: 'حسناً'
+                    });
+                } else {
+                    alert('تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!');
+                }
             }
             
             window.location.reload();
@@ -306,6 +326,8 @@ async function renderManageExams() {
             [window.AppwriteQuery.orderDesc('$createdAt')]
         );
         
+        window.allLoadedExams = response.documents;
+        
         let html = '';
         
         if (response.documents.length === 0) {
@@ -327,9 +349,14 @@ async function renderManageExams() {
                         <td class="fw-bold text-primary">${exam.title}</td>
                         <td><span class="badge bg-secondary">${questionsArray.length} أسئلة</span></td>
                         <td>
-                            <button class="btn btn-sm btn-danger fw-bold" onclick="deleteExam('${exam.$id}')">
-                                حذف <i class="fa-solid fa-trash ms-1"></i>
-                            </button>
+                            <div class="d-flex gap-1 justify-content-center">
+                                <button class="btn btn-sm btn-warning fw-bold text-dark" onclick="editFullExam('${exam.$id}')" title="تعديل الاختبار">
+                                    تعديل <i class="fa-solid fa-pen-to-square ms-1"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger fw-bold" onclick="deleteExam('${exam.$id}')" title="حذف الاختبار">
+                                    حذف <i class="fa-solid fa-trash ms-1"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -338,9 +365,57 @@ async function renderManageExams() {
         tbody.innerHTML = html;
     } catch (error) {
         console.error(error);
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">حدث خطأ أثناء الاتصال بقاعدة البيانات.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">حدث خطأ أثناء تحميل الاختبارات من الخادم...</td></tr>';
     }
 }
+
+window.editFullExam = function(examId) {
+    const exam = window.allLoadedExams.find(e => e.$id === examId);
+    if (!exam) return;
+    
+    // Set edit mode
+    window.editingExamId = examId;
+    
+    // Populate form fields
+    document.getElementById('exam-title').value = exam.title;
+    document.getElementById('exam-level').value = exam.level;
+    
+    // Trigger change to populate subjects dropdown, then select the subject
+    const event = new Event('change');
+    document.getElementById('exam-level').dispatchEvent(event);
+    setTimeout(() => {
+        document.getElementById('exam-subject').value = exam.subject_id;
+    }, 100);
+    
+    // Populate duration and score
+    const durationMins = exam.duration || 60;
+    document.getElementById('exam-hours').value = Math.floor(durationMins / 60);
+    document.getElementById('exam-minutes').value = durationMins % 60;
+    document.getElementById('exam-max-score').value = exam.max_score || 100;
+    
+    // Populate questions
+    currentExamQuestions = typeof exam.questions === 'string' ? JSON.parse(exam.questions) : exam.questions;
+    renderQuestionsList();
+    
+    // Update save button text
+    const saveBtn = document.getElementById('save-exam-btn');
+    saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i> تحديث الاختبار';
+    saveBtn.classList.replace('btn-success', 'btn-warning');
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'info',
+            title: 'وضع التعديل: يمكنك الآن تعديل بيانات الاختبار والأسئلة.',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+};
 
 window.deleteExam = async function(examId) {
     if (typeof Swal !== 'undefined') {
