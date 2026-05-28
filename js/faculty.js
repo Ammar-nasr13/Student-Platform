@@ -140,6 +140,7 @@ function renderQuestionsList() {
 
         let qPrefix = q.direction === 'ltr' ? `Q${index + 1}:` : `سؤال ${index + 1}:`;
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left; padding-right: 80px;"' : 'dir="rtl" style="text-align: right; padding-left: 80px;"';
+        let btnPositionClass = q.direction === 'ltr' ? 'start-0' : 'end-0';
 
         const item = document.createElement('div');
         item.className = 'border p-3 rounded-3 bg-light position-relative mb-2';
@@ -149,7 +150,7 @@ function renderQuestionsList() {
                 <div>${typeBadge}</div>
             </div>
             <div ${qDirStyle}>${correctAnswerHtml}</div>
-            <div class="position-absolute top-0 end-0 m-2 d-flex gap-2" style="z-index: 10;">
+            <div class="position-absolute top-0 ${btnPositionClass} m-2 d-flex gap-2" style="z-index: 10;">
                 <button type="button" class="btn btn-sm btn-warning" onclick="editQuestion(${index})" title="تعديل السؤال"><i class="fa-solid fa-edit"></i></button>
                 <button type="button" class="btn btn-sm btn-danger" onclick="deleteQuestion(${index})" title="حذف السؤال"><i class="fa-solid fa-trash"></i></button>
             </div>
