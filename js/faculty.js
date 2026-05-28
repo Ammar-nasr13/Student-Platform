@@ -395,6 +395,7 @@ window.editFullExam = function(examId) {
     
     // Populate questions
     currentExamQuestions = typeof exam.questions === 'string' ? JSON.parse(exam.questions) : exam.questions;
+    
     renderQuestionsList();
     
     // Update save button text
