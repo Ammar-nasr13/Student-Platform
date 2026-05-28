@@ -335,9 +335,10 @@ function downloadSolvedExamPDF() {
   const levelText = currentQuiz.level ? (direction === 'rtl' ? `المستوى ${currentQuiz.level}` : `Level ${currentQuiz.level}`) : "";
   const studentName = window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student");
   const dateStr = new Date().toLocaleDateString(direction === 'rtl' ? 'ar-EG' : 'en-US', { dateStyle: 'long' });
-  const finalScore = direction === 'rtl' ? `${score} من ${questions.length}` : `${score} out of ${questions.length}`;
-  const percentage = Math.round((score / questions.length) * 100);
- 
+  const maxScore = currentQuiz.max_score || questions.length;
+  const actualScore = Math.round((score / questions.length) * maxScore);
+  const finalScore = direction === 'rtl' ? `${actualScore} من ${maxScore}` : `${actualScore} out of ${maxScore}`;
+  const percentage = Math.round((score / questions.length) * 100); 
   let win = window.open("", "_blank");
   let html = `
     <html dir="${direction}" lang="${direction === 'rtl' ? 'ar' : 'en'}">
@@ -346,9 +347,10 @@ function downloadSolvedExamPDF() {
         <title>${direction === 'rtl' ? 'تقرير نتائج الاختبار' : 'Exam Results Report'} - ${currentQuiz.title}</title>
         <style>
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; direction: ${direction}; text-align: ${textAlign}; }
-            .header { text-align: center; border-bottom: 3px double #0f2b46; padding-bottom: 20px; margin-bottom: 30px; }
-            .header h1 { color: #0f2b46; margin: 10px 0; font-size: 24px; }
-            .header h3 { color: #555; margin: 5px 0; font-size: 18px; }
+            .header { text-align: center; border-bottom: 2px solid #0f2b46; padding-bottom: 15px; margin-bottom: 25px; }
+            .header h1 { color: #0f2b46; margin: 5px 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+            .header h3 { color: #555; margin: 5px 0; font-size: 14px; font-weight: normal; }
+            .header h2 { color: #198754; margin: 10px 0 0 0; font-size: 18px; border-top: 1px dashed #ccc; padding-top: 10px; display: inline-block; }
             .meta-info { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
             .meta-item { font-size: 15px; }
             .meta-item strong { color: #0f2b46; }
@@ -468,7 +470,8 @@ function showQuizResults() {
   e.classList.remove("d-none");
   const t = currentQuiz.questions.length,
     n = Math.round((score / t) * 100);
-    
+  const maxScore = currentQuiz.max_score || t;
+  const actualScore = Math.round((score / t) * maxScore);
   const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
   
   if (window.AppwriteDB && window.DB_CONFIG) {
@@ -477,8 +480,8 @@ function showQuizResults() {
       examTitle: currentQuiz.title || (direction === 'rtl' ? "بدون عنوان" : "Untitled"),
       subjectName: currentQuiz.subject_id || (direction === 'rtl' ? "غير معروف" : "Unknown"),
       level: currentQuiz.level ? currentQuiz.level.toString() : (direction === 'rtl' ? "غير محدد" : "Not specified"),
-      score: score,
-      totalScore: t,
+      score: actualScore,
+      totalScore: maxScore,
       details: JSON.stringify({ userAnswers: userAnswers, quiz: currentQuiz }),
     };
     window.AppwriteDB.createDocument(
@@ -552,7 +555,7 @@ function showQuizResults() {
         <div class="text-center p-4" dir="${direction}">
             <div class="display-1 text-gold mb-3"><i class="fas fa-trophy text-warning"></i></div>
             <h3 class="fw-bold text-primary">${direction === 'rtl' ? 'اكتمل الاختبار!' : 'Quiz Completed!'}</h3>
-            <p class="fs-5 text-muted mb-4">${direction === 'rtl' ? `لقد أجبت بشكل صحيح على <strong>${score}</strong> أسئلة من أصل <strong>${t}</strong>` : `You correctly answered <strong>${score}</strong> out of <strong>${t}</strong> questions`}</p>
+            <p class="fs-5 text-muted mb-4">${direction === 'rtl' ? `أجبت بشكل صحيح على ${score} من ${t} أسئلة.<br>الدرجة المستحقة: <strong>${actualScore}</strong> من أصل <strong>${maxScore}</strong> درجة.` : `You answered ${score} out of ${t} questions correctly.<br>Total score: <strong>${actualScore}</strong> out of <strong>${maxScore}</strong> points.`}</p>
             
             <div class="progress mb-4" style="height: 25px; border-radius: 50px;">
                 <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated text-dark fw-bold" 
@@ -607,13 +610,17 @@ window.renderAllQuestions = function () {
     const textAlign = direction === 'rtl' ? 'right' : 'left';
     
     (currentQuiz.questions.forEach((e, t) => {
-      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${direction}" style="text-align: ${textAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${t + 1}. ${e.q}</div>\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
+        let qDir = e.direction === 'ltr' ? 'ltr' : 'rtl';
+        let qAlign = qDir === 'ltr' ? 'left' : 'right';
+        let qPrefix = qDir === 'ltr' ? `Q${t + 1}:` : `سؤال ${t + 1}:`;
+        
+      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${qDir}" style="text-align: ${qAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${qPrefix} ${e.q}</div>\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
         "essay" === e.type
-          ? (n += `<textarea class="form-control" rows="4" placeholder="${direction === 'rtl' ? 'اكتب إجابتك هنا...' : 'Type your answer here...'}" id="essay-ans-${t}"></textarea>`)
+          ? (n += `<textarea class="form-control" rows="4" placeholder="${qDir === 'rtl' ? 'اكتب إجابتك هنا...' : 'Type your answer here...'}" id="essay-ans-${t}"></textarea>`)
           : "complete" === e.type
-            ? (n += `<input type="text" class="form-control" placeholder="${direction === 'rtl' ? 'اكتب الكلمة أو العبارة المناسبة لإكمال الجملة...' : 'Type the correct answer to complete the sentence...'}" id="complete-ans-${t}">`)
+            ? (n += `<input type="text" class="form-control" placeholder="${qDir === 'rtl' ? 'اكتب الكلمة أو العبارة المناسبة لإكمال الجملة...' : 'Type the correct answer to complete the sentence...'}" id="complete-ans-${t}">`)
             : e.options.forEach((e, s) => {
-                n += `\n                    <label class="btn btn-outline-secondary text-start w-100 option-label d-flex align-items-center" style="cursor: pointer; font-family: Cairo, sans-serif;">\n                        <input type="radio" name="q-${t}" value="${s}" class="me-3 ms-1" style="transform: scale(1.2);"> \n                        <span class="badge bg-secondary me-3 ms-1">${s + 1}</span> <span>${e}</span>\n                    </label>\n                `;
+                n += `\n                    <label class="btn btn-outline-secondary text-start w-100 option-label d-flex align-items-center" style="cursor: pointer; font-family: Cairo, sans-serif;" dir="${qDir}">\n                        <input type="radio" name="q-${t}" value="${s}" class="me-3 ms-1" style="transform: scale(1.2);"> \n                        <span class="badge bg-secondary me-3 ms-1">${s + 1}</span> <span>${e}</span>\n                    </label>\n                `;
               }),
         (n += `\n                </div>\n                <div class="explanation-area mt-3 d-none" id="q-exp-${t}"></div>\n            </div>\n        `));
     }),
@@ -708,7 +715,7 @@ window.processExamSubmission = function () {
                 const explainDiv = document.getElementById(`q-exp-${t}`);
                 explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info">
                     <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الإجابة النموذجية:' : 'Model Answer:'}</strong>
-                    <p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>
+                    <p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>
                 </div>`;
                 explainDiv.classList.remove("d-none");
             }
@@ -731,7 +738,7 @@ window.processExamSubmission = function () {
             let expHtml = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2">
                 <i class="fa-solid fa-circle-info ms-2 text-primary"></i><strong>${correctText}</strong>`;
             if (e.explain && e.explain !== "undefined") {
-                expHtml += `<p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>`;
+                expHtml += `<p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>`;
             }
             expHtml += `</div>`;
             explainDiv.innerHTML = expHtml;
@@ -762,7 +769,7 @@ window.processExamSubmission = function () {
                 const explainDiv = document.getElementById(`q-exp-${t}`);
                 explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2">
                     <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الشرح:' : 'Explanation:'}</strong>
-                    <p class="mb-0 mt-2 text-dark lh-lg">${e.explain}</p>
+                    <p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>
                 </div>`;
                 explainDiv.classList.remove("d-none");
             }

@@ -228,11 +228,28 @@ if (addExamForm) {
             return;
         }
 
+        const hours = parseInt(document.getElementById('exam-hours').value) || 0;
+        const minutes = parseInt(document.getElementById('exam-minutes').value) || 0;
+        const totalDuration = (hours * 60) + minutes;
+        const maxScore = parseInt(document.getElementById('exam-max-score').value) || 100;
+
+        if (totalDuration <= 0) {
+            if (typeof Swal !== 'undefined') Swal.fire('تنبيه', 'الرجاء تحديد مدة الاختبار بحيث لا تقل عن دقيقة واحدة!', 'warning');
+            else alert('الرجاء تحديد مدة الاختبار بحيث لا تقل عن دقيقة واحدة!');
+            return;
+        }
+        if (maxScore <= 0) {
+            if (typeof Swal !== 'undefined') Swal.fire('تنبيه', 'الرجاء تحديد درجة نهائية صحيحة للاختبار!', 'warning');
+            else alert('الرجاء تحديد درجة نهائية صحيحة للاختبار!');
+            return;
+        }
+
         const examData = {
             title: examTitle,
             level: level,
             subject_id: subject,
-            duration: 60,
+            duration: totalDuration,
+            max_score: maxScore,
             questions: JSON.stringify(currentExamQuestions)
         };
 
@@ -248,11 +265,26 @@ if (addExamForm) {
                 window.AppwriteID.unique(), 
                 examData
             );
-            alert('تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!');
+            
+            if (typeof Swal !== 'undefined') {
+                await Swal.fire({
+                    title: 'نجاح!',
+                    text: 'تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!',
+                    icon: 'success',
+                    confirmButtonText: 'حسناً'
+                });
+            } else {
+                alert('تم حفظ ونشر الاختبار بنجاح على قاعدة البيانات!');
+            }
+            
             window.location.reload();
         } catch (error) {
             console.error("Appwrite Error:", error);
-            alert('حدث خطأ أثناء حفظ الاختبار: ' + error.message);
+            if (typeof Swal !== 'undefined') {
+                Swal.fire('خطأ', 'حدث خطأ أثناء حفظ الاختبار: ' + error.message, 'error');
+            } else {
+                alert('حدث خطأ أثناء حفظ الاختبار: ' + error.message);
+            }
             saveBtn.innerHTML = originalText;
             saveBtn.disabled = false;
         }
@@ -459,36 +491,40 @@ window.showStudentDetails = function(res) {
         let ansHtml = '';
         let isCorrect = false;
         
+        let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left;"' : 'dir="rtl" style="text-align: right;"';
+        let qPrefix = q.direction === 'ltr' ? `Q${idx + 1}:` : `سؤال ${idx + 1}:`;
+        
         if (q.type === 'essay') {
             ansHtml = `
-                <div class="mt-2 p-3 bg-light rounded border border-warning">
-                    <div class="text-muted small mb-1">إجابة الطالب:</div>
-                    <div class="fw-bold">${studentAns || 'لم يجب'}</div>
+                <div class="mt-2 p-3 bg-light rounded border border-warning" ${qDirStyle}>
+                    <div class="text-muted small mb-1">${q.direction === 'ltr' ? 'Student Answer:' : 'إجابة الطالب:'}</div>
+                    <div class="fw-bold" style="white-space: pre-wrap;">${studentAns || (q.direction === 'ltr' ? 'Not answered' : 'لم يجب')}</div>
                 </div>`;
-            isCorrect = true; // Essay is manually graded but we highlight it neutrally
+            isCorrect = true; 
         } else if (q.type === 'complete') {
             isCorrect = (studentAns && studentAns.trim().toLowerCase() === q.correctAnswer.toLowerCase());
             ansHtml = `
-                <div class="mt-2 p-2 rounded ${isCorrect ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} fw-bold border border-2 ${isCorrect ? 'border-success' : 'border-danger'}">
-                    <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'} me-2"></i> ${studentAns || 'لم يجب'}
+                <div class="mt-2 p-2 rounded ${isCorrect ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} fw-bold border border-2 ${isCorrect ? 'border-success' : 'border-danger'}" ${qDirStyle}>
+                    <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'} me-2"></i> ${studentAns || (q.direction === 'ltr' ? 'Not answered' : 'لم يجب')}
                 </div>
-                ${!isCorrect ? `<div class="mt-1 text-success small fw-bold"><i class="fa-solid fa-check-circle me-1"></i> الإجابة الصحيحة: ${q.correctAnswer}</div>` : ''}
+                ${!isCorrect ? `<div class="mt-1 text-success small fw-bold" ${qDirStyle}><i class="fa-solid fa-check-circle me-1"></i> ${q.direction === 'ltr' ? 'Correct Answer:' : 'الإجابة الصحيحة:'} ${q.correctAnswer}</div>` : ''}
             `;
         } else {
             isCorrect = (studentAns === q.correct);
-            let ansText = studentAns !== undefined && studentAns !== -1 && q.options[studentAns] ? q.options[studentAns] : 'لم يجب أو إجابة ملغاة';
+            let notAnsweredText = q.direction === 'ltr' ? 'Not answered or invalid' : 'لم يجب أو إجابة ملغاة';
+            let ansText = studentAns !== undefined && studentAns !== -1 && q.options[studentAns] ? q.options[studentAns] : notAnsweredText;
             
             ansHtml = `
-                <div class="mt-2 p-2 rounded ${isCorrect ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} fw-bold border border-2 ${isCorrect ? 'border-success' : 'border-danger'}">
+                <div class="mt-2 p-2 rounded ${isCorrect ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} fw-bold border border-2 ${isCorrect ? 'border-success' : 'border-danger'}" ${qDirStyle}>
                     <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'} me-2"></i> ${ansText}
                 </div>
-                ${!isCorrect ? `<div class="mt-1 text-success small fw-bold"><i class="fa-solid fa-check-circle me-1"></i> الإجابة الصحيحة: ${q.options[q.correct]}</div>` : ''}
+                ${!isCorrect ? `<div class="mt-1 text-success small fw-bold" ${qDirStyle}><i class="fa-solid fa-check-circle me-1"></i> ${q.direction === 'ltr' ? 'Correct Answer:' : 'الإجابة الصحيحة:'} ${q.options[q.correct]}</div>` : ''}
             `;
         }
         
         html += `
-            <div class="border p-3 rounded shadow-sm">
-                <div class="fw-bold mb-2">${idx + 1}. ${q.q}</div>
+            <div class="border p-3 rounded shadow-sm" ${qDirStyle}>
+                <div class="fw-bold mb-2">${qPrefix} ${q.q}</div>
                 ${ansHtml}
             </div>
         `;

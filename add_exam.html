@@ -145,10 +145,20 @@
                     </div>
                 </div>
 
-                <div class="alert alert-warning small fw-bold">
-                    <i class="fa-solid fa-clock me-1"></i> مدة الاختبار ستكون 60 دقيقة (ساعة كاملة) تلقائياً.
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-primary">مدة الاختبار (الساعات):</label>
+                        <input type="number" id="exam-hours" class="form-control" placeholder="مثلاً: 1" min="0" max="12" value="1" required>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <label class="form-label fw-bold text-primary">مدة الاختبار (الدقائق):</label>
+                        <input type="number" id="exam-minutes" class="form-control" placeholder="مثلاً: 30" min="0" max="59" value="0" required>
+                    </div>
+                    <div class="col-md-12 mt-3">
+                        <label class="form-label fw-bold text-primary">الدرجة النهائية للاختبار:</label>
+                        <input type="number" id="exam-max-score" class="form-control" placeholder="مثال: 50، 100..." min="1" value="100" required>
+                    </div>
                 </div>
-
                 <hr class="my-4 text-muted">
 
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-3">
