@@ -169,6 +169,15 @@ function initQuizPageEvents() {
     }),
     n.addEventListener("change", () => {
       s.disabled = !n.value;
+      const durationEl = document.getElementById("exam-duration-instruction");
+      if (durationEl) {
+        if (n.value && window.currentSubjectExams && window.currentSubjectExams[n.value]) {
+          const duration = window.currentSubjectExams[n.value].duration || 60;
+          durationEl.innerHTML = `<strong>${duration} دقيقة</strong>`;
+        } else {
+          durationEl.textContent = "حسب ما يحدده أستاذ المادة";
+        }
+      }
     }),
     s.addEventListener("click", () => {
       if (localStorage.getItem("is_faculty") === "true" || localStorage.getItem("currentRole") === "faculty") {
