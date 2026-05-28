@@ -2001,27 +2001,55 @@ body.dark-theme .level-select-btn.active-level {
 
 /* ============================================================
    Mobile Navbar — RTL Responsive (< 1200px)
-   الهامبرجر أقصى اليسار — البراند أقصى اليمين
+   الهامبرجر + أيقونة الثيم أقصى اليسار — البراند أقصى اليمين وكامل
    ============================================================ */
 @media (max-width: 1199px) {
 
-    /* الحاوية الرئيسية للناف بار */
+    /* الحاوية الرئيسية — براند يمين / أزرار يسار */
     .navbar > .container {
         display: flex !important;
-        flex-direction: row !important;       /* RTL: يمين → يسار */
+        flex-direction: row !important;
         flex-wrap: wrap !important;
         align-items: center !important;
         justify-content: space-between !important;
         gap: 0 !important;
+        padding-right: 12px !important;
+        padding-left: 12px !important;
     }
 
-    /* البراند يأخذ أقصى اليمين ويتقلص لو المساحة ضيقة */
+    /* البراند — يأخذ المساحة المتاحة ولا يُقطع */
     .navbar-brand {
-        flex-shrink: 1 !important;
-        min-width: 0 !important;
-        max-width: calc(100% - 90px) !important;
-        overflow: hidden !important;
         order: 1;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: calc(100% - 110px) !important; /* مسافة للأزرار */
+        overflow: visible !important;
+        margin-inline-end: 8px !important;
+    }
+
+    /* إزالة القطع (truncate) من عنوان البراند وتصغير الخط */
+    .navbar-brand span,
+    .navbar-brand span.text-truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        font-size: 0.88rem !important;
+        line-height: 1.25 !important;
+        display: block !important;
+    }
+    .navbar-brand small,
+    .navbar-brand small.text-truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        font-size: 0.72rem !important;
+        line-height: 1.2 !important;
+        display: block !important;
+    }
+    .navbar-brand-logo {
+        width: 40px !important;
+        height: 40px !important;
+        flex-shrink: 0 !important;
     }
 
     /* الـ div اللي فيه زر الثيم + الهامبرجر — أقصى اليسار */
@@ -2029,11 +2057,10 @@ body.dark-theme .level-select-btn.active-level {
     .navbar > .container > div.d-flex.align-items-center.d-xl-none {
         order: 2;
         flex-shrink: 0 !important;
+        flex-grow: 0 !important;
         display: flex !important;
         align-items: center !important;
         gap: 6px !important;
-        margin-right: 0 !important;
-        margin-left: 0 !important;
     }
 
     /* زر الهامبرجر — تصميم واضح ومميز */
