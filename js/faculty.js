@@ -138,15 +138,21 @@ function renderQuestionsList() {
             correctAnswerHtml = `<div class="text-success small fw-bold">الإجابة الصحيحة: ${q.correctAnswer}</div>`;
         }
 
+        let qPrefix = q.direction === 'ltr' ? `Q${index + 1}:` : `سؤال ${index + 1}:`;
+        let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left; padding-right: 80px;"' : 'dir="rtl" style="text-align: right; padding-left: 80px;"';
+
         const item = document.createElement('div');
-        item.className = 'border p-3 rounded-3 bg-light position-relative';
+        item.className = 'border p-3 rounded-3 bg-light position-relative mb-2';
         item.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <h6 class="fw-bold mb-0">${index + 1}. ${q.q}</h6>
-                ${typeBadge}
+            <div class="d-flex justify-content-between align-items-start mb-2" ${qDirStyle}>
+                <h6 class="fw-bold mb-0">${qPrefix} <span class="ms-1 me-1">${q.q}</span></h6>
+                <div>${typeBadge}</div>
             </div>
-            ${correctAnswerHtml}
-            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" onclick="deleteQuestion(${index})" title="حذف السؤال"><i class="fa-solid fa-trash"></i></button>
+            <div ${qDirStyle}>${correctAnswerHtml}</div>
+            <div class="position-absolute top-0 end-0 m-2 d-flex gap-2" style="z-index: 10;">
+                <button type="button" class="btn btn-sm btn-warning" onclick="editQuestion(${index})" title="تعديل السؤال"><i class="fa-solid fa-edit"></i></button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="deleteQuestion(${index})" title="حذف السؤال"><i class="fa-solid fa-trash"></i></button>
+            </div>
         `;
         list.appendChild(item);
     });
@@ -155,6 +161,44 @@ function renderQuestionsList() {
 window.deleteQuestion = function(index) {
     currentExamQuestions.splice(index, 1);
     renderQuestionsList();
+};
+
+window.editQuestion = function(index) {
+    const q = currentExamQuestions[index];
+    
+    // تعبئة البيانات في نافذة إضافة سؤال
+    document.getElementById('q-type').value = q.type;
+    window.updateQuestionUI();
+    
+    document.getElementById('q-text').value = q.q;
+    if (document.getElementById('q-explain')) document.getElementById('q-explain').value = q.explain || '';
+    if (document.getElementById('exam-direction')) document.getElementById('exam-direction').value = q.direction || 'rtl';
+    
+    if (q.type === 'mcq') {
+        const optionInputs = document.querySelectorAll('.mcq-option');
+        if (q.options) {
+            optionInputs.forEach((input, i) => {
+                if (q.options[i] !== undefined) input.value = q.options[i];
+            });
+        }
+        const correctRadio = document.querySelector(`input[name="mcq-correct"][value="${q.correct}"]`);
+        if (correctRadio) correctRadio.checked = true;
+    } else if (q.type === 'tf') {
+        const correctRadio = document.querySelector(`input[name="tf-correct"][value="${q.correct}"]`);
+        if (correctRadio) correctRadio.checked = true;
+    } else if (q.type === 'complete') {
+        const correctAnsInput = document.getElementById('complete-correct');
+        if (correctAnsInput) correctAnsInput.value = q.correctAnswer || '';
+    }
+    
+    // إزالة السؤال من القائمة لكي يتم إضافته كجديد عند حفظ التعديل
+    currentExamQuestions.splice(index, 1);
+    renderQuestionsList();
+    
+    // فتح النافذة
+    const modalEl = document.getElementById('addQuestionModal');
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.show();
 };
 
 // Save entire exam
@@ -283,6 +327,8 @@ window.deleteExam = async function(examId) {
     }
 
     try {
+        if (typeof Swal !== 'undefined') Swal.fire({ title: 'جاري الحذف...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        
         await window.AppwriteDB.deleteDocument(
             window.DB_CONFIG.dbId,
             window.DB_CONFIG.examsCol,
@@ -316,6 +362,8 @@ window.deleteResult = async function(resultId) {
     }
 
     try {
+        if (typeof Swal !== 'undefined') Swal.fire({ title: 'جاري الحذف...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
         await window.AppwriteDB.deleteDocument(
             window.DB_CONFIG.dbId,
             window.DB_CONFIG.resultsCol,

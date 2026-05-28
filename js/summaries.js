@@ -291,12 +291,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         const { value: formValues } = await Swal.fire({
                             title: 'تعديل تفاصيل الملف',
                             html:
-                                `<label class="d-block text-start mb-1 fw-bold">اسم المقرر:</label>
-                                <select id="swal-edit-subject" class="swal2-select w-100 mb-3" style="font-size: 1rem;">
-                                    ${subjects.map(s => `<option value="${s.id}" ${s.id === currentSubjectId ? 'selected' : ''}>${s.name}</option>`).join('')}
-                                </select>
-                                <label class="d-block text-start mb-1 fw-bold">اسم الناشر:</label>
-                                <input id="swal-edit-student" class="swal2-input w-100 m-0" placeholder="اسم الطالب" value="${currentStudentName}">`,
+                                `<div class="mb-3 text-end" style="text-align: right;">
+                                    <label class="form-label fw-bold text-dark">اسم المقرر:</label>
+                                    <select id="swal-edit-subject" class="form-select bg-light">
+                                        ${subjects.map(s => `<option value="${s.id}" ${s.id === currentSubjectId ? 'selected' : ''}>${s.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="mb-3 text-end" style="text-align: right;">
+                                    <label class="form-label fw-bold text-dark">اسم الناشر:</label>
+                                    <input id="swal-edit-student" class="form-control bg-light" placeholder="أدخل اسم الطالب" value="${currentStudentName}">
+                                </div>`,
                             focusConfirm: false,
                             showCancelButton: true,
                             confirmButtonText: 'حفظ التعديلات',
