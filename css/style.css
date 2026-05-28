@@ -229,6 +229,23 @@ body.dark-theme .btn-navy-solid {
 body.dark-theme .btn-navy-solid:hover {
     background-color:#3b5b88
 }
+/* حالة الرفع — اللون يفضل كحلي مش يتحول */
+.btn-navy-solid:disabled,
+.btn-navy-solid[disabled],
+.btn-navy-solid.is-loading {
+    background-color:#1a365d!important;
+    color:#fff!important;
+    border:none!important;
+    opacity:.88!important;
+    cursor:wait!important;
+    transform:none!important;
+    box-shadow:0 4px 15px rgba(26,54,93,.2)!important
+}
+body.dark-theme .btn-navy-solid:disabled,
+body.dark-theme .btn-navy-solid[disabled],
+body.dark-theme .btn-navy-solid.is-loading {
+    background-color:#2a4365!important
+}
 .btn-outline-gold {
     background:0 0;
     color:var(--primary-color)!important;

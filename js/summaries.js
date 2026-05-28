@@ -384,15 +384,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = btn.querySelector('#summary-btn-text');
         
         if (isLoading) {
-            btn.disabled = true;
-            if(spinner) spinner.classList.remove('d-none');
-            if(icon) icon.classList.add('d-none');
-            if(text) text.textContent = 'جاري الرفع...';
+            // نستخدم is-loading بدل disabled حتى يفضل لون الزرار كحلي
+            btn.classList.add('is-loading');
+            btn.setAttribute('aria-disabled', 'true');
+            btn.style.pointerEvents = 'none';
+            if (spinner) spinner.classList.remove('d-none');
+            if (icon) icon.classList.add('d-none');
+            if (text) text.textContent = 'جاري الرفع...';
         } else {
-            btn.disabled = false;
-            if(spinner) spinner.classList.add('d-none');
-            if(icon) icon.classList.remove('d-none');
-            if(text) text.textContent = 'رفع ونشر';
+            btn.classList.remove('is-loading');
+            btn.removeAttribute('aria-disabled');
+            btn.style.pointerEvents = '';
+            if (spinner) spinner.classList.add('d-none');
+            if (icon) icon.classList.remove('d-none');
+            if (text) text.textContent = 'رفع ونشر';
         }
     }
 });
