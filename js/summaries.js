@@ -51,9 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // تحويل القيمة إلى رقم للتطابق مع مفاتيح subjectsByLevel
+            const levelKey = parseInt(level, 10);
+            const subjects = (window.subjectsByLevel && window.subjectsByLevel[levelKey]) || [];
+
             modalSubject.disabled = false;
             modalSubject.innerHTML = '<option value="">-- حدد المادة --</option>';
-            const subjects = window.subjectsByLevel[level] || [];
+
+            if (subjects.length === 0) {
+                modalSubject.innerHTML += '<option value="" disabled>-- لا توجد مواد لهذا المستوى --</option>';
+                return;
+            }
+
             subjects.forEach(sub => {
                 const opt = document.createElement('option');
                 opt.value = sub.id;

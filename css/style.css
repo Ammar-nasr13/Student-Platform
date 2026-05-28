@@ -1999,25 +1999,94 @@ body.dark-theme .level-select-btn.active-level {
     }
 }
 
-/* Mobile navbar - allow wrapping and stacking */
+/* ============================================================
+   Mobile Navbar — RTL Responsive (< 1200px)
+   الهامبرجر أقصى اليسار — البراند أقصى اليمين
+   ============================================================ */
 @media (max-width: 1199px) {
+
+    /* الحاوية الرئيسية للناف بار */
     .navbar > .container {
+        display: flex !important;
+        flex-direction: row !important;       /* RTL: يمين → يسار */
         flex-wrap: wrap !important;
-        align-items: center;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0 !important;
     }
+
+    /* البراند يأخذ أقصى اليمين ويتقلص لو المساحة ضيقة */
     .navbar-brand {
-        max-width: calc(100% - 100px) !important;
-        overflow: hidden;
+        flex-shrink: 1 !important;
+        min-width: 0 !important;
+        max-width: calc(100% - 90px) !important;
+        overflow: hidden !important;
+        order: 1;
     }
+
+    /* الـ div اللي فيه زر الثيم + الهامبرجر — أقصى اليسار */
+    .navbar > .container > .d-xl-none,
+    .navbar > .container > div.d-flex.align-items-center.d-xl-none {
+        order: 2;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    /* زر الهامبرجر — تصميم واضح ومميز */
+    .navbar-toggler {
+        border: 2px solid rgba(255, 255, 255, 0.5) !important;
+        border-radius: 8px !important;
+        padding: 6px 10px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #fff !important;
+        transition: all 0.25s ease !important;
+        outline: none !important;
+        box-shadow: none !important;
+        width: 42px !important;
+        height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .navbar-toggler:hover,
+    .navbar-toggler:focus {
+        background: rgba(255, 255, 255, 0.18) !important;
+        border-color: rgba(255, 255, 255, 0.8) !important;
+        box-shadow: none !important;
+    }
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255%2C255%2C255%2C1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    /* القائمة المنسدلة — تأخذ العرض الكامل تحت الناف بار */
     .navbar-collapse {
+        order: 3;
         flex-basis: 100% !important;
         width: 100% !important;
         flex-wrap: wrap !important;
+        background: #1a365d !important;
+        border-radius: 12px !important;
+        margin-top: 10px !important;
+        padding: 0.75rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
     }
+    body.dark-theme .navbar-collapse {
+        background: #0c1c2b !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* روابط الناف بار — كل رابط في سطر */
     .navbar-nav {
         flex-direction: column !important;
         width: 100% !important;
-        gap: 4px !important;
+        gap: 3px !important;
     }
     .navbar-nav .nav-link {
         display: block !important;
@@ -2025,39 +2094,61 @@ body.dark-theme .level-select-btn.active-level {
         padding: 0.6rem 1rem !important;
         border-radius: 8px !important;
         margin: 0 !important;
+        font-size: 0.95rem !important;
     }
-    .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-        background: rgba(255,255,255,0.12) !important;
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.12) !important;
     }
+
+    /* زر "ابدأ اختباراً" وزر الثيم داخل الـ collapse */
     .navbar-collapse .d-flex.ms-xl-3 {
-        width: 100%;
-        justify-content: center;
-        padding: 0.5rem 0 0.25rem;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.5rem 0 0.25rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
         margin-top: 0.5rem !important;
+        gap: 8px !important;
     }
+
+    /* قائمة المستويات الفرعية داخل الـ collapse */
     .navbar-collapse .dropdown-menu {
         position: static !important;
         float: none !important;
         width: 100% !important;
-        background: rgba(255,255,255,0.05) !important;
+        min-width: unset !important;
+        background: rgba(255, 255, 255, 0.06) !important;
         border: none !important;
         border-radius: 8px !important;
         margin-top: 4px !important;
-        padding: 0.5rem !important;
+        padding: 6px !important;
         box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .navbar-collapse .dropdown-menu.show {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
     }
     .navbar-collapse .dropdown-item {
         border-radius: 6px !important;
         padding: 8px 14px !important;
         font-size: 0.9rem !important;
-        color: rgba(255,255,255,0.85) !important;
+        color: rgba(255, 255, 255, 0.88) !important;
         background: transparent !important;
         box-shadow: none !important;
+        transform: none !important;
+        text-align: right !important;
     }
     .navbar-collapse .dropdown-item:hover {
-        background: rgba(255,255,255,0.1) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
         transform: none !important;
+    }
+
+    /* زر إغلاق القائمة داخل الـ collapse */
+    .navbar-collapse .btn.btn-outline-light.btn-sm {
+        border-color: rgba(255, 255, 255, 0.4) !important;
     }
 }
 
