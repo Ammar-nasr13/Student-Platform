@@ -2039,26 +2039,26 @@ body.dark-theme .level-select-btn.active-level {
         order: 1;
         flex: 1 1 auto !important;
         min-width: 0 !important;
-        max-width: calc(100% - 110px) !important; /* مسافة للأزرار */
-        overflow: visible !important;
+        max-width: calc(100% - 110px) !important;
+        overflow: hidden !important;
         margin-inline-end: 8px !important;
     }
 
-    /* إزالة القطع (truncate) من عنوان البراند وتصغير الخط */
+    /* العنوان لا يلف — الخط يصغر مع الشاشة */
     .navbar-brand span,
     .navbar-brand span.text-truncate {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
-        font-size: 0.88rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        font-size: 0.92rem !important;
         line-height: 1.25 !important;
         display: block !important;
     }
     .navbar-brand small,
     .navbar-brand small.text-truncate {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
         font-size: 0.72rem !important;
         line-height: 1.2 !important;
         display: block !important;
@@ -2193,6 +2193,61 @@ body.dark-theme .level-select-btn.active-level {
     /* زر إغلاق القائمة داخل الـ collapse */
     .navbar-collapse .btn.btn-outline-light.btn-sm {
         border-color: rgba(255, 255, 255, 0.4) !important;
+    }
+}
+
+/* ====== تصغير تدريجي لعنوان البراند بدون wrap ====== */
+
+@media (max-width: 900px) {
+    .navbar-brand span, .navbar-brand span.text-truncate {
+        font-size: 0.82rem !important;
+    }
+    .navbar-brand small, .navbar-brand small.text-truncate {
+        font-size: 0.66rem !important;
+    }
+}
+@media (max-width: 768px) {
+    .navbar-brand span, .navbar-brand span.text-truncate {
+        font-size: 0.75rem !important;
+    }
+    .navbar-brand small, .navbar-brand small.text-truncate {
+        font-size: 0.62rem !important;
+    }
+    .navbar-brand-logo {
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+@media (max-width: 576px) {
+    .navbar-brand span, .navbar-brand span.text-truncate {
+        font-size: 0.68rem !important;
+    }
+    /* الوصف الصغير يختفي تحت 576px لتوفير المساحة */
+    .navbar-brand small, .navbar-brand small.text-truncate {
+        display: none !important;
+    }
+    .navbar-brand-logo {
+        width: 34px !important;
+        height: 34px !important;
+    }
+}
+@media (max-width: 420px) {
+    .navbar-brand span, .navbar-brand span.text-truncate {
+        font-size: 0.62rem !important;
+    }
+    .navbar-brand-logo {
+        width: 30px !important;
+        height: 30px !important;
+    }
+    .navbar-brand { gap: 6px !important; }
+}
+@media (max-width: 360px) {
+    .navbar-brand span, .navbar-brand span.text-truncate {
+        font-size: 0.57rem !important;
+    }
+    .navbar-brand-logo {
+        width: 28px !important;
+        height: 28px !important;
     }
 }
 

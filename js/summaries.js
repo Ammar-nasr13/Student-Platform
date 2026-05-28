@@ -359,21 +359,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (result.isConfirmed) {
+            Swal.fire({ title: 'جاري الحذف...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
             try {
-                // حذف الملف من Storage
-                await window.AppwriteStorage.deleteFile(window.DB_CONFIG.summariesBucket, fileId);
-                // حذف السجل من Database
-                await window.AppwriteDB.deleteDocument(window.DB_CONFIG.dbId, window.DB_CONFIG.summariesCol, docId);
+                // التأكد من وجود جلسة نشطة قبل الحذف
+                try {
+                    await window.AppwriteAccount.get();
+                } catch (sessionError) {
+                    await window.AppwriteAccount.createAnonymousSession();
+                }
+
+                // حذف الملف من Storage (لو فشل نكمل ونحذف السجل)
+                if (fileId && fileId !== 'undefined' && fileId !== '') {
+                    try {
+                        await window.AppwriteStorage.deleteFile(window.DB_CONFIG.summariesBucket, fileId);
+                    } catch (fileError) {
+                        // الملف قد يكون محذوف مسبقاً أو غير موجود — نكمل الحذف
+                        console.warn('Storage file not found or already deleted, continuing...', fileError.message);
+                    }
+                }
+
+                // حذف السجل من Database دايماً
+                await window.AppwriteDB.deleteDocument(
+                    window.DB_CONFIG.dbId,
+                    window.DB_CONFIG.summariesCol,
+                    docId
+                );
 
                 Swal.fire('تم الحذف!', 'تم حذف الملخص بنجاح.', 'success');
-                // تحديث العرض
                 loading.classList.remove('d-none');
                 content.classList.add('d-none');
                 content.innerHTML = '';
                 await fetchAndRenderSummaries(currentLevel);
+
             } catch (error) {
                 console.error("Error deleting summary:", error);
-                Swal.fire('خطأ', 'فشل حذف الملخص.', 'error');
+                const msg = error?.message || 'خطأ غير معروف';
+                Swal.fire('خطأ في الحذف', `فشل حذف الملخص: ${msg}`, 'error');
             }
         }
     }
