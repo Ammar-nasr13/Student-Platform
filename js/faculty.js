@@ -46,19 +46,54 @@ window.updateQuestionUI = function() {
     }
 };
 
+let editingQuestionImage = null;
+let editingExplainImage = null;
+
 // Save single question to list
-window.saveQuestion = function() {
+window.saveQuestion = async function() {
     const text = document.getElementById('q-text').value.trim();
-    if (!text) {
-        alert('الرجاء كتابة نص السؤال');
+    const qImageFile = document.getElementById('q-image').files[0];
+    
+    if (!text && !qImageFile) {
+        alert('الرجاء كتابة نص السؤال أو إضافة صورة للسؤال');
         return;
     }
+    
+    // Helper to upload image
+    const uploadImage = async (file) => {
+        if (!file) return null;
+        try {
+            const uploadedFile = await window.AppwriteStorage.createFile(
+                window.DB_CONFIG.summariesBucket,
+                window.AppwriteID.unique(),
+                file
+            );
+            return uploadedFile.$id;
+        } catch (e) {
+            console.error("Error uploading image:", e);
+            return null;
+        }
+    };
+    
+    const saveBtn = document.querySelector('#addQuestionModal .btn-primary');
+    const originalBtnHtml = saveBtn ? saveBtn.innerHTML : '';
+    if (qImageFile || (document.getElementById('q-explain-image') && document.getElementById('q-explain-image').files[0])) {
+        if (saveBtn) {
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الرفع...';
+            saveBtn.disabled = true;
+        }
+    }
+    
+    const qImageId = await uploadImage(qImageFile) || editingQuestionImage;
+    const explainImageId = await uploadImage(document.getElementById('q-explain-image') ? document.getElementById('q-explain-image').files[0] : null) || editingExplainImage;
 
     const type = document.getElementById('q-type').value;
     const direction = document.getElementById('exam-direction') ? document.getElementById('exam-direction').value : 'rtl';
     let questionObj = { type: type, q: text, direction: direction };
+    if (qImageId) questionObj.qImage = qImageId;
 
     const explainText = document.getElementById('q-explain') ? document.getElementById('q-explain').value.trim() : "";
+    if (explainImageId) questionObj.explainImage = explainImageId;
 
     if (type === 'mcq') {
         const optionInputs = document.querySelectorAll('.mcq-option');
@@ -100,11 +135,21 @@ window.saveQuestion = function() {
     
     // reset modal
     document.getElementById('q-text').value = '';
+    if (document.getElementById('q-image')) document.getElementById('q-image').value = '';
     document.querySelectorAll('.mcq-option').forEach(input => input.value = '');
     document.querySelector('input[name="mcq-correct"][value="0"]').checked = true;
     document.getElementById('tf-true').checked = true;
     if (document.getElementById('complete-correct')) document.getElementById('complete-correct').value = '';
     if (document.getElementById('q-explain')) document.getElementById('q-explain').value = '';
+    if (document.getElementById('q-explain-image')) document.getElementById('q-explain-image').value = '';
+    
+    editingQuestionImage = null;
+    editingExplainImage = null;
+    
+    if (saveBtn) {
+        saveBtn.innerHTML = originalBtnHtml;
+        saveBtn.disabled = false;
+    }
     
     // close modal
     const modalEl = document.getElementById('addQuestionModal');
@@ -141,12 +186,13 @@ function renderQuestionsList() {
         let qPrefix = q.direction === 'ltr' ? `Q${index + 1}:` : `سؤال ${index + 1}:`;
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left; padding-right: 80px;"' : 'dir="rtl" style="text-align: right; padding-left: 80px;"';
         let btnPositionClass = q.direction === 'ltr' ? 'start-0' : 'end-0';
+        let imgBadge = q.qImage ? '<i class="fa-regular fa-image text-primary ms-2 me-2" title="يحتوي على صورة"></i>' : '';
 
         const item = document.createElement('div');
         item.className = 'border p-3 rounded-3 bg-light position-relative mb-2';
         item.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2" ${qDirStyle}>
-                <h6 class="fw-bold mb-0">${qPrefix} <span class="ms-1 me-1">${q.q}</span></h6>
+                <h6 class="fw-bold mb-0">${qPrefix} <span class="ms-1 me-1">${q.q}</span> ${imgBadge}</h6>
                 <div>${typeBadge}</div>
             </div>
             <div ${qDirStyle}>${correctAnswerHtml}</div>
@@ -166,6 +212,9 @@ window.deleteQuestion = function(index) {
 
 window.editQuestion = function(index) {
     const q = currentExamQuestions[index];
+    
+    editingQuestionImage = q.qImage || null;
+    editingExplainImage = q.explainImage || null;
     
     // تعبئة البيانات في نافذة إضافة سؤال
     document.getElementById('q-type').value = q.type;

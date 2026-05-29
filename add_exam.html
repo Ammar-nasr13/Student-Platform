@@ -257,8 +257,10 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label fw-bold">نص السؤال:</label>
-                        <textarea class="form-control" id="q-text" rows="2" placeholder="اكتب سؤالك هنا..." required></textarea>
+                        <label class="form-label fw-bold">نص السؤال (ممكن يكون فارغ إذا أضفت صورة):</label>
+                        <textarea class="form-control mb-2" id="q-text" rows="2" placeholder="اكتب سؤالك هنا..."></textarea>
+                        <label class="form-label fw-bold">صورة للسؤال (اختياري):</label>
+                        <input type="file" class="form-control" id="q-image" accept="image/*">
                     </div>
 
                     <!-- Multiple Choice Area -->
@@ -311,8 +313,10 @@
                     <!-- Explanation Area -->
                     <div id="area-explain" class="mt-4 border-top pt-3">
                         <label class="form-label fw-bold" style="color: #0f2b46;"><i class="fa-solid fa-lightbulb text-warning me-1"></i> الإجابة (اختياري):</label>
-                        <p class="text-muted small mb-2">أضف إجابة نموذجية تظهر للطالب بعد الإجابة على السؤال.</p>
-                        <textarea class="form-control border-info" id="q-explain" rows="3" placeholder="اكتب الإجابة هنا..." dir="ltr" style="text-align: left;"></textarea>
+                        <p class="text-muted small mb-2">أضف إجابة نموذجية أو شرح يظهر للطالب بعد الإجابة على السؤال.</p>
+                        <textarea class="form-control border-info mb-2" id="q-explain" rows="3" placeholder="اكتب الإجابة هنا..." dir="ltr" style="text-align: left;"></textarea>
+                        <label class="form-label fw-bold">صورة للإجابة أو الشرح (اختياري):</label>
+                        <input type="file" class="form-control border-info" id="q-explain-image" accept="image/*">
                     </div>
                 </div>
                 <div class="modal-footer border-0 bg-light rounded-bottom-4">

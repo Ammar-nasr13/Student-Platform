@@ -618,12 +618,29 @@ window.renderAllQuestions = function () {
     const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
     const textAlign = direction === 'rtl' ? 'right' : 'left';
     
+    const hasEssay = currentQuiz.questions.some(q => q.type === 'essay');
+    if (hasEssay) {
+        n += `<div class="alert alert-info border-0 border-start border-4 border-info mb-4" dir="${direction}">
+                <i class="fa-solid fa-circle-info ms-2 text-primary"></i>
+                <strong>${direction === 'rtl' ? 'تعليمات هامة:' : 'Important Instructions:'}</strong>
+                <p class="mb-0 mt-1">${direction === 'rtl' 
+                  ? 'سيتم احتساب جميع الأسئلة المقالية صحيحة كإجراء افتراضي. برجاء التأكد والاطلاع على الإجابات النموذجية أسفل كل سؤال بعد الانتهاء من الاختبار للتأكد من صحة إجابتك. قريباً سيتم إضافة نظام ذكي لتصحيح الأسئلة المقالية.' 
+                  : 'All essay questions are graded as correct by default. Please review the model answers provided below each question after completing the exam to verify your answers. An intelligent grading system for essay questions will be added soon.'}</p>
+              </div>`;
+    }
+    
     (currentQuiz.questions.forEach((e, t) => {
         let qDir = e.direction === 'ltr' ? 'ltr' : 'rtl';
         let qAlign = qDir === 'ltr' ? 'left' : 'right';
         let qPrefix = qDir === 'ltr' ? `Q${t + 1}:` : `سؤال ${t + 1}:`;
         
-      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${qDir}" style="text-align: ${qAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${qPrefix} ${e.q}</div>\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
+        let qImageHtml = "";
+        if (e.qImage) {
+            const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${e.qImage}/view?project=6a0f923e00138d15d172`;
+            qImageHtml = `<div class="mb-3 text-center"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 400px;" alt="Question Image"></div>`;
+        }
+        
+      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${qDir}" style="text-align: ${qAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${qPrefix} ${e.q}</div>\n                ${qImageHtml}\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
         "essay" === e.type
           ? (n += `<textarea class="form-control" rows="4" placeholder="${qDir === 'rtl' ? 'اكتب إجابتك هنا...' : 'Type your answer here...'}" id="essay-ans-${t}"></textarea>`)
           : "complete" === e.type
@@ -720,11 +737,17 @@ window.processExamSubmission = function () {
             score++;
             document.getElementById(`essay-ans-${t}`).disabled = true;
             
-            if (e.explain && e.explain !== "undefined") {
+            if (e.explain && e.explain !== "undefined" || e.explainImage) {
                 const explainDiv = document.getElementById(`q-exp-${t}`);
+                let expImg = "";
+                if (e.explainImage) {
+                    const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${e.explainImage}/view?project=6a0f923e00138d15d172`;
+                    expImg = `<div class="mt-2"><img src="${imgUrl}" class="img-fluid rounded border" style="max-height: 300px;" alt="Answer Image"></div>`;
+                }
                 explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info">
                     <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الإجابة النموذجية:' : 'Model Answer:'}</strong>
-                    <p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>
+                    ${e.explain && e.explain !== "undefined" ? `<p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>` : ''}
+                    ${expImg}
                 </div>`;
                 explainDiv.classList.remove("d-none");
             }
@@ -748,6 +771,10 @@ window.processExamSubmission = function () {
                 <i class="fa-solid fa-circle-info ms-2 text-primary"></i><strong>${correctText}</strong>`;
             if (e.explain && e.explain !== "undefined") {
                 expHtml += `<p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>`;
+            }
+            if (e.explainImage) {
+                const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${e.explainImage}/view?project=6a0f923e00138d15d172`;
+                expHtml += `<div class="mt-2"><img src="${imgUrl}" class="img-fluid rounded border" style="max-height: 300px;" alt="Answer Image"></div>`;
             }
             expHtml += `</div>`;
             explainDiv.innerHTML = expHtml;
@@ -774,11 +801,17 @@ window.processExamSubmission = function () {
             
             if (n === e.correct) score++;
             
-            if (e.explain && e.explain !== "undefined") {
+            if (e.explain && e.explain !== "undefined" || e.explainImage) {
                 const explainDiv = document.getElementById(`q-exp-${t}`);
+                let expImg = "";
+                if (e.explainImage) {
+                    const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${e.explainImage}/view?project=6a0f923e00138d15d172`;
+                    expImg = `<div class="mt-2"><img src="${imgUrl}" class="img-fluid rounded border" style="max-height: 300px;" alt="Explanation Image"></div>`;
+                }
                 explainDiv.innerHTML = `<div class="alert alert-info border-0 border-start border-4 border-info mt-2">
                     <i class="fa-solid fa-lightbulb ms-2 text-warning"></i><strong>${direction === 'rtl' ? 'الشرح:' : 'Explanation:'}</strong>
-                    <p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>
+                    ${e.explain && e.explain !== "undefined" ? `<p class="mb-0 mt-2 text-dark lh-lg" style="white-space: pre-wrap;">${e.explain}</p>` : ''}
+                    ${expImg}
                 </div>`;
                 explainDiv.classList.remove("d-none");
             }
