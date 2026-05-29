@@ -258,8 +258,10 @@ function startQuiz(e, t, n) {
 function resetTimer() {
   clearInterval(quizTimer);
   const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
-  const e = 60 === currentQuiz.duration;
-  timeLeft = e ? 3600 : 45;
+  
+  // currentQuiz.duration is in minutes. Convert to seconds.
+  timeLeft = (currentQuiz.duration || 60) * 60;
+  
   updateTimerUI();
   quizTimer = setInterval(() => {
     timeLeft--;
@@ -285,18 +287,15 @@ function updateTimerUI() {
   const e = document.getElementById("quiz-timer");
   if (e) {
     const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
-    if (60 === currentQuiz.duration) {
-      const t = Math.floor(timeLeft / 60),
-        n = timeLeft % 60;
-      e.textContent = direction === 'rtl' 
-        ? `الوقت المتبقي: ${t}:${n < 10 ? "0" : ""}${n} دقيقة`
-        : `Time remaining: ${t}:${n < 10 ? "0" : ""}${n} minutes`;
-    } else {
-      e.textContent = direction === 'rtl'
-        ? `الوقت المتبقي: ${timeLeft} ثانية`
-        : `Time remaining: ${timeLeft} seconds`;
-    }
-    if (timeLeft <= 10) {
+    
+    const t = Math.floor(timeLeft / 60);
+    const n = timeLeft % 60;
+    
+    e.textContent = direction === 'rtl' 
+      ? `الوقت المتبقي: ${t}:${n < 10 ? "0" : ""}${n} دقيقة`
+      : `Time remaining: ${t}:${n < 10 ? "0" : ""}${n} minutes`;
+      
+    if (timeLeft <= 60) {
       e.classList.add("text-danger", "fw-bold");
     } else {
       e.classList.remove("text-danger", "fw-bold");
