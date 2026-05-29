@@ -187,14 +187,22 @@ function renderQuestionsList() {
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left; padding-right: 80px;"' : 'dir="rtl" style="text-align: right; padding-left: 80px;"';
         let btnPositionClass = q.direction === 'ltr' ? 'start-0' : 'end-0';
         let imgBadge = q.qImage ? '<i class="fa-regular fa-image text-primary ms-2 me-2" title="يحتوي على صورة"></i>' : '';
+        let qText = q.q ? q.q : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>';
+
+        let qImageHtml = '';
+        if (q.qImage) {
+            const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.qImage}/view?project=6a0f923e00138d15d172`;
+            qImageHtml = `<div class="mt-2"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 150px;" alt="Question Image"></div>`;
+        }
 
         const item = document.createElement('div');
         item.className = 'border p-3 rounded-3 bg-light position-relative mb-2';
         item.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2" ${qDirStyle}>
-                <h6 class="fw-bold mb-0">${qPrefix} <span class="ms-1 me-1">${q.q}</span> ${imgBadge}</h6>
+                <h6 class="fw-bold mb-0">${qPrefix} <span class="ms-1 me-1">${qText}</span> ${imgBadge}</h6>
                 <div>${typeBadge}</div>
             </div>
+            ${qImageHtml}
             <div ${qDirStyle}>${correctAnswerHtml}</div>
             <div class="position-absolute top-0 ${btnPositionClass} m-2 d-flex gap-2" style="z-index: 10;">
                 <button type="button" class="btn btn-sm btn-warning" onclick="editQuestion(${index})" title="تعديل السؤال"><i class="fa-solid fa-edit"></i></button>
@@ -618,6 +626,13 @@ window.showStudentDetails = function(res) {
         
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left;"' : 'dir="rtl" style="text-align: right;"';
         let qPrefix = q.direction === 'ltr' ? `Q${idx + 1}:` : `سؤال ${idx + 1}:`;
+        let qText = q.q ? q.q : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>';
+        
+        let qImageHtml = '';
+        if (q.qImage) {
+            const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.qImage}/view?project=6a0f923e00138d15d172`;
+            qImageHtml = `<div class="mt-2 text-center"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;" alt="Question Image"></div>`;
+        }
         
         if (q.type === 'essay') {
             ansHtml = `
@@ -647,10 +662,18 @@ window.showStudentDetails = function(res) {
             `;
         }
         
+        let expImgHtml = '';
+        if (q.explainImage) {
+            const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.explainImage}/view?project=6a0f923e00138d15d172`;
+            expImgHtml = `<div class="mt-2 text-center"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;" alt="Explanation Image"></div>`;
+        }
+        
         html += `
             <div class="border p-3 rounded shadow-sm" ${qDirStyle}>
-                <div class="fw-bold mb-2">${qPrefix} ${q.q}</div>
+                <div class="fw-bold mb-2">${qPrefix} ${qText}</div>
+                ${qImageHtml}
                 ${ansHtml}
+                ${expImgHtml}
             </div>
         `;
     });

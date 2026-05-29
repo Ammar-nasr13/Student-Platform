@@ -403,9 +403,18 @@ function downloadSolvedExamPDF() {
     const userAnswerIdx = userAnswers[idx];
     const correctIdx = q.correct;
     
+    let qImageHtml = '';
+    if (q.qImage) {
+        const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.qImage}/view?project=6a0f923e00138d15d172`;
+        qImageHtml = `<div style="text-align: center; margin-bottom: 15px;"><img src="${imgUrl}" style="max-height: 250px; max-width: 100%; border: 1px solid #ccc; border-radius: 4px;" alt="Question Image"></div>`;
+    }
+    
+    let qText = q.q ? q.q : (direction === 'rtl' ? '<span style="color: #6c757d; font-style: italic;">(سؤال مصور - انظر الصورة)</span>' : '<span style="color: #6c757d; font-style: italic;">(Image Question)</span>');
+    
     html += `
         <div class="question-box">
-            <div class="question-text">${idx + 1}. ${q.q}</div>
+            <div class="question-text">${idx + 1}. ${qText}</div>
+            ${qImageHtml}
     `;
  
     if (q.type === 'mcq' || q.type === 'tf') {
@@ -444,10 +453,16 @@ function downloadSolvedExamPDF() {
       `;
     }
  
-    if (q.explain && q.explain !== "undefined") {
+    if (q.explain && q.explain !== "undefined" || q.explainImage) {
+      let expImgHtml = '';
+      if (q.explainImage) {
+          const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.explainImage}/view?project=6a0f923e00138d15d172`;
+          expImgHtml = `<div style="text-align: center; margin-top: 10px;"><img src="${imgUrl}" style="max-height: 200px; max-width: 100%; border: 1px solid #ccc; border-radius: 4px;" alt="Explanation Image"></div>`;
+      }
       html += `
         <div class="explain-box">
-            <strong>${direction === 'rtl' ? 'الشرح / التفسير:' : 'Explanation:'}</strong> ${q.explain}
+            <strong>${direction === 'rtl' ? 'الشرح / التفسير:' : 'Explanation:'}</strong> ${q.explain && q.explain !== "undefined" ? q.explain : ''}
+            ${expImgHtml}
         </div>
       `;
     }
@@ -633,6 +648,7 @@ window.renderAllQuestions = function () {
         let qDir = e.direction === 'ltr' ? 'ltr' : 'rtl';
         let qAlign = qDir === 'ltr' ? 'left' : 'right';
         let qPrefix = qDir === 'ltr' ? `Q${t + 1}:` : `سؤال ${t + 1}:`;
+        let qText = e.q ? e.q : (qDir === 'ltr' ? '<span class="text-muted fst-italic">(Image Question - see below)</span>' : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة أدناه)</span>');
         
         let qImageHtml = "";
         if (e.qImage) {
@@ -640,7 +656,7 @@ window.renderAllQuestions = function () {
             qImageHtml = `<div class="mb-3 text-center"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 400px;" alt="Question Image"></div>`;
         }
         
-      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${qDir}" style="text-align: ${qAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${qPrefix} ${e.q}</div>\n                ${qImageHtml}\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
+      ((n += `\n            <div class="question-block mb-5 p-4 border rounded-3 bg-light shadow-sm" id="q-block-${t}" dir="${qDir}" style="text-align: ${qAlign};">\n                <div class="question-text fw-bold fs-5 mb-3" style="font-family: Cairo, sans-serif;">${qPrefix} ${qText}</div>\n                ${qImageHtml}\n                <div class="options-list d-flex flex-column gap-2" id="q-opts-${t}">\n        `),
         "essay" === e.type
           ? (n += `<textarea class="form-control" rows="4" placeholder="${qDir === 'rtl' ? 'اكتب إجابتك هنا...' : 'Type your answer here...'}" id="essay-ans-${t}"></textarea>`)
           : "complete" === e.type
