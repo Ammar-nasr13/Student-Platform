@@ -79,16 +79,8 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto mb-2 mb-xl-0">
                     <li class="nav-link-item"><a class="nav-link" href="index.html">الرئيسية</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="levelsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            المستويات الدراسية
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark text-right" aria-labelledby="levelsDropdown">
-                            <li><a class="dropdown-item" href="level1.html">المستوى الأول</a></li>
-                            <li><a class="dropdown-item" href="level2.html">المستوى الثاني</a></li>
-                            <li><a class="dropdown-item" href="level3.html">المستوى الثالث</a></li>
-                            <li><a class="dropdown-item" href="level4.html">المستوى الرابع</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#levelsModal">المستويات الدراسية</a>
                     </li>
                     <li class="nav-link-item"><a class="nav-link" href="exams.html">الاختبارات التفاعلية</a></li>
                     <li class="nav-link-item"><a class="nav-link" href="summaries.html">الملخصات</a></li>
@@ -279,5 +271,27 @@
             }
         })();
     </script>
+
+    <!-- Modal المستويات الدراسية -->
+    <div class="modal fade" id="levelsModal" tabindex="-1" aria-labelledby="levelsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+          <div class="modal-body text-center p-4">
+            <h4 class="fw-bold mb-3" style="color: #4a4a4a;">تصفح المقررات الدراسية</h4>
+            <p class="text-muted mb-4" style="font-size: 0.95rem;">يرجى اختيار المستوى الدراسي الذي تود تصفحه:</p>
+            
+            <div class="d-flex flex-column gap-2 mb-4">
+                <a href="level1.html" class="btn text-white fw-bold py-2 rounded-3" style="background-color: #1c355e;">المستوى الأول</a>
+                <a href="level2.html" class="btn text-white fw-bold py-2 rounded-3" style="background-color: #198754;">المستوى الثاني</a>
+                <a href="level3.html" class="btn text-white fw-bold py-2 rounded-3" style="background-color: #0d6efd;">المستوى الثالث</a>
+                <a href="level4.html" class="btn text-white fw-bold py-2 rounded-3" style="background-color: #dc3545;">المستوى الرابع</a>
+            </div>
+            
+            <button type="button" class="btn text-white fw-bold px-4" style="background-color: #6c757d;" data-bs-dismiss="modal">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </body>
 </html>

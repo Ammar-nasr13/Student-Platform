@@ -408,8 +408,8 @@ function downloadSolvedExamPDF() {
         qImageHtml = `<div style="text-align: center; margin-bottom: 15px;"><img src="${imgUrl}" style="max-height: 250px; max-width: 100%; border: 1px solid #ccc; border-radius: 4px;" alt="Question Image"></div>`;
     }
     
-    let qText = q.q ? q.q : (direction === 'rtl' ? '<span style="color: #6c757d; font-style: italic;">(سؤال مصور - انظر الصورة)</span>' : '<span style="color: #6c757d; font-style: italic;">(Image Question)</span>');
-    
+    let qDir = q.direction === 'ltr' ? 'ltr' : 'rtl';
+    let qText = q.q ? q.q : (qDir === 'ltr' ? '<span style="color: #6c757d; font-style: italic;">(Image Question)</span>' : '<span style="color: #6c757d; font-style: italic;">(سؤال مصور - انظر الصورة)</span>');    
     html += `
         <div class="question-box">
             <div class="question-text">${idx + 1}. ${qText}</div>
@@ -634,12 +634,10 @@ window.renderAllQuestions = function () {
     
     const hasEssay = currentQuiz.questions.some(q => q.type === 'essay');
     if (hasEssay) {
-        n += `<div class="alert alert-info border-0 border-start border-4 border-info mb-4" dir="${direction}">
+        n += `<div class="alert alert-info border-0 border-start border-4 border-info mb-4" dir="rtl" style="text-align: right;">
                 <i class="fa-solid fa-circle-info ms-2 text-primary"></i>
-                <strong>${direction === 'rtl' ? 'تعليمات هامة:' : 'Important Instructions:'}</strong>
-                <p class="mb-0 mt-1">${direction === 'rtl' 
-                  ? 'سيتم احتساب جميع الأسئلة المقالية صحيحة كإجراء افتراضي. برجاء التأكد والاطلاع على الإجابات النموذجية أسفل كل سؤال بعد الانتهاء من الاختبار للتأكد من صحة إجابتك. قريباً سيتم إضافة نظام ذكي لتصحيح الأسئلة المقالية.' 
-                  : 'All essay questions are graded as correct by default. Please review the model answers provided below each question after completing the exam to verify your answers. An intelligent grading system for essay questions will be added soon.'}</p>
+                <strong>تعليمات هامة:</strong>
+                <p class="mb-0 mt-1">سيتم احتساب جميع الأسئلة المقالية صحيحة كإجراء افتراضي. برجاء التأكد والاطلاع على الإجابات النموذجية أسفل كل سؤال بعد الانتهاء من الاختبار للتأكد من صحة إجابتك. قريباً سيتم إضافة نظام ذكي لتصحيح الأسئلة المقالية.</p>
               </div>`;
     }
     

@@ -187,9 +187,8 @@ function renderQuestionsList() {
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left; padding-right: 80px;"' : 'dir="rtl" style="text-align: right; padding-left: 80px;"';
         let btnPositionClass = q.direction === 'ltr' ? 'start-0' : 'end-0';
         let imgBadge = q.qImage ? '<i class="fa-regular fa-image text-primary ms-2 me-2" title="يحتوي على صورة"></i>' : '';
-        let qText = q.q ? q.q : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>';
-
         let qImageHtml = '';
+        let qText = q.q ? q.q : (q.direction === 'ltr' ? '<span class="text-muted fst-italic">(Image Question - see below)</span>' : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>');
         if (q.qImage) {
             const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.qImage}/view?project=6a0f923e00138d15d172`;
             qImageHtml = `<div class="mt-2"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 150px;" alt="Question Image"></div>`;
@@ -626,9 +625,9 @@ window.showStudentDetails = function(res) {
         
         let qDirStyle = q.direction === 'ltr' ? 'dir="ltr" style="text-align: left;"' : 'dir="rtl" style="text-align: right;"';
         let qPrefix = q.direction === 'ltr' ? `Q${idx + 1}:` : `سؤال ${idx + 1}:`;
-        let qText = q.q ? q.q : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>';
         
         let qImageHtml = '';
+        let qText = q.q ? q.q : (q.direction === 'ltr' ? '<span class="text-muted fst-italic">(Image Question - see below)</span>' : '<span class="text-muted fst-italic">(سؤال مصور - انظر الصورة)</span>');
         if (q.qImage) {
             const imgUrl = `https://appwrite.etihadalmdina.com/v1/storage/buckets/${window.DB_CONFIG.summariesBucket}/files/${q.qImage}/view?project=6a0f923e00138d15d172`;
             qImageHtml = `<div class="mt-2 text-center"><img src="${imgUrl}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;" alt="Question Image"></div>`;
