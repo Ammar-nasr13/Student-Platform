@@ -497,46 +497,6 @@ function showQuizResults() {
   const actualScore = Math.round((score / t) * maxScore);
   const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
   
-  if (window.AppwriteDB && window.DB_CONFIG) {
-    const e = {
-      studentName: window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student"),
-      examTitle: currentQuiz.title || (direction === 'rtl' ? "بدون عنوان" : "Untitled"),
-      subjectName: currentQuiz.subject_id || (direction === 'rtl' ? "غير معروف" : "Unknown"),
-      level: currentQuiz.level ? currentQuiz.level.toString() : (direction === 'rtl' ? "غير محدد" : "Not specified"),
-      score: actualScore,
-      totalScore: maxScore,
-      details: JSON.stringify({ userAnswers: userAnswers, quiz: currentQuiz }),
-    };
-    window.AppwriteDB.createDocument(
-      window.DB_CONFIG.dbId,
-      window.DB_CONFIG.resultsCol,
-      window.AppwriteID.unique(),
-      e,
-    )
-      .then(() => {
-        console.log("تم حفظ النتيجة مع التفاصيل بنجاح.");
-      })
-      .catch((t) => {
-        (console.error(
-          "خطأ أثناء حفظ النتيجة بالتفاصيل، محاولة الحفظ بدون التفاصيل...",
-          t,
-        ),
-          delete e.details,
-          window.AppwriteDB.createDocument(
-            window.DB_CONFIG.dbId,
-            window.DB_CONFIG.resultsCol,
-            window.AppwriteID.unique(),
-            e,
-          )
-            .then(() => {
-              console.log("تم حفظ النتيجة المصغرة بنجاح.");
-            })
-            .catch((e) => {
-              console.error("فشل الحفظ النهائي:", e);
-            }));
-      });
-  }
-  
   let allAnswered = true;
   if (currentQuiz && currentQuiz.questions) {
     currentQuiz.questions.forEach((q, idx) => {
@@ -839,6 +799,50 @@ window.processExamSubmission = function () {
     eBtn.removeEventListener("click", submitFullExam);
     eBtn.addEventListener("click", showQuizResults);
     window.scrollTo({ top: 0, behavior: "smooth" });
+    
+    const t_total = currentQuiz.questions.length;
+    const maxScore = currentQuiz.max_score || t_total;
+    const actualScore = Math.round((score / t_total) * maxScore);
+    
+    if (window.AppwriteDB && window.DB_CONFIG) {
+      const dbObj = {
+        studentName: window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student"),
+        examTitle: currentQuiz.title || (direction === 'rtl' ? "بدون عنوان" : "Untitled"),
+        subjectName: currentQuiz.subject_id || (direction === 'rtl' ? "غير معروف" : "Unknown"),
+        level: currentQuiz.level ? currentQuiz.level.toString() : (direction === 'rtl' ? "غير محدد" : "Not specified"),
+        score: actualScore,
+        totalScore: maxScore,
+        details: JSON.stringify({ userAnswers: userAnswers, quiz: currentQuiz }),
+      };
+      window.AppwriteDB.createDocument(
+        window.DB_CONFIG.dbId,
+        window.DB_CONFIG.resultsCol,
+        window.AppwriteID.unique(),
+        dbObj,
+      )
+        .then(() => {
+          console.log("تم حفظ النتيجة مع التفاصيل بنجاح.");
+        })
+        .catch((err) => {
+          console.error(
+            "خطأ أثناء حفظ النتيجة بالتفاصيل، محاولة الحفظ بدون التفاصيل...",
+            err,
+          );
+          delete dbObj.details;
+          window.AppwriteDB.createDocument(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.resultsCol,
+            window.AppwriteID.unique(),
+            dbObj,
+          )
+            .then(() => {
+              console.log("تم حفظ النتيجة المصغرة بنجاح.");
+            })
+            .catch((err2) => {
+              console.error("فشل الحفظ النهائي:", err2);
+            });
+        });
+    }
     
     if ("undefined" != typeof Swal) {
         Swal.fire(
