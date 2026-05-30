@@ -68,23 +68,32 @@ function updateUIForFaculty() {
         e.appendChild(li);
       }
       
+      // Hide student features for all faculty members
+      const studentSelectorsToHide = [
+          'a[href="exams.html"]',
+          'a[href="summaries.html"]',
+          'a[href="favorites.html"]',
+          'a[data-bs-target="#levelsModal"]'
+      ];
+      studentSelectorsToHide.forEach(selector => {
+          document.querySelectorAll(selector).forEach(el => {
+              if (el.parentElement && el.parentElement.tagName === 'LI') {
+                  el.parentElement.style.display = 'none';
+              } else {
+                  el.style.display = 'none';
+              }
+          });
+      });
+
+      // DB Admin shouldn't see add_exam
       if (isDBAdmin) {
-        const selectorsToHide = [
-            'a[href="exams.html"]',
-            'a[href="summaries.html"]',
-            'a[href="favorites.html"]',
-            'a[data-bs-target="#levelsModal"]',
-            'a[href="add_exam.html"]'
-        ];
-        selectorsToHide.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-                if (el.parentElement && el.parentElement.tagName === 'LI') {
-                    el.parentElement.style.display = 'none';
-                } else {
-                    el.style.display = 'none';
-                }
-            });
-        });
+          document.querySelectorAll('a[href="add_exam.html"]').forEach(el => {
+              if (el.parentElement && el.parentElement.tagName === 'LI') {
+                  el.parentElement.style.display = 'none';
+              } else {
+                  el.style.display = 'none';
+              }
+          });
       }
     }
   }

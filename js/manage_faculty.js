@@ -107,7 +107,7 @@ function renderDoctorsTable() {
     if (doctorsList.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center py-5 text-muted">
+                <td colspan="6" class="text-center py-5 text-muted">
                     <i class="fa-solid fa-folder-open fs-1 text-black-50 mb-3"></i>
                     <p class="mb-0">لا يوجد أعضاء هيئة تدريس مسجلين حالياً.</p>
                 </td>
@@ -121,6 +121,9 @@ function renderDoctorsTable() {
         const date = new Date(doc.$createdAt).toLocaleDateString('ar-EG');
         return `
             <tr>
+                <td>
+                    <input class="form-check-input doctor-select-check" type="checkbox" value="${doc.$id}">
+                </td>
                 <td class="fw-bold"><i class="fa-solid fa-user-tie text-primary me-2"></i> ${doc.name}</td>
                 <td dir="ltr" class="text-muted">${doc.email}</td>
                 <td><span class="badge bg-info text-dark rounded-pill px-3 py-2">${subjectsCount} مقررات</span></td>
@@ -132,6 +135,80 @@ function renderDoctorsTable() {
             </tr>
         `;
     }).join('');
+}
+
+function toggleSelectAllDoctors() {
+    const isChecked = document.getElementById('selectAllDoctors').checked;
+    document.querySelectorAll('.doctor-select-check').forEach(cb => {
+        cb.checked = isChecked;
+    });
+}
+
+function openPrintModal() {
+    const selected = document.querySelectorAll('.doctor-select-check:checked');
+    if (selected.length === 0) {
+        Swal.fire('تنبيه', 'الرجاء تحديد دكتور واحد على الأقل للطباعة', 'info');
+        return;
+    }
+    const modal = new bootstrap.Modal(document.getElementById('printModal'));
+    modal.show();
+}
+
+function executePrint() {
+    // 1. Get selected doctors
+    const selectedIds = Array.from(document.querySelectorAll('.doctor-select-check:checked')).map(cb => cb.value);
+    const selectedDocs = doctorsList.filter(d => selectedIds.includes(d.$id));
+    
+    // 2. Get selected columns
+    const cols = Array.from(document.querySelectorAll('.print-col-check:checked')).map(cb => cb.value);
+    if (cols.length === 0) {
+        Swal.fire('تنبيه', 'الرجاء اختيار عمود واحد على الأقل للطباعة', 'warning');
+        return;
+    }
+
+    // 3. Build HTML Table
+    let html = `
+        <div class="print-header">
+            <h2>كشف بيانات أعضاء هيئة التدريس</h2>
+            <p>تم استخراج الكشف بتاريخ: ${new Date().toLocaleDateString('ar-EG')} - عدد الأعضاء: ${selectedDocs.length}</p>
+        </div>
+        <table class="print-table">
+            <thead>
+                <tr>
+                    ${cols.includes('name') ? '<th>الاسم</th>' : ''}
+                    ${cols.includes('email') ? '<th>البريد الإلكتروني</th>' : ''}
+                    ${cols.includes('password') ? '<th>كلمة المرور</th>' : ''}
+                    ${cols.includes('subjects') ? '<th>المقررات المخصصة</th>' : ''}
+                    ${cols.includes('date') ? '<th>تاريخ الإضافة</th>' : ''}
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    selectedDocs.forEach(doc => {
+        html += '<tr>';
+        if (cols.includes('name')) html += `<td>${doc.name}</td>`;
+        if (cols.includes('email')) html += `<td dir="ltr">${doc.email}</td>`;
+        if (cols.includes('password')) html += `<td dir="ltr">${doc.password || 'غير متوفر'}</td>`;
+        if (cols.includes('subjects')) html += `<td>${(doc.subjects || []).join('، ')}</td>`;
+        if (cols.includes('date')) html += `<td>${new Date(doc.$createdAt).toLocaleDateString('ar-EG')}</td>`;
+        html += '</tr>';
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    // 4. Inject and Print
+    const printContainer = document.getElementById('print-container');
+    printContainer.innerHTML = html;
+    
+    bootstrap.Modal.getInstance(document.getElementById('printModal')).hide();
+    
+    setTimeout(() => {
+        window.print();
+    }, 500);
 }
 
 function openAddDoctorModal() {
@@ -218,7 +295,7 @@ async function saveDoctor() {
         fetchDoctors();
     } catch (error) {
         console.error("Error saving doctor:", error);
-        Swal.fire('خطأ', 'تفاصيل الخطأ: ' + (error.message || 'حدث خطأ أثناء حفظ البيانات'), 'error');
+        Swal.fire('خطأ', 'حدث خطأ أثناء حفظ البيانات', 'error');
     } finally {
         btn.innerHTML = oldText;
         btn.disabled = false;

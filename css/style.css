@@ -2556,3 +2556,59 @@ body.dark-theme .ad-glass-card {
     }
 }
 
+/* =========================================
+   Print Styles for PDF Export
+   ========================================= */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-container, #print-container * {
+        visibility: visible;
+    }
+    #print-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background-color: white;
+        color: black;
+        direction: rtl;
+    }
+    
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .print-table th, .print-table td {
+        border: 1px solid #000;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+        color: #000;
+    }
+    
+    .print-table th {
+        background-color: #f2f2f2 !important;
+        font-weight: bold;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .print-header h2 {
+        color: #000;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .print-header p {
+        color: #333;
+        font-size: 14px;
+    }
+}
+
