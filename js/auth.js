@@ -31,31 +31,26 @@ function updateUIForStudent() {
   if ("true" === localStorage.getItem("is_student") && e) {
       if (!document.getElementById("nav-student-profile")) {
           const t = document.createElement("li");
-          t.className = "nav-item dropdown ms-xl-3 mt-3 mt-xl-0";
+          t.className = "nav-item ms-xl-3 mt-3 mt-xl-0";
           t.id = "nav-student-profile";
-          
-          const levelNames = {
-              "1": "المستوى الأول",
-              "2": "المستوى الثاني",
-              "3": "المستوى الثالث",
-              "4": "المستوى الرابع"
-          };
-          const lvl = localStorage.getItem("student_level");
-          const levelText = levelNames[lvl] || lvl;
-          
           t.innerHTML = `
-            <a class="nav-link dropdown-toggle fw-bold text-warning" href="#" id="studentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-user-circle fs-5 me-1"></i> ${localStorage.getItem("student_name").split(' ')[0]}
-            </a>
-            <ul class="dropdown-menu shadow border-0" aria-labelledby="studentDropdown" style="text-align: right; font-family: 'Cairo', sans-serif; min-width: 250px;">
-                <li class="px-3 py-2 border-bottom mb-2">
-                    <span class="d-block fw-bold text-primary mb-1"><i class="fa-solid fa-user me-2"></i> ${localStorage.getItem("student_name")}</span>
-                    <span class="d-block text-muted small mb-1"><i class="fa-solid fa-id-card me-2"></i> الكود: ${localStorage.getItem("student_code")}</span>
-                    <span class="d-block text-muted small"><i class="fa-solid fa-layer-group me-2"></i> ${levelText}</span>
-                </li>
-                <li><a class="dropdown-item text-danger fw-bold py-2" href="#" onclick="logoutStudent(); return false;"><i class="fa-solid fa-right-from-bracket me-2"></i> تسجيل الخروج</a></li>
-            </ul>`;
+            <a class="nav-link fw-bold text-warning" href="profile.html">
+                <i class="fa-solid fa-user-circle fs-5 me-1"></i> الملف الشخصي
+            </a>`;
           e.appendChild(t);
+      }
+  }
+  
+  // Add logout button to navbar actions if it doesn't exist
+  const actionsContainer = document.querySelector(".d-flex.ms-xl-3.align-items-center");
+  if ("true" === localStorage.getItem("is_student") && actionsContainer) {
+      if (!document.getElementById("nav-student-logout")) {
+          const btn = document.createElement("button");
+          btn.id = "nav-student-logout";
+          btn.className = "btn btn-danger btn-sm px-3 rounded-pill fw-bold ms-2";
+          btn.innerHTML = `<i class="fa-solid fa-sign-out-alt me-1"></i> تسجيل الخروج`;
+          btn.onclick = logoutStudent;
+          actionsContainer.appendChild(btn);
       }
   }
 }

@@ -1,4 +1,4 @@
-const databases = new Appwrite.Databases(client);
+const databases = window.AppwriteDB;
 let allStudents = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,11 +15,11 @@ async function loadStudents() {
     
     try {
         const response = await databases.listDocuments(
-            DB_CONFIG.DATABASE_ID,
-            DB_CONFIG.STUDENTS_COLLECTION_ID,
+            DB_CONFIG.dbId,
+            DB_CONFIG.studentsCol,
             [
-                Appwrite.Query.limit(100),
-                Appwrite.Query.orderDesc("$createdAt")
+                window.AppwriteQuery.limit(100),
+                window.AppwriteQuery.orderDesc("$createdAt")
             ]
         );
         
@@ -123,8 +123,8 @@ async function saveStudent() {
         if (docId) {
             // Update existing
             await databases.updateDocument(
-                DB_CONFIG.DATABASE_ID,
-                DB_CONFIG.STUDENTS_COLLECTION_ID,
+                DB_CONFIG.dbId,
+                DB_CONFIG.studentsCol,
                 docId,
                 payload
             );
@@ -132,9 +132,9 @@ async function saveStudent() {
         } else {
             // Check if code already exists to avoid duplicates
             const existing = await databases.listDocuments(
-                DB_CONFIG.DATABASE_ID,
-                DB_CONFIG.STUDENTS_COLLECTION_ID,
-                [Appwrite.Query.equal("code", code)]
+                DB_CONFIG.dbId,
+                DB_CONFIG.studentsCol,
+                [window.AppwriteQuery.equal("code", code)]
             );
             
             if (existing.documents.length > 0) {
@@ -146,9 +146,9 @@ async function saveStudent() {
             
             // Create new
             await databases.createDocument(
-                DB_CONFIG.DATABASE_ID,
-                DB_CONFIG.STUDENTS_COLLECTION_ID,
-                Appwrite.ID.unique(),
+                DB_CONFIG.dbId,
+                DB_CONFIG.studentsCol,
+                window.AppwriteID.unique(),
                 payload,
                 [
                     Appwrite.Permission.read(Appwrite.Role.any())
@@ -207,8 +207,8 @@ async function deleteStudent(id) {
 async function executeDelete(id) {
     try {
         await databases.deleteDocument(
-            DB_CONFIG.DATABASE_ID,
-            DB_CONFIG.STUDENTS_COLLECTION_ID,
+            DB_CONFIG.dbId,
+            DB_CONFIG.studentsCol,
             id
         );
         showToast("تم حذف الطالب بنجاح", "success");
