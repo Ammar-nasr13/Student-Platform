@@ -2,8 +2,11 @@
 
 function checkAuthSession() {
   document.getElementById("auth-gateway");
-  updateUIForFaculty();
-  updateUIForStudent();
+  if (localStorage.getItem("is_faculty") === "true") {
+    updateUIForFaculty();
+  } else if (localStorage.getItem("is_student") === "true") {
+    updateUIForStudent();
+  }
 }
 function closeAuthGateway() {
   const e = document.getElementById("auth-gateway");
@@ -134,6 +137,7 @@ async function loginFaculty() {
     try {
       (await window.AppwriteAccount.createEmailPasswordSession(e, t),
         localStorage.setItem("is_faculty", "true"),
+        localStorage.removeItem("is_student"), // Clear student session if exists
         n.classList.add("d-none"),
         closeAuthGateway(),
         updateUIForFaculty());
@@ -210,6 +214,7 @@ async function loginStudentByCode() {
         if (res.documents.length > 0) {
             const student = res.documents[0];
             localStorage.setItem("is_student", "true");
+            localStorage.removeItem("is_faculty"); // Clear faculty session if exists
             localStorage.setItem("student_code", student.code);
             localStorage.setItem("student_name", student.name);
             localStorage.setItem("student_level", student.level);
