@@ -166,39 +166,62 @@ function executePrint() {
         return;
     }
 
-    // 3. Build HTML Table
-    let html = `
-        <div class="print-header">
-            <h2>كشف بيانات أعضاء هيئة التدريس</h2>
-            <p>تم استخراج الكشف بتاريخ: ${new Date().toLocaleDateString('ar-EG')} - عدد الأعضاء: ${selectedDocs.length}</p>
-        </div>
-        <table class="print-table">
-            <thead>
-                <tr>
-                    ${cols.includes('name') ? '<th>الاسم</th>' : ''}
-                    ${cols.includes('email') ? '<th>البريد الإلكتروني</th>' : ''}
-                    ${cols.includes('password') ? '<th>كلمة المرور</th>' : ''}
-                    ${cols.includes('subjects') ? '<th>المقررات المخصصة</th>' : ''}
-                    ${cols.includes('date') ? '<th>تاريخ الإضافة</th>' : ''}
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    // 3. Build HTML Template (Academic Letter Format)
+    let html = '';
 
     selectedDocs.forEach(doc => {
-        html += '<tr>';
-        if (cols.includes('name')) html += `<td>${doc.name}</td>`;
-        if (cols.includes('email')) html += `<td dir="ltr">${doc.email}</td>`;
-        if (cols.includes('password')) html += `<td dir="ltr">${doc.password || 'غير متوفر'}</td>`;
-        if (cols.includes('subjects')) html += `<td>${(doc.subjects || []).join('، ')}</td>`;
-        if (cols.includes('date')) html += `<td>${new Date(doc.$createdAt).toLocaleDateString('ar-EG')}</td>`;
-        html += '</tr>';
+        html += `
+        <div class="print-card">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1a365d; margin-top: 10px; font-weight: bold;">جامعة المنيا - كلية السياحة والفنادق</h2>
+                <h3 style="color: #4b5563;">قسم تكنولوجيا صناعة السياحة والضيافة</h3>
+                <hr style="border-top: 2px solid #1a365d; margin-top: 15px;">
+            </div>
+            <h3 style="text-align: center; margin-bottom: 30px; font-weight: bold;">بيانات الدخول لمنصة الاختبارات التفاعلية</h3>
+            
+            <div style="font-size: 18px; line-height: 2;">
+                ${cols.includes('name') ? `<p><strong>السيد الأستاذ الدكتور / </strong> ${doc.name}</p>` : ''}
+                <p>تحية طيبة وبعد،،،</p>
+                <p>مرفق لسيادتكم بيانات الدخول الخاصة بكم على منصة الاختبارات التفاعلية للقسم:</p>
+                
+                <table class="print-table">
+                    <tbody>
+                        ${cols.includes('email') ? `
+                        <tr>
+                            <th>البريد الإلكتروني:</th>
+                            <td style="text-align: left; direction: ltr;">${doc.email}</td>
+                        </tr>` : ''}
+                        
+                        ${cols.includes('password') ? `
+                        <tr>
+                            <th>كلمة المرور:</th>
+                            <td style="text-align: left; direction: ltr;">${doc.password || 'غير متوفر'}</td>
+                        </tr>` : ''}
+                        
+                        ${cols.includes('subjects') ? `
+                        <tr>
+                            <th>المقررات المخصصة:</th>
+                            <td>${(doc.subjects || []).join('، ')}</td>
+                        </tr>` : ''}
+                        
+                        ${cols.includes('date') ? `
+                        <tr>
+                            <th>تاريخ الإضافة:</th>
+                            <td>${new Date(doc.$createdAt).toLocaleDateString('ar-EG')}</td>
+                        </tr>` : ''}
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 20px;">يرجى التكرم بتسجيل الدخول للمنصة والبدء في إعداد الاختبارات التفاعلية للطلاب.</p>
+                
+                <div style="margin-top: 60px; text-align: left; padding-left: 50px;">
+                    <p style="font-weight: bold; margin-bottom: 5px;">مع تحيات،</p>
+                    <p style="font-weight: bold;">إدارة الكلية</p>
+                </div>
+            </div>
+        </div>
+        `;
     });
-
-    html += `
-            </tbody>
-        </table>
-    `;
 
     // 4. Inject and Print
     const printContainer = document.getElementById('print-container');
