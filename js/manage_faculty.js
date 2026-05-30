@@ -138,6 +138,7 @@ function openAddDoctorModal() {
     document.getElementById("doc-id").value = "";
     document.getElementById("doc-name").value = "";
     document.getElementById("doc-email").value = "";
+    document.getElementById("doc-password").value = "";
     document.getElementById("doctorModalTitle").textContent = "إضافة دكتور جديد";
     
     // clear checkboxes
@@ -151,6 +152,7 @@ function openEditDoctorModal(id) {
     document.getElementById("doc-id").value = doc.$id;
     document.getElementById("doc-name").value = doc.name;
     document.getElementById("doc-email").value = doc.email;
+    document.getElementById("doc-password").value = doc.password || "";
     document.getElementById("doctorModalTitle").textContent = "تعديل بيانات الدكتور";
 
     // set checkboxes
@@ -166,9 +168,10 @@ async function saveDoctor() {
     const id = document.getElementById("doc-id").value;
     const name = document.getElementById("doc-name").value.trim();
     const email = document.getElementById("doc-email").value.trim();
+    const password = document.getElementById("doc-password").value;
 
-    if (!name || !email) {
-        Swal.fire('بيانات ناقصة', 'الرجاء إدخال الاسم والبريد الإلكتروني', 'warning');
+    if (!name || !email || !password) {
+        Swal.fire('بيانات ناقصة', 'الرجاء إدخال الاسم والبريد وكلمة المرور', 'warning');
         return;
     }
 
@@ -186,7 +189,7 @@ async function saveDoctor() {
                 window.DB_CONFIG.dbId,
                 window.DB_CONFIG.doctorsCol,
                 id,
-                { name, email, subjects: selectedSubjects }
+                { name, email, password, subjects: selectedSubjects }
             );
             Swal.fire('نجاح', 'تم تحديث بيانات الدكتور بنجاح', 'success');
         } else {
@@ -206,7 +209,7 @@ async function saveDoctor() {
                 window.DB_CONFIG.dbId,
                 window.DB_CONFIG.doctorsCol,
                 window.AppwriteID.unique(),
-                { name, email, subjects: selectedSubjects }
+                { name, email, password, subjects: selectedSubjects }
             );
             Swal.fire('نجاح', 'تم إضافة الدكتور وتخصيص المقررات بنجاح', 'success');
         }

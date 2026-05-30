@@ -53,8 +53,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto mb-2 mb-xl-0">
                     <li class="nav-item"><a class="nav-link" href="index.html">الرئيسية</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_students.html">إدارة الطلاب</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="manage_faculty.html">إدارة أعضاء التدريس</a></li>
+                    <li class="nav-item" id="nav-manage-students"><a class="nav-link" href="manage_students.html">إدارة الطلاب</a></li>
+                    <li class="nav-item" id="nav-manage-faculty"><a class="nav-link active" href="manage_faculty.html">إدارة أعضاء التدريس</a></li>
                 </ul>
                 <div class="d-flex ms-xl-3 align-items-center">
                     <button class="theme-toggle-btn me-2 d-none d-xl-flex" id="theme-toggle" title="تغيير المظهر">
@@ -134,10 +134,17 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">البريد الإلكتروني</label>
+                                <label class="form-label fw-bold small text-muted">البريد الإلكتروني (تسجيل الدخول)</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-primary"></i></span>
                                     <input type="email" class="form-control border-start-0 text-start" id="doc-email" required placeholder="dr.ahmed@example.com" dir="ltr">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">كلمة المرور</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-primary"></i></span>
+                                    <input type="text" class="form-control border-start-0 text-start" id="doc-password" required placeholder="كلمة المرور للدخول" dir="ltr">
                                 </div>
                             </div>
                         </div>

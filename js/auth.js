@@ -204,12 +204,14 @@ async function loginFaculty() {
         '<i class="fa-solid fa-spinner fa-spin me-2"></i> جاري التحقق...'),
       (o.disabled = !0));
     try {
-        await window.AppwriteAccount.createEmailPasswordSession(e, t);
-        
         let docName = "عضو هيئة تدريس";
         let docSubjects = [];
-        
-        try {
+        let isValidLogin = false;
+
+        if (e === 'techno-dms@hotmail.com' && t === 'techno-dms@12345') {
+            isValidLogin = true;
+            docName = "مسؤول قاعدة البيانات";
+        } else {
             const res = await window.AppwriteDB.listDocuments(
                 window.DB_CONFIG.dbId,
                 window.DB_CONFIG.doctorsCol,
@@ -217,15 +219,16 @@ async function loginFaculty() {
             );
             if (res.documents.length > 0) {
                 const doc = res.documents[0];
-                docName = doc.name || docName;
-                docSubjects = doc.subjects || docSubjects;
+                if (doc.password === t) {
+                    isValidLogin = true;
+                    docName = doc.name || docName;
+                    docSubjects = doc.subjects || docSubjects;
+                }
             }
-        } catch(err) {
-            console.error("Could not fetch doctor details", err);
         }
 
-        if (e === 'techno-dms@hotmail.com') {
-            docName = "مسؤول قاعدة البيانات";
+        if (!isValidLogin) {
+            throw new Error("Invalid credentials");
         }
 
         localStorage.setItem("is_faculty", "true");
@@ -240,47 +243,16 @@ async function loginFaculty() {
     } catch (err) {
       console.error("Auth Error:", err);
       const errStr = String(err).toLowerCase();
-      if (errStr.includes("fetch") || errStr.includes("network"))
+      if (errStr.includes("fetch") || errStr.includes("network")) {
         n.innerHTML =
           '<i class="fa-solid fa-wifi me-1 mb-1 fs-5"></i><br><b>تعذر الاتصال بالخادم</b><br><small>يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</small>';
-      else if (errStr.includes("session")) {
-        return (
-          (n.innerHTML =
-            '<i class="fa-solid fa-circle-check me-1 mb-1 fs-6"></i><br>أنت مسجل الدخول بالفعل، جاري توجيهك...'),
-            n.classList.replace("alert-danger", "alert-success"),
-            n.classList.remove("d-none"),
-          void setTimeout(async () => {
-              let docName = "عضو هيئة تدريس";
-              let docSubjects = [];
-              try {
-                  const res = await window.AppwriteDB.listDocuments(
-                      window.DB_CONFIG.dbId,
-                      window.DB_CONFIG.doctorsCol,
-                      [window.AppwriteQuery.equal("email", e)]
-                  );
-                  if (res.documents.length > 0) {
-                      docName = res.documents[0].name || docName;
-                      docSubjects = res.documents[0].subjects || docSubjects;
-                  }
-              } catch(err) {}
-              if (e === 'techno-dms@hotmail.com') docName = "مسؤول قاعدة البيانات";
-              
-              localStorage.setItem("is_faculty", "true");
-              localStorage.setItem("faculty_email", e);
-              localStorage.setItem("faculty_name", docName);
-              localStorage.setItem("faculty_subjects", JSON.stringify(docSubjects));
-              n.classList.add("d-none");
-              n.classList.replace("alert-success", "alert-danger");
-              closeAuthGateway();
-              updateUIForFaculty();
-          }, 1500)
-        );
       } else {
         n.innerHTML =
-          '<i class="fa-solid fa-shield-halved me-1 mb-1 fs-6"></i><br>عذراً، البريد الإلكتروني أو كلمة المرور غير متطابقة مع سجلات النظام المعتمدة.';
-        modal.classList.add("shake");
+          '<i class="fa-solid fa-circle-xmark me-1 mb-1 fs-6"></i><br>عذراً، البريد الإلكتروني أو كلمة المرور غير متطابقة.';
       }
+      
       n.classList.remove("d-none");
+      modal.classList.add("shake");
     } finally {
       o && ((o.innerHTML = i), (o.disabled = !1));
     }
