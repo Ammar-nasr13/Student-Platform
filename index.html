@@ -136,13 +136,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <!-- بوابة الدخول الرئيسية (Auth Gateway) -->
     <div id="auth-gateway" class="auth-gateway-overlay">
         <div class="auth-modal">
-            <div class="text-center mb-4">
+            <div class="text-center mb-4" style="font-family: 'Cairo', sans-serif;">
                 <img src="assets/logo.webp" alt="شعار المنصة" class="auth-logo mb-3" width="120" height="120" style="max-width: 120px;" loading="lazy">
-                <h3 class="fw-bold text-primary">أهلاً بك في تكنولوجيا صناعة السياحة والضيافة</h3>
+                <h3 class="fw-bold text-primary">أهلاً بك في منصة تكنولوجيا صناعة السياحة والضيافة</h3>
                 <p class="text-muted small">الرجاء تحديد صفتك للدخول إلى المنصة</p>
             </div>
             
-            <div id="auth-role-selection" class="d-flex flex-column gap-3">
+            <div id="auth-role-selection" class="d-flex flex-column gap-3" style="font-family: 'Cairo', sans-serif;">
                 <button class="btn btn-lg fw-bold d-flex justify-content-center align-items-center" style="background-color: #0f2b46; border-color: #0f2b46; color: white;" onclick="selectRole('student')">
                     <i class="fa-solid fa-user-graduate me-2"></i> دخول كطالب 
                 </button>
@@ -151,7 +151,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 </button>
             </div>
 
-            <div id="auth-faculty-login" class="d-none mt-3">
+            <div id="auth-faculty-login" class="d-none mt-3" style="font-family: 'Cairo', sans-serif;">
                 <h5 class="fw-bold text-dark mb-4 d-flex justify-content-center align-items-center">
                     تسجيل دخول هيئة التدريس <i class="fa-solid fa-lock ms-2" style="color: #0f2b46;"></i>
                 </h5>
@@ -172,6 +172,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 <div class="d-flex gap-2">
                     <button class="btn btn-secondary fw-bold" onclick="backToRoles()"><i class="fa-solid fa-arrow-right"></i></button>
                     <button class="btn flex-fill fw-bold" style="background-color: #0f2b46; border-color: #0f2b46; color: white;" onclick="loginFaculty()">تسجيل الدخول</button>
+                </div>
+            </div>
+
+            <div id="auth-student-login" class="d-none mt-3" style="font-family: 'Cairo', sans-serif;">
+                <h5 class="fw-bold text-dark mb-4 d-flex justify-content-center align-items-center">
+                    تسجيل دخول الطالب <i class="fa-solid fa-graduation-cap ms-2" style="color: #0f2b46;"></i>
+                </h5>
+                <div class="mb-3 text-start">
+                    <label class="form-label small fw-bold">كود الطالب</label>
+                    <input type="text" id="student-code" class="form-control" dir="ltr" placeholder="أدخل كود الطالب">
+                </div>
+                <div class="mb-4 text-start">
+                    <label class="form-label small fw-bold">المستوى الدراسي</label>
+                    <select id="student-level" class="form-select">
+                        <option value="">-- اختر مستواك --</option>
+                        <option value="1">المستوى الأول</option>
+                        <option value="2">المستوى الثاني</option>
+                        <option value="3">المستوى الثالث</option>
+                        <option value="4">المستوى الرابع</option>
+                    </select>
+                </div>
+                <div id="student-auth-error" class="alert alert-danger small mb-3 d-none fw-bold text-center border-0 shadow-sm" style="border-radius: 8px; padding: 12px;">بيانات الطالب غير صحيحة أو غير موجودة!</div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-secondary fw-bold" onclick="backToRoles()"><i class="fa-solid fa-arrow-right"></i></button>
+                    <button class="btn flex-fill fw-bold" style="background-color: #0f2b46; border-color: #0f2b46; color: white;" onclick="loginStudentByCode()">تسجيل الدخول</button>
                 </div>
             </div>
         </div>

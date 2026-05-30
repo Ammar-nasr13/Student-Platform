@@ -102,6 +102,25 @@ function initQuizPageEvents() {
     }
   }
 
+  const authStatus = document.getElementById("student-auth-status");
+  const sBtn = document.getElementById("start-quiz-btn");
+  if (authStatus) {
+      if (localStorage.getItem("is_student") === "true") {
+          authStatus.innerHTML = `
+            <div class="alert alert-success border-0 border-start border-4 border-success">
+                <i class="fa-solid fa-user-graduate ms-2"></i> الطالب: <strong>${localStorage.getItem("student_name")}</strong> (كود: ${localStorage.getItem("student_code")})
+            </div>
+          `;
+      } else {
+          authStatus.innerHTML = `
+            <div class="alert alert-warning border-0 border-start border-4 border-warning">
+                <i class="fa-solid fa-circle-exclamation ms-2"></i> يجب <a href="index.html" class="fw-bold">تسجيل الدخول كطالب</a> من الصفحة الرئيسية لتتمكن من أداء الاختبار.
+            </div>
+          `;
+          if (sBtn) sBtn.style.display = "none";
+      }
+  }
+
   const e = document.getElementById("quiz-level-select"),
     t = document.getElementById("quiz-subject-select"),
     n = document.getElementById("quiz-exam-select"),
@@ -195,22 +214,19 @@ function initQuizPageEvents() {
         }
         return;
       }
+      
+      if (localStorage.getItem("is_student") !== "true") {
+        showToast("يجب تسجيل الدخول كطالب أولاً!", "error");
+        return;
+      }
+      
       const s = e.value,
         o = t.value,
-        i = n.value,
-        a = document.getElementById("student-name");
-      if (a) {
-        const e = a.value.trim();
-        if (!e || e.split(" ").length < 2)
-          return (
-            showToast(
-              "الرجاء كتابة اسمك الثنائي على الأقل قبل بدء الاختبار!",
-              "warning",
-            ),
-            void a.focus()
-          );
-        window.currentStudentName = e;
-      }
+        i = n.value;
+      
+      window.currentStudentName = localStorage.getItem("student_name");
+      window.currentStudentCode = localStorage.getItem("student_code");
+      
       startQuiz(s, o, i);
     }));
 }
@@ -342,6 +358,7 @@ function downloadSolvedExamPDF() {
   
   const levelText = currentQuiz.level ? (direction === 'rtl' ? `المستوى ${currentQuiz.level}` : `Level ${currentQuiz.level}`) : "";
   const studentName = window.currentStudentName || (direction === 'rtl' ? "طالب مجهول" : "Unknown Student");
+  const studentCode = window.currentStudentCode || (direction === 'rtl' ? "غير مسجل" : "Not registered");
   const dateStr = new Date().toLocaleDateString(direction === 'rtl' ? 'ar-EG' : 'en-US', { dateStyle: 'long' });
   const maxScore = currentQuiz.max_score || questions.length;
   const actualScore = Math.round((score / questions.length) * maxScore);
@@ -359,7 +376,7 @@ function downloadSolvedExamPDF() {
             .header h1 { color: #0f2b46; margin: 5px 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
             .header h3 { color: #555; margin: 5px 0; font-size: 14px; font-weight: normal; }
             .header h2 { color: #198754; margin: 10px 0 0 0; font-size: 18px; border-top: 1px dashed #ccc; padding-top: 10px; display: inline-block; }
-            .meta-info { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+            .meta-info { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; flex-wrap: wrap; gap: 10px; }
             .meta-item { font-size: 15px; }
             .meta-item strong { color: #0f2b46; }
             .score-badge { font-size: 18px; font-weight: bold; color: #198754; text-align: center; margin-bottom: 30px; padding: 10px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9; }
@@ -387,6 +404,7 @@ function downloadSolvedExamPDF() {
         
         <div class="meta-info">
             <div class="meta-item"><strong>${direction === 'rtl' ? 'اسم الطالب:' : 'Student Name:'}</strong> ${studentName}</div>
+            <div class="meta-item"><strong>${direction === 'rtl' ? 'كود الطالب:' : 'Student Code:'}</strong> ${studentCode}</div>
             <div class="meta-item"><strong>${direction === 'rtl' ? 'المستوى:' : 'Level:'}</strong> ${levelText}</div>
             <div class="meta-item"><strong>${direction === 'rtl' ? 'التاريخ:' : 'Date:'}</strong> ${dateStr}</div>
         </div>
