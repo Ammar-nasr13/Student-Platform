@@ -31,26 +31,13 @@ function updateUIForStudent() {
   if ("true" === localStorage.getItem("is_student") && e) {
       if (!document.getElementById("nav-student-profile")) {
           const t = document.createElement("li");
-          t.className = "nav-item ms-xl-3 mt-3 mt-xl-0";
+          t.className = "nav-link-item mt-3 mt-xl-0";
           t.id = "nav-student-profile";
           t.innerHTML = `
-            <a class="nav-link fw-bold text-warning" href="profile.html">
+            <a class="nav-link fw-bold d-flex align-items-center" href="profile.html">
                 <i class="fa-solid fa-user-circle fs-5 me-1"></i> الملف الشخصي
             </a>`;
           e.appendChild(t);
-      }
-  }
-  
-  // Add logout button to navbar actions if it doesn't exist
-  const actionsContainer = document.querySelector(".d-flex.ms-xl-3.align-items-center");
-  if ("true" === localStorage.getItem("is_student") && actionsContainer) {
-      if (!document.getElementById("nav-student-logout")) {
-          const btn = document.createElement("button");
-          btn.id = "nav-student-logout";
-          btn.className = "btn btn-danger btn-sm px-3 rounded-pill fw-bold ms-2";
-          btn.innerHTML = `<i class="fa-solid fa-sign-out-alt me-1"></i> تسجيل الخروج`;
-          btn.onclick = logoutStudent;
-          actionsContainer.appendChild(btn);
       }
   }
 }
