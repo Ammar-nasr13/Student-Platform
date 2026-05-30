@@ -24,7 +24,9 @@
 
     <!-- Security Gate -->
     <script>
-        if (localStorage.getItem('is_student') !== 'true') {
+        const isStudent = localStorage.getItem('is_student') === 'true';
+        const isDBAdmin = localStorage.getItem('faculty_email') === 'techno-dms@hotmail.com';
+        if (!isStudent && !isDBAdmin) {
             window.location.href = 'index.html';
         }
     </script>
@@ -73,19 +75,19 @@
             
             <div class="card-body px-4 pb-5 pt-5 text-center mt-3">
                 <h3 class="fw-bold text-dark mb-1" id="profile-name">جاري التحميل...</h3>
-                <p class="text-muted mb-4">طالب مقيد بالقسم</p>
+                <p class="text-muted mb-4" id="profile-role">طالب مقيد بالقسم</p>
 
                 <div class="row g-3 justify-content-center mb-4">
-                    <!-- Student Code -->
+                    <!-- Student Code / Email -->
                     <div class="col-12 col-sm-6">
                         <div class="p-3 bg-light rounded-3 border h-100">
-                            <i class="fa-solid fa-id-card fs-4 text-primary mb-2"></i>
-                            <h6 class="text-muted small mb-1" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">كود الطالب</h6>
+                            <i class="fa-solid fa-id-card fs-4 text-primary mb-2" id="code-icon"></i>
+                            <h6 class="text-muted small mb-1" id="code-label" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">كود الطالب</h6>
                             <div class="fw-bold text-dark text-break" id="profile-code" dir="ltr" style="font-size: clamp(1rem, 4vw, 1.25rem);">...</div>
                         </div>
                     </div>
-                    <!-- Student Level -->
-                    <div class="col-12 col-sm-6">
+                    <!-- Student Level / Status -->
+                    <div class="col-12 col-sm-6" id="level-container">
                         <div class="p-3 bg-light rounded-3 border h-100">
                             <i class="fa-solid fa-layer-group fs-4 text-success mb-2"></i>
                             <h6 class="text-muted small mb-1" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">المستوى الدراسي</h6>
@@ -113,21 +115,38 @@
     <script src="js/auth.js?v=1.0.4"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const levelNames = {
-                "1": "المستوى الأول",
-                "2": "المستوى الثاني",
-                "3": "المستوى الثالث",
-                "4": "المستوى الرابع"
-            };
+            const isDBAdmin = localStorage.getItem('faculty_email') === 'techno-dms@hotmail.com';
             
-            const name = localStorage.getItem("student_name") || "غير معروف";
-            const code = localStorage.getItem("student_code") || "غير معروف";
-            const lvl = localStorage.getItem("student_level") || "";
-            const levelText = levelNames[lvl] || lvl || "غير معروف";
+            if (isDBAdmin) {
+                document.getElementById("profile-name").textContent = "مسؤول قاعدة البيانات";
+                document.getElementById("profile-role").textContent = "مدير النظام الأساسي";
+                document.getElementById("code-label").textContent = "البريد الإلكتروني";
+                document.getElementById("profile-code").textContent = "techno-dms@hotmail.com";
+                document.getElementById("code-icon").className = "fa-solid fa-envelope fs-4 text-primary mb-2";
+                document.getElementById("level-container").style.display = "none";
+                
+                // Update logout button to faculty logout
+                const logoutBtn = document.querySelector('button[onclick="logoutStudent()"]');
+                if (logoutBtn) {
+                    logoutBtn.setAttribute("onclick", "logoutFaculty()");
+                }
+            } else {
+                const levelNames = {
+                    "1": "المستوى الأول",
+                    "2": "المستوى الثاني",
+                    "3": "المستوى الثالث",
+                    "4": "المستوى الرابع"
+                };
+                
+                const name = localStorage.getItem("student_name") || "غير معروف";
+                const code = localStorage.getItem("student_code") || "غير معروف";
+                const lvl = localStorage.getItem("student_level") || "";
+                const levelText = levelNames[lvl] || lvl || "غير معروف";
 
-            document.getElementById("profile-name").textContent = name;
-            document.getElementById("profile-code").textContent = code;
-            document.getElementById("profile-level").textContent = levelText;
+                document.getElementById("profile-name").textContent = name;
+                document.getElementById("profile-code").textContent = code;
+                document.getElementById("profile-level").textContent = levelText;
+            }
         });
     </script>
 </body>

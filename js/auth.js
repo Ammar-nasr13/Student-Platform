@@ -20,7 +20,8 @@ function updateUIForFaculty() {
   if ("true" === localStorage.getItem("is_faculty")) {
     const e = document.querySelector(".navbar-nav");
     if (e) {
-      if (localStorage.getItem("faculty_email") === "techno-dms@hotmail.com" && !document.getElementById("nav-manage-students")) {
+      const isDBAdmin = localStorage.getItem("faculty_email") === "techno-dms@hotmail.com";
+      if (isDBAdmin && !document.getElementById("nav-manage-students")) {
         const li = document.createElement("li");
         li.className = "nav-item";
         li.id = "nav-manage-students";
@@ -28,13 +29,43 @@ function updateUIForFaculty() {
         li.innerHTML = `<a class="nav-link ${isActive}" href="manage_students.html">إدارة الطلاب</a>`;
         e.appendChild(li);
       }
-      if (!document.getElementById("nav-add-exam")) {
+      if (isDBAdmin && !document.getElementById("nav-dbadmin-profile")) {
+        const li = document.createElement("li");
+        li.className = "nav-link-item mt-3 mt-xl-0";
+        li.id = "nav-dbadmin-profile";
+        const isActive = window.location.pathname.includes("profile.html") ? "active" : "";
+        li.innerHTML = `
+            <a class="nav-link fw-bold d-flex align-items-center ${isActive}" href="profile.html">
+                <i class="fa-solid fa-user-shield fs-5 me-1"></i> الملف الشخصي
+            </a>`;
+        e.appendChild(li);
+      }
+      if (!isDBAdmin && !document.getElementById("nav-add-exam")) {
         const t = document.createElement("li");
         ((t.className = "nav-item ms-xl-3 mt-3 mt-xl-0"),
           (t.id = "nav-add-exam"),
           (t.innerHTML =
             '<a href="add_exam.html" class="btn btn-warning fw-bold px-3 rounded-pill text-dark shadow-sm"><i class="fa-solid fa-plus-circle me-1"></i> إضافة اختبار</a>'),
           e.appendChild(t));
+      }
+      
+      if (isDBAdmin) {
+        const selectorsToHide = [
+            'a[href="exams.html"]',
+            'a[href="summaries.html"]',
+            'a[href="favorites.html"]',
+            'a[data-bs-target="#levelsModal"]',
+            'a[href="add_exam.html"]'
+        ];
+        selectorsToHide.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el.parentElement && el.parentElement.tagName === 'LI') {
+                    el.parentElement.style.display = 'none';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        });
       }
     }
   }
@@ -86,6 +117,8 @@ async function logoutFaculty() {
     e && e.remove();
     const ms = document.getElementById("nav-manage-students");
     ms && ms.remove();
+    const prof = document.getElementById("nav-dbadmin-profile");
+    prof && prof.remove();
     const t = document.getElementById("auth-gateway");
     t
       ? (t.classList.remove("d-none", "fade-out"),
