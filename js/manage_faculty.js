@@ -213,7 +213,7 @@ async function executePrint() {
                 visibility: visible;
             }
             .print-card {
-                page-break-after: always;
+                page-break-inside: avoid;
                 padding: 40px 20px;
                 border: 2px solid #1a365d;
                 border-radius: 15px;
@@ -222,7 +222,7 @@ async function executePrint() {
                 position: relative;
             }
             .print-card:last-child {
-                page-break-after: auto;
+                margin-bottom: 0;
             }
             .print-header {
                 display: flex;
@@ -385,17 +385,6 @@ async function executePrint() {
                 
                 <p style="margin-top: 40px; font-weight: 600;">في حال وجود أية استفسارات أو مواجهة صعوبات فنية، يرجى عدم التردد في التواصل مع فريق الدعم الفني بالكلية.</p>
                 <p style="text-align: center; font-weight: 800; font-size: 20px; margin-top: 30px;">وتفضلوا بقبول فائق الاحترام والتقدير،،،</p>
-                
-                <div class="footer-signature">
-                    <div class="signature-box">
-                        <p>رئيس القسم</p>
-                        <div class="signature-line"></div>
-                    </div>
-                    <div class="signature-box">
-                        <p>عميد الكلية</p>
-                        <div class="signature-line"></div>
-                    </div>
-                </div>
             </div>
         </div>
         `;
