@@ -41,6 +41,53 @@
             window.location.href = 'index.html';
         }
     </script>
+    <style>
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            border-radius: 12px;
+        }
+        .profile-header-bg {
+            background: linear-gradient(135deg, #0f2b46 0%, #1a365d 100%);
+            height: 140px;
+            border-radius: 12px 12px 0 0;
+        }
+        .profile-avatar-container {
+            margin-top: -60px;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            background: #fff;
+            border: 5px solid #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #0f2b46;
+            margin: 0 auto;
+        }
+        .info-box {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: #f8fafc;
+        }
+        .info-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border-color: #0f2b46;
+        }
+        .btn-custom {
+            border-radius: 0 !important;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -71,49 +118,47 @@
     </nav>
 
     <!-- المحتوى الرئيسي للملف الشخصي -->
-    <main class="container my-5 animated-fade-in" style="max-width: 600px;">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    <main class="container my-5 animated-fade-in" style="max-width: 650px;">
+        <div class="profile-card overflow-hidden">
             <!-- Header Background -->
-            <div class="bg-primary bg-gradient py-5 text-center position-relative">
-                <div class="position-absolute top-0 start-50 translate-middle-x mt-4">
-                    <div class="bg-white rounded-circle p-2 shadow-sm d-inline-block">
-                        <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2.5rem;">
-                            <i class="fa-solid fa-user-graduate"></i>
-                        </div>
+            <div class="profile-header-bg"></div>
+            
+            <div class="card-body px-4 pb-5 text-center">
+                <div class="profile-avatar-container mb-3">
+                    <div class="profile-avatar rounded-circle mx-auto">
+                        <i class="fa-solid fa-user-graduate"></i>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card-body px-4 pb-5 pt-5 text-center mt-3">
+                
                 <h3 class="fw-bold text-dark mb-1" id="profile-name">جاري التحميل...</h3>
-                <p class="text-muted mb-4" id="profile-role">طالب مقيد بالقسم</p>
+                <p class="text-muted mb-4 fs-6" id="profile-role">طالب مقيد بالقسم</p>
 
                 <div class="row g-3 justify-content-center mb-4">
                     <!-- Student Code / Email -->
                     <div class="col-12 col-sm-6" id="code-col">
-                        <div class="p-3 bg-light rounded-3 border h-100">
-                            <i class="fa-solid fa-id-card fs-4 text-primary mb-2" id="code-icon"></i>
-                            <h6 class="text-muted small mb-1" id="code-label" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">كود الطالب</h6>
-                            <div class="fw-bold text-dark text-break" id="profile-code" dir="ltr" style="font-size: clamp(1rem, 4vw, 1.25rem);">...</div>
+                        <div class="info-box p-4 rounded-3 h-100">
+                            <i class="fa-solid fa-id-card fs-3 text-primary mb-3" id="code-icon"></i>
+                            <h6 class="text-muted mb-2 fw-bold" id="code-label" style="font-size: 0.9rem;">كود الطالب</h6>
+                            <div class="fw-bold text-dark text-break" id="profile-code" dir="ltr" style="font-size: 1.15rem;">...</div>
                         </div>
                     </div>
                     <!-- Student Level / Status -->
                     <div class="col-12 col-sm-6" id="level-container">
-                        <div class="p-3 bg-light rounded-3 border h-100">
-                            <i class="fa-solid fa-layer-group fs-4 text-success mb-2"></i>
-                            <h6 class="text-muted small mb-1" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">المستوى الدراسي</h6>
-                            <div class="fw-bold text-dark text-break" id="profile-level" style="font-size: clamp(1rem, 4vw, 1.25rem);">...</div>
+                        <div class="info-box p-4 rounded-3 h-100">
+                            <i class="fa-solid fa-layer-group fs-3 text-success mb-3"></i>
+                            <h6 class="text-muted mb-2 fw-bold" style="font-size: 0.9rem;">المستوى الدراسي</h6>
+                            <div class="fw-bold text-dark text-break" id="profile-level" style="font-size: 1.15rem;">...</div>
                         </div>
                     </div>
                 </div>
 
-                <hr class="my-4 text-muted opacity-25">
+                <hr class="my-4 text-muted opacity-10">
 
-                <div class="d-flex flex-column gap-2">
-                    <a href="index.html" class="btn btn-outline-primary fw-bold py-2 rounded-3">
+                <div class="d-flex flex-column gap-3 mt-4">
+                    <a href="index.html" class="btn btn-outline-primary fw-bold py-3 btn-custom">
                         <i class="fa-solid fa-home me-2"></i> العودة للرئيسية
                     </a>
-                    <button class="btn btn-danger fw-bold py-2 px-4 rounded-pill shadow-sm" onclick="logoutStudent()">
+                    <button class="btn btn-danger fw-bold py-3 px-4 btn-custom shadow-sm" onclick="logoutStudent()">
                         <i class="fa-solid fa-sign-out-alt me-2"></i> تسجيل الخروج
                     </button>
                 </div>

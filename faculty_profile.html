@@ -30,6 +30,60 @@
             window.location.href = 'index.html';
         }
     </script>
+    <style>
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            border-radius: 12px;
+        }
+        .profile-header-bg {
+            background: linear-gradient(135deg, #0f2b46 0%, #1a365d 100%);
+            height: 140px;
+            border-radius: 12px 12px 0 0;
+        }
+        .profile-avatar-container {
+            margin-top: -60px;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            background: #fff;
+            border: 5px solid #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #0f2b46;
+            margin: 0 auto;
+        }
+        .info-box {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: #f8fafc;
+        }
+        .info-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border-color: #0f2b46;
+        }
+        .btn-custom {
+            border-radius: 0 !important;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .subject-badge {
+            transition: all 0.2s ease;
+        }
+        .subject-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -59,47 +113,45 @@
 
     <!-- Main Content -->
     <main class="container my-5 animated-fade-in" style="max-width: 700px;">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="profile-card overflow-hidden">
             <!-- Header Background -->
-            <div class="bg-primary bg-gradient py-5 text-center position-relative">
-                <div class="position-absolute top-0 start-50 translate-middle-x mt-4">
-                    <div class="bg-white rounded-circle p-2 shadow-sm d-inline-block">
-                        <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2.5rem;">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
+            <div class="profile-header-bg"></div>
+            
+            <div class="card-body px-4 pb-5 text-center">
+                <div class="profile-avatar-container mb-3">
+                    <div class="profile-avatar rounded-circle mx-auto">
+                        <i class="fa-solid fa-user-tie"></i>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card-body px-4 pb-5 pt-5 text-center mt-3">
+                
                 <h3 class="fw-bold text-dark mb-1" id="faculty-name">جاري التحميل...</h3>
-                <p class="text-muted mb-4">عضو هيئة تدريس بالقسم</p>
+                <p class="text-muted mb-4 fs-6">عضو هيئة تدريس بالقسم</p>
 
                 <div class="row justify-content-center mb-4">
                     <div class="col-12" id="email-col">
-                        <div class="p-3 bg-light rounded-3 border">
-                            <i class="fa-solid fa-envelope fs-4 text-primary mb-2"></i>
-                            <h6 class="text-muted small mb-1" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">البريد الإلكتروني</h6>
-                            <div class="fw-bold text-dark" id="faculty-email" dir="ltr" style="font-size: clamp(0.9rem, 4vw, 1.25rem);">...</div>
+                        <div class="info-box p-4 rounded-3 h-100">
+                            <i class="fa-solid fa-envelope fs-3 text-primary mb-3"></i>
+                            <h6 class="text-muted mb-2 fw-bold" style="font-size: 0.9rem;">البريد الإلكتروني</h6>
+                            <div class="fw-bold text-dark" id="faculty-email" dir="ltr" style="font-size: 1.15rem;">...</div>
                         </div>
                     </div>
                 </div>
 
-                <hr class="my-4 text-muted opacity-25">
+                <hr class="my-4 text-muted opacity-10">
 
                 <!-- Assigned Subjects -->
                 <div class="text-start mb-4">
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-book-open text-warning me-2"></i> المقررات المخصصة لك:</h5>
+                    <h5 class="fw-bold text-dark mb-3 fs-5"><i class="fa-solid fa-book-open text-warning me-2"></i> المقررات المخصصة لك:</h5>
                     <div id="faculty-subjects-container" class="d-flex flex-wrap gap-2">
                         <!-- Subjects will be injected here -->
                     </div>
                 </div>
 
-                <div class="d-flex flex-column gap-2 mt-4">
-                    <a href="index.html" class="btn btn-outline-primary fw-bold py-2 rounded-3">
+                <div class="d-flex flex-column gap-3 mt-5">
+                    <a href="index.html" class="btn btn-outline-primary fw-bold py-3 btn-custom">
                         <i class="fa-solid fa-home me-2"></i> العودة للرئيسية
                     </a>
-                    <button class="btn btn-danger fw-bold py-2 px-4 rounded-pill shadow-sm" onclick="logoutFaculty()">
+                    <button class="btn btn-danger fw-bold py-3 px-4 btn-custom shadow-sm" onclick="logoutFaculty()">
                         <i class="fa-solid fa-sign-out-alt me-2"></i> تسجيل الخروج
                     </button>
                 </div>
@@ -128,7 +180,7 @@
             const container = document.getElementById("faculty-subjects-container");
             if (subjects.length > 0) {
                 container.innerHTML = subjects.map(sub => 
-                    `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle py-2 px-3 fw-bold fs-6 shadow-sm">${sub}</span>`
+                    `<span class="badge bg-white text-primary border border-primary-subtle py-2 px-3 fw-bold fs-6 shadow-sm subject-badge">${sub}</span>`
                 ).join('');
             } else {
                 container.innerHTML = `<p class="text-muted small m-0"><i class="fa-solid fa-circle-info me-1"></i> لا توجد مقررات مخصصة لك حتى الآن. يرجى مراجعة مسؤول قاعدة البيانات.</p>`;
