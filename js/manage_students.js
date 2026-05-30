@@ -1,4 +1,8 @@
-const databases = window.AppwriteDB;
+// Global safe reference getter
+function getAppwriteDB() {
+    return window.AppwriteDB;
+}
+
 let allStudents = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -6,38 +10,53 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "index.html";
         return;
     }
-    loadStudents();
+    
+    // Catch any synchronous errors during initialization
+    try {
+        loadStudents();
+    } catch (err) {
+        document.getElementById("students-table-body").innerHTML = `<tr><td colspan="5" class="text-danger p-4">خطأ غير متوقع: ${err.message}</td></tr>`;
+    }
 });
 
 async function loadStudents() {
     const tbody = document.getElementById("students-table-body");
+    if (!tbody) return;
+    
     tbody.innerHTML = `<tr><td colspan="5" class="text-muted p-4"><i class="fa-solid fa-spinner fa-spin me-2"></i> جاري تحميل بيانات الطلاب...</td></tr>`;
     
     try {
-        const response = await databases.listDocuments(
-            DB_CONFIG.dbId,
-            DB_CONFIG.studentsCol,
+        // Safe checks before making API call
+        if (!window.AppwriteDB) throw new Error("AppwriteDB is not initialized");
+        if (!window.DB_CONFIG) throw new Error("DB_CONFIG is not initialized");
+        if (!window.AppwriteQuery) throw new Error("AppwriteQuery is not initialized");
+
+        // Removed orderDesc("$createdAt") just in case the index doesn't exist
+        // to prevent Appwrite 400 errors, though they should have been caught anyway.
+        const response = await window.AppwriteDB.listDocuments(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.studentsCol,
             [
-                window.AppwriteQuery.limit(100),
-                window.AppwriteQuery.orderDesc("$createdAt")
+                window.AppwriteQuery.limit(100)
             ]
         );
         
-        allStudents = response.documents;
+        allStudents = response.documents || [];
         renderStudents(allStudents);
     } catch (error) {
         console.error("Error loading students:", error);
-        tbody.innerHTML = `<tr><td colspan="5" class="text-danger p-4">حدث خطأ أثناء تحميل البيانات: ${error.message}</td></tr>`;
-        showToast("فشل في تحميل قائمة الطلاب", "error");
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger p-4 fw-bold">حدث خطأ أثناء تحميل البيانات:<br><small dir="ltr">${error.message}</small></td></tr>`;
+        if (typeof showToast === 'function') showToast("فشل في تحميل قائمة الطلاب", "error");
     }
 }
 
 function renderStudents(studentsArray) {
     const tbody = document.getElementById("students-table-body");
+    if (!tbody) return;
     tbody.innerHTML = "";
     
-    if (studentsArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-muted p-4">لا يوجد طلاب مسجلين حالياً.</td></tr>`;
+    if (!studentsArray || studentsArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-muted p-4 fw-bold">لا يوجد طلاب مسجلين حالياً.</td></tr>`;
         return;
     }
 
@@ -50,11 +69,12 @@ function renderStudents(studentsArray) {
 
     studentsArray.forEach((student, index) => {
         const tr = document.createElement("tr");
+        const studentLevelStr = String(student.level);
         tr.innerHTML = `
             <td class="fw-bold text-muted">${index + 1}</td>
-            <td class="fw-bold" dir="ltr">${student.code}</td>
-            <td class="fw-bold text-primary">${student.name}</td>
-            <td><span class="badge bg-secondary">${levelNames[student.level] || student.level}</span></td>
+            <td class="fw-bold" dir="ltr">${student.code || 'غير متوفر'}</td>
+            <td class="fw-bold text-primary">${student.name || 'غير متوفر'}</td>
+            <td><span class="badge bg-secondary">${levelNames[studentLevelStr] || studentLevelStr}</span></td>
             <td>
                 <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditStudentModal('${student.$id}')" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteStudent('${student.$id}')" title="حذف"><i class="fa-solid fa-trash"></i></button>
@@ -64,47 +84,57 @@ function renderStudents(studentsArray) {
     });
 }
 
-function filterStudents() {
-    const searchTerm = document.getElementById("search-student").value.toLowerCase().trim();
-    const filterLevel = document.getElementById("filter-level").value;
+window.filterStudents = function() {
+    const searchInput = document.getElementById("search-student");
+    const levelInput = document.getElementById("filter-level");
+    if (!searchInput || !levelInput) return;
+
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const filterLevel = levelInput.value;
     
     const filtered = allStudents.filter(student => {
-        const matchSearch = student.name.toLowerCase().includes(searchTerm) || student.code.toLowerCase().includes(searchTerm);
-        const matchLevel = filterLevel === "" || student.level === filterLevel;
+        const name = student.name || "";
+        const code = student.code || "";
+        const matchSearch = name.toLowerCase().includes(searchTerm) || code.toLowerCase().includes(searchTerm);
+        const matchLevel = filterLevel === "" || String(student.level) === filterLevel;
         return matchSearch && matchLevel;
     });
     
     renderStudents(filtered);
 }
 
-function openAddStudentModal() {
+window.openAddStudentModal = function() {
     document.getElementById("studentModalTitle").innerHTML = `إضافة طالب جديد <i class="fa-solid fa-user-plus ms-2"></i>`;
-    document.getElementById("student-form").reset();
+    const form = document.getElementById("student-form");
+    if (form) form.reset();
     document.getElementById("student-doc-id").value = "";
 }
 
-function openEditStudentModal(id) {
+window.openEditStudentModal = function(id) {
     const student = allStudents.find(s => s.$id === id);
     if (!student) return;
     
     document.getElementById("studentModalTitle").innerHTML = `تعديل بيانات الطالب <i class="fa-solid fa-user-pen ms-2"></i>`;
     document.getElementById("student-doc-id").value = student.$id;
-    document.getElementById("student-form-name").value = student.name;
-    document.getElementById("student-form-code").value = student.code;
-    document.getElementById("student-form-level").value = student.level;
+    document.getElementById("student-form-name").value = student.name || '';
+    document.getElementById("student-form-code").value = student.code || '';
+    document.getElementById("student-form-level").value = student.level || '';
     
-    const modal = new bootstrap.Modal(document.getElementById("studentModal"));
-    modal.show();
+    const modalEl = document.getElementById("studentModal");
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
 }
 
-async function saveStudent() {
+window.saveStudent = async function() {
     const name = document.getElementById("student-form-name").value.trim();
     const code = document.getElementById("student-form-code").value.trim();
     const level = document.getElementById("student-form-level").value;
     const docId = document.getElementById("student-doc-id").value;
     
     if (!name || !code || !level) {
-        showToast("يرجى تعبئة جميع الحقول بشكل صحيح", "warning");
+        if (typeof showToast === 'function') showToast("يرجى تعبئة جميع الحقول بشكل صحيح", "warning");
         return;
     }
     
@@ -114,74 +144,74 @@ async function saveStudent() {
     btn.disabled = true;
     
     try {
+        if (!window.AppwriteDB) throw new Error("AppwriteDB not initialized");
+
         const payload = {
             name: name,
             code: code,
-            level: level
+            level: String(level)
         };
         
         if (docId) {
             // Update existing
-            await databases.updateDocument(
-                DB_CONFIG.dbId,
-                DB_CONFIG.studentsCol,
+            await window.AppwriteDB.updateDocument(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.studentsCol,
                 docId,
                 payload
             );
-            showToast("تم تحديث بيانات الطالب بنجاح", "success");
+            if (typeof showToast === 'function') showToast("تم تحديث بيانات الطالب بنجاح", "success");
         } else {
             // Check if code already exists to avoid duplicates
-            const existing = await databases.listDocuments(
-                DB_CONFIG.dbId,
-                DB_CONFIG.studentsCol,
+            const existing = await window.AppwriteDB.listDocuments(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.studentsCol,
                 [window.AppwriteQuery.equal("code", code)]
             );
             
-            if (existing.documents.length > 0) {
-                showToast("كود الطالب مسجل مسبقاً في النظام!", "error");
+            if (existing.documents && existing.documents.length > 0) {
+                if (typeof showToast === 'function') showToast("كود الطالب مسجل مسبقاً في النظام!", "error");
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 return;
             }
             
             // Create new
-            await databases.createDocument(
-                DB_CONFIG.dbId,
-                DB_CONFIG.studentsCol,
+            await window.AppwriteDB.createDocument(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.studentsCol,
                 window.AppwriteID.unique(),
-                payload,
-                [
-                    Appwrite.Permission.read(Appwrite.Role.any())
-                ]
+                payload
             );
-            showToast("تم إضافة الطالب بنجاح", "success");
+            if (typeof showToast === 'function') showToast("تم إضافة الطالب بنجاح", "success");
         }
         
         // Hide modal and reload
         const modalEl = document.getElementById("studentModal");
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        if (modalInstance) {
-            modalInstance.hide();
-        } else {
-            // Fallback for bootstrap modal closure
-            modalEl.classList.remove('show');
-            modalEl.style.display = 'none';
-            document.body.classList.remove('modal-open');
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.remove();
+        if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            } else {
+                modalEl.classList.remove('show');
+                modalEl.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+            }
         }
         
         loadStudents();
     } catch (error) {
         console.error("Save Student Error:", error);
-        showToast("حدث خطأ أثناء الحفظ: " + error.message, "error");
+        if (typeof showToast === 'function') showToast("حدث خطأ أثناء الحفظ: " + error.message, "error");
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-async function deleteStudent(id) {
+window.deleteStudent = async function(id) {
     if (typeof Swal !== "undefined") {
         Swal.fire({
             title: "هل أنت متأكد؟",
@@ -206,15 +236,16 @@ async function deleteStudent(id) {
 
 async function executeDelete(id) {
     try {
-        await databases.deleteDocument(
-            DB_CONFIG.dbId,
-            DB_CONFIG.studentsCol,
+        if (!window.AppwriteDB) throw new Error("AppwriteDB not initialized");
+        await window.AppwriteDB.deleteDocument(
+            window.DB_CONFIG.dbId,
+            window.DB_CONFIG.studentsCol,
             id
         );
-        showToast("تم حذف الطالب بنجاح", "success");
+        if (typeof showToast === 'function') showToast("تم حذف الطالب بنجاح", "success");
         loadStudents();
     } catch (error) {
         console.error("Delete error:", error);
-        showToast("حدث خطأ أثناء الحذف: " + error.message, "error");
+        if (typeof showToast === 'function') showToast("حدث خطأ أثناء الحذف: " + error.message, "error");
     }
 }
