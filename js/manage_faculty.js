@@ -154,7 +154,7 @@ function openPrintModal() {
     modal.show();
 }
 
-function executePrint() {
+async function executePrint() {
     // 1. Get selected doctors
     const selectedIds = Array.from(document.querySelectorAll('.doctor-select-check:checked')).map(cb => cb.value);
     const selectedDocs = doctorsList.filter(d => selectedIds.includes(d.$id));
@@ -166,57 +166,234 @@ function executePrint() {
         return;
     }
 
-    // 3. Build HTML Template (Academic Letter Format)
-    let html = '';
+    // 3. Logo Handling
+    const logoInput = document.getElementById('print-logo');
+    let logoDataUrl = '';
+    const logoPositionEl = document.querySelector('input[name="logoPosition"]:checked');
+    const logoPosition = logoPositionEl ? logoPositionEl.value : 'right';
+
+    if (logoInput && logoInput.files && logoInput.files[0]) {
+        try {
+            logoDataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(logoInput.files[0]);
+            });
+        } catch (error) {
+            console.error("Error reading logo file:", error);
+        }
+    }
+
+    // 4. Build HTML Template (Academic Letter Format)
+    let html = `
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #print-container, #print-container * {
+                visibility: visible;
+            }
+            #print-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                direction: rtl;
+                font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            .print-card {
+                page-break-after: always;
+                padding: 40px 20px;
+                border: 2px solid #1a365d;
+                border-radius: 15px;
+                background-color: #fff;
+                margin-bottom: 20px;
+                position: relative;
+            }
+            .print-card:last-child {
+                page-break-after: auto;
+            }
+            .print-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                border-bottom: 4px double #1a365d;
+                padding-bottom: 20px;
+            }
+            .print-header.center-logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            .print-header.right-logo {
+                flex-direction: row;
+            }
+            .print-header.left-logo {
+                flex-direction: row-reverse;
+            }
+            .logo-placeholder {
+                width: 120px;
+            }
+            .logo-img {
+                max-width: 120px;
+                max-height: 120px;
+                object-fit: contain;
+            }
+            .university-titles {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .university-titles h2 {
+                color: #1a365d !important;
+                margin: 0 0 10px 0;
+                font-size: 26px;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+            }
+            .university-titles h3 {
+                color: #4b5563 !important;
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+            }
+            .doc-title {
+                text-align: center;
+                margin-bottom: 40px;
+                font-weight: 800;
+                font-size: 22px;
+                text-decoration: underline;
+                text-underline-offset: 8px;
+                color: #1e293b !important;
+            }
+            .greeting-text {
+                font-size: 18px;
+                line-height: 2;
+                color: #334155 !important;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 30px 0;
+                border: 2px solid #94a3b8;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #cbd5e1;
+                padding: 14px 18px;
+                font-size: 17px;
+            }
+            .print-table th {
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+                font-weight: 800;
+                width: 35%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .print-table td {
+                color: #1e293b !important;
+                font-weight: 600;
+            }
+            .footer-signature {
+                margin-top: 70px;
+                display: flex;
+                justify-content: space-between;
+                padding: 0 40px;
+            }
+            .signature-box {
+                text-align: center;
+                min-width: 200px;
+            }
+            .signature-box p {
+                margin: 5px 0;
+                font-weight: 800;
+                font-size: 19px;
+                color: #0f172a !important;
+            }
+            .signature-line {
+                margin-top: 40px;
+                border-bottom: 2px dashed #94a3b8;
+                width: 80%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
+    `;
 
     selectedDocs.forEach(doc => {
+        let headerClass = 'right-logo';
+        if (logoPosition === 'left') headerClass = 'left-logo';
+        else if (logoPosition === 'center') headerClass = 'center-logo';
+
+        const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" class="logo-img" alt="شعار">` : `<div class="logo-placeholder"></div>`;
+        const dummyPlaceholder = logoPosition === 'center' ? '' : `<div class="logo-placeholder"></div>`;
+
         html += `
         <div class="print-card">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color: #1a365d; margin-top: 10px; font-weight: bold;">جامعة المنيا - كلية السياحة والفنادق</h2>
-                <h3 style="color: #4b5563;">قسم تكنولوجيا صناعة السياحة والضيافة</h3>
-                <hr style="border-top: 2px solid #1a365d; margin-top: 15px;">
+            <div class="print-header ${headerClass}">
+                ${logoPosition === 'right' || logoPosition === 'center' ? logoHtml : dummyPlaceholder}
+                <div class="university-titles">
+                    <h2>جامعة المنيا - كلية السياحة والفنادق</h2>
+                    <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>
+                </div>
+                ${logoPosition === 'left' ? logoHtml : dummyPlaceholder}
             </div>
-            <h3 style="text-align: center; margin-bottom: 30px; font-weight: bold;">بيانات الدخول لمنصة الاختبارات التفاعلية</h3>
             
-            <div style="font-size: 18px; line-height: 2;">
-                ${cols.includes('name') ? `<p><strong>السيد الأستاذ الدكتور / </strong> ${doc.name}</p>` : ''}
-                <p>تحية طيبة وبعد،،،</p>
-                <p>مرفق لسيادتكم بيانات الدخول الخاصة بكم على منصة الاختبارات التفاعلية للقسم:</p>
+            <div class="doc-title">
+                بيان رسمي ببيانات الدخول لمنصة الاختبارات التفاعلية
+            </div>
+            
+            <div class="greeting-text">
+                ${cols.includes('name') ? `<p style="font-size: 21px;"><strong>السيد الأستاذ الدكتور / </strong> <span style="color: #1d4ed8 !important; font-weight: 800;">${doc.name}</span></p>` : ''}
+                <p style="font-weight: 700; margin-top: 20px;">تحية طيبة وبعد،،،</p>
+                <p>مرفق لسيادتكم بيانات الدخول الخاصة بكم على منصة الاختبارات التفاعلية الخاصة بالقسم، نرجو من سيادتكم التكرم بالاحتفاظ بها في مكان آمن والبدء في إعداد الاختبارات للطلاب:</p>
                 
                 <table class="print-table">
                     <tbody>
                         ${cols.includes('email') ? `
                         <tr>
-                            <th>البريد الإلكتروني:</th>
+                            <th>البريد الإلكتروني (اسم المستخدم)</th>
                             <td style="text-align: left; direction: ltr;">${doc.email}</td>
                         </tr>` : ''}
                         
                         ${cols.includes('password') ? `
                         <tr>
-                            <th>كلمة المرور:</th>
+                            <th>كلمة المرور</th>
                             <td style="text-align: left; direction: ltr;">${doc.password || 'غير متوفر'}</td>
                         </tr>` : ''}
                         
                         ${cols.includes('subjects') ? `
                         <tr>
-                            <th>المقررات المخصصة:</th>
-                            <td>${(doc.subjects || []).join('، ')}</td>
+                            <th>المقررات الدراسية المخصصة</th>
+                            <td>${(doc.subjects || []).length > 0 ? (doc.subjects || []).join(' ، ') : 'لم يتم تخصيص مقررات بعد'}</td>
                         </tr>` : ''}
                         
                         ${cols.includes('date') ? `
                         <tr>
-                            <th>تاريخ الإضافة:</th>
-                            <td>${new Date(doc.$createdAt).toLocaleDateString('ar-EG')}</td>
+                            <th>تاريخ استخراج البيان</th>
+                            <td>${new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
                         </tr>` : ''}
                     </tbody>
                 </table>
                 
-                <p style="margin-top: 20px;">يرجى التكرم بتسجيل الدخول للمنصة والبدء في إعداد الاختبارات التفاعلية للطلاب.</p>
+                <p style="margin-top: 40px; font-weight: 600;">في حال وجود أية استفسارات أو مواجهة صعوبات فنية، يرجى عدم التردد في التواصل مع فريق الدعم الفني بالكلية.</p>
+                <p style="text-align: center; font-weight: 800; font-size: 20px; margin-top: 30px;">وتفضلوا بقبول فائق الاحترام والتقدير،،،</p>
                 
-                <div style="margin-top: 60px; text-align: left; padding-left: 50px;">
-                    <p style="font-weight: bold; margin-bottom: 5px;">مع تحيات،</p>
-                    <p style="font-weight: bold;">إدارة الكلية</p>
+                <div class="footer-signature">
+                    <div class="signature-box">
+                        <p>رئيس القسم</p>
+                        <div class="signature-line"></div>
+                    </div>
+                    <div class="signature-box">
+                        <p>عميد الكلية</p>
+                        <div class="signature-line"></div>
+                    </div>
                 </div>
             </div>
         </div>

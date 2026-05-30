@@ -1,10 +1,18 @@
 // Authentication & Session Module
 
 function checkAuthSession() {
-  document.getElementById("auth-gateway");
+  const gateway = document.getElementById("auth-gateway");
   if (localStorage.getItem("is_faculty") === "true") {
+    if (gateway) {
+      gateway.classList.add("d-none");
+      gateway.style.display = "none";
+    }
     updateUIForFaculty();
   } else if (localStorage.getItem("is_student") === "true") {
+    if (gateway) {
+      gateway.classList.add("d-none");
+      gateway.style.display = "none";
+    }
     updateUIForStudent();
   }
 }
