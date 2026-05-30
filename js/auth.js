@@ -29,6 +29,14 @@ function updateUIForFaculty() {
         li.innerHTML = `<a class="nav-link ${isActive}" href="manage_students.html">إدارة الطلاب</a>`;
         e.appendChild(li);
       }
+      if (isDBAdmin && !document.getElementById("nav-manage-faculty")) {
+        const li = document.createElement("li");
+        li.className = "nav-item";
+        li.id = "nav-manage-faculty";
+        const isActive = window.location.pathname.includes("manage_faculty.html") ? "active" : "";
+        li.innerHTML = `<a class="nav-link ${isActive}" href="manage_faculty.html">إدارة أعضاء التدريس</a>`;
+        e.appendChild(li);
+      }
       if (isDBAdmin && !document.getElementById("nav-dbadmin-profile")) {
         const li = document.createElement("li");
         li.className = "nav-link-item mt-3 mt-xl-0";
@@ -47,6 +55,17 @@ function updateUIForFaculty() {
           (t.innerHTML =
             '<a href="add_exam.html" class="btn btn-warning fw-bold px-3 rounded-pill text-dark shadow-sm"><i class="fa-solid fa-plus-circle me-1"></i> إضافة اختبار</a>'),
           e.appendChild(t));
+      }
+      if (!isDBAdmin && !document.getElementById("nav-regular-faculty-profile")) {
+        const li = document.createElement("li");
+        li.className = "nav-link-item mt-3 mt-xl-0";
+        li.id = "nav-regular-faculty-profile";
+        const isActive = window.location.pathname.includes("faculty_profile.html") ? "active" : "";
+        li.innerHTML = `
+            <a class="nav-link fw-bold d-flex align-items-center ${isActive}" href="faculty_profile.html">
+                <i class="fa-solid fa-user-tie fs-5 me-1"></i> الملف الشخصي
+            </a>`;
+        e.appendChild(li);
       }
       
       if (isDBAdmin) {
@@ -117,8 +136,12 @@ async function logoutFaculty() {
     e && e.remove();
     const ms = document.getElementById("nav-manage-students");
     ms && ms.remove();
+    const mf = document.getElementById("nav-manage-faculty");
+    mf && mf.remove();
     const prof = document.getElementById("nav-dbadmin-profile");
     prof && prof.remove();
+    const regProf = document.getElementById("nav-regular-faculty-profile");
+    regProf && regProf.remove();
     const t = document.getElementById("auth-gateway");
     t
       ? (t.classList.remove("d-none", "fade-out"),
@@ -181,13 +204,39 @@ async function loginFaculty() {
         '<i class="fa-solid fa-spinner fa-spin me-2"></i> جاري التحقق...'),
       (o.disabled = !0));
     try {
-      (await window.AppwriteAccount.createEmailPasswordSession(e, t),
-        localStorage.setItem("is_faculty", "true"),
-        localStorage.setItem("faculty_email", e),
-        localStorage.removeItem("is_student"), // Clear student session if exists
-        n.classList.add("d-none"),
-        closeAuthGateway(),
-        updateUIForFaculty());
+        await window.AppwriteAccount.createEmailPasswordSession(e, t);
+        
+        let docName = "عضو هيئة تدريس";
+        let docSubjects = [];
+        
+        try {
+            const res = await window.AppwriteDB.listDocuments(
+                window.DB_CONFIG.dbId,
+                window.DB_CONFIG.doctorsCol,
+                [window.AppwriteQuery.equal("email", e)]
+            );
+            if (res.documents.length > 0) {
+                const doc = res.documents[0];
+                docName = doc.name || docName;
+                docSubjects = doc.subjects || docSubjects;
+            }
+        } catch(err) {
+            console.error("Could not fetch doctor details", err);
+        }
+
+        if (e === 'techno-dms@hotmail.com') {
+            docName = "مسؤول قاعدة البيانات";
+        }
+
+        localStorage.setItem("is_faculty", "true");
+        localStorage.setItem("faculty_email", e);
+        localStorage.setItem("faculty_name", docName);
+        localStorage.setItem("faculty_subjects", JSON.stringify(docSubjects));
+        
+        localStorage.removeItem("is_student"); // Clear student session if exists
+        n.classList.add("d-none");
+        closeAuthGateway();
+        updateUIForFaculty();
     } catch (err) {
       console.error("Auth Error:", err);
       const errStr = String(err).toLowerCase();
@@ -200,13 +249,30 @@ async function loginFaculty() {
             '<i class="fa-solid fa-circle-check me-1 mb-1 fs-6"></i><br>أنت مسجل الدخول بالفعل، جاري توجيهك...'),
             n.classList.replace("alert-danger", "alert-success"),
             n.classList.remove("d-none"),
-          void setTimeout(() => {
-            (localStorage.setItem("is_faculty", "true"),
-              localStorage.setItem("faculty_email", e),
-              n.classList.add("d-none"),
-              n.classList.replace("alert-success", "alert-danger"),
-              closeAuthGateway(),
-              updateUIForFaculty());
+          void setTimeout(async () => {
+              let docName = "عضو هيئة تدريس";
+              let docSubjects = [];
+              try {
+                  const res = await window.AppwriteDB.listDocuments(
+                      window.DB_CONFIG.dbId,
+                      window.DB_CONFIG.doctorsCol,
+                      [window.AppwriteQuery.equal("email", e)]
+                  );
+                  if (res.documents.length > 0) {
+                      docName = res.documents[0].name || docName;
+                      docSubjects = res.documents[0].subjects || docSubjects;
+                  }
+              } catch(err) {}
+              if (e === 'techno-dms@hotmail.com') docName = "مسؤول قاعدة البيانات";
+              
+              localStorage.setItem("is_faculty", "true");
+              localStorage.setItem("faculty_email", e);
+              localStorage.setItem("faculty_name", docName);
+              localStorage.setItem("faculty_subjects", JSON.stringify(docSubjects));
+              n.classList.add("d-none");
+              n.classList.replace("alert-success", "alert-danger");
+              closeAuthGateway();
+              updateUIForFaculty();
           }, 1500)
         );
       } else {

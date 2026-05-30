@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي | أعضاء هيئة التدريس</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="الملف الشخصي لأعضاء هيئة التدريس وتفاصيل المقررات المخصصة لهم.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://tourism-tech.online/faculty_profile.html">
+    <meta name="application-name" content="تكنولوجيا صناعة السياحة والضيافة">
+
+    <!-- Preconnect & Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" crossorigin="anonymous">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Style CSS -->
+    <link rel="stylesheet" href="css/style.min.css">
+
+    <!-- Security Gate -->
+    <script>
+        const isFaculty = localStorage.getItem('is_faculty') === 'true';
+        if (!isFaculty) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-xl navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none me-0" href="index.html">
+                <img src="assets/logo.webp" alt="شعار القسم" class="navbar-brand-logo flex-shrink-0" width="48" height="48" loading="lazy">
+                <div class="d-flex flex-column justify-content-center">
+                    <span class="d-block lh-sm text-white fw-bold mb-1 text-truncate" style="font-size: 1.1rem;">تكنولوجيا صناعة السياحة والضيافة</span>
+                    <small class="fw-light text-white-50 lh-sm text-truncate" style="font-size: 0.8rem;">كلية السياحة والفنادق - جامعة المنيا</small>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav ms-auto mb-2 mb-xl-0">
+                    <li class="nav-item"><a class="nav-link" href="index.html">الرئيسية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add_exam.html">إضافة اختبار</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-5 animated-fade-in" style="max-width: 700px;">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header Background -->
+            <div class="bg-primary bg-gradient py-5 text-center position-relative">
+                <div class="position-absolute top-0 start-50 translate-middle-x mt-4">
+                    <div class="bg-white rounded-circle p-2 shadow-sm d-inline-block">
+                        <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body px-4 pb-5 pt-5 text-center mt-3">
+                <h3 class="fw-bold text-dark mb-1" id="faculty-name">جاري التحميل...</h3>
+                <p class="text-muted mb-4">عضو هيئة تدريس بالقسم</p>
+
+                <div class="row justify-content-center mb-4">
+                    <div class="col-12" id="email-col">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <i class="fa-solid fa-envelope fs-4 text-primary mb-2"></i>
+                            <h6 class="text-muted small mb-1" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">البريد الإلكتروني</h6>
+                            <div class="fw-bold text-dark" id="faculty-email" dir="ltr" style="font-size: clamp(0.9rem, 4vw, 1.25rem);">...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4 text-muted opacity-25">
+
+                <!-- Assigned Subjects -->
+                <div class="text-start mb-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-book-open text-warning me-2"></i> المقررات المخصصة لك:</h5>
+                    <div id="faculty-subjects-container" class="d-flex flex-wrap gap-2">
+                        <!-- Subjects will be injected here -->
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-4">
+                    <a href="index.html" class="btn btn-outline-primary fw-bold py-2 rounded-3">
+                        <i class="fa-solid fa-home me-2"></i> العودة للرئيسية
+                    </a>
+                    <button class="btn btn-danger fw-bold py-2 px-4 rounded-pill shadow-sm" onclick="logoutFaculty()">
+                        <i class="fa-solid fa-sign-out-alt me-2"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js?v=1.0.4"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const name = localStorage.getItem("faculty_name") || "غير معروف";
+            const email = localStorage.getItem("faculty_email") || "غير معروف";
+            
+            document.getElementById("faculty-name").textContent = name;
+            document.getElementById("faculty-email").textContent = email;
+
+            let subjects = [];
+            try {
+                subjects = JSON.parse(localStorage.getItem("faculty_subjects") || "[]");
+            } catch (e) {
+                console.error(e);
+            }
+
+            const container = document.getElementById("faculty-subjects-container");
+            if (subjects.length > 0) {
+                container.innerHTML = subjects.map(sub => 
+                    `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle py-2 px-3 fw-bold fs-6 shadow-sm">${sub}</span>`
+                ).join('');
+            } else {
+                container.innerHTML = `<p class="text-muted small m-0"><i class="fa-solid fa-circle-info me-1"></i> لا توجد مقررات مخصصة لك حتى الآن. يرجى مراجعة مسؤول قاعدة البيانات.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

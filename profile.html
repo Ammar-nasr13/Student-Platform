@@ -5,7 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الملف الشخصي | تكنولوجيا صناعة السياحة والضيافة</title>
     <!-- SEO Meta Tags -->
+    <meta name="description" content="الملف الشخصي لطلاب قسم تكنولوجيا صناعة السياحة والضيافة بجامعة المنيا.">
     <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://tourism-tech.online/profile.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tourism-tech.online/profile.html">
+    <meta property="og:title" content="الملف الشخصي | تكنولوجيا صناعة السياحة والضيافة">
+    <meta property="og:description" content="الملف الشخصي لطلاب قسم تكنولوجيا صناعة السياحة والضيافة بجامعة المنيا.">
+    <meta property="og:image" content="https://tourism-tech.online/assets/logo.webp">
+    <meta property="og:site_name" content="تكنولوجيا صناعة السياحة والضيافة">
+    
     <meta name="application-name" content="تكنولوجيا صناعة السياحة والضيافة">
 
     <!-- Preconnect & Performance (Speed SEO) -->
@@ -79,7 +90,7 @@
 
                 <div class="row g-3 justify-content-center mb-4">
                     <!-- Student Code / Email -->
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-6" id="code-col">
                         <div class="p-3 bg-light rounded-3 border h-100">
                             <i class="fa-solid fa-id-card fs-4 text-primary mb-2" id="code-icon"></i>
                             <h6 class="text-muted small mb-1" id="code-label" style="font-size: clamp(0.7rem, 2.5vw, 0.875rem);">كود الطالب</h6>
@@ -124,6 +135,17 @@
                 document.getElementById("profile-code").textContent = "techno-dms@hotmail.com";
                 document.getElementById("code-icon").className = "fa-solid fa-envelope fs-4 text-primary mb-2";
                 document.getElementById("level-container").style.display = "none";
+                
+                // Make the email container full width and prevent word break
+                const codeCol = document.getElementById("code-col");
+                if (codeCol) {
+                    codeCol.className = "col-12";
+                }
+                const profileCode = document.getElementById("profile-code");
+                if (profileCode) {
+                    profileCode.classList.remove("text-break");
+                    profileCode.style.fontSize = "clamp(0.9rem, 4vw, 1.25rem)";
+                }
                 
                 // Update logout button to faculty logout
                 const logoutBtn = document.querySelector('button[onclick="logoutStudent()"]');

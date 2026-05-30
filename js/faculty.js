@@ -15,11 +15,20 @@ if (examLevelSelect && examSubjectSelect) {
         
         if (level && window.subjectsByLevel && window.subjectsByLevel[level]) {
             examSubjectSelect.disabled = false;
+            
+            let facultySubjects = [];
+            try {
+                facultySubjects = JSON.parse(localStorage.getItem('faculty_subjects') || "[]");
+            } catch(e) {}
+            const isDBAdmin = localStorage.getItem('faculty_email') === 'techno-dms@hotmail.com';
+            
             window.subjectsByLevel[level].forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.id;
-                option.textContent = subject.name;
-                examSubjectSelect.appendChild(option);
+                if (isDBAdmin || facultySubjects.includes(subject.name)) {
+                    const option = document.createElement('option');
+                    option.value = subject.id;
+                    option.textContent = subject.name;
+                    examSubjectSelect.appendChild(option);
+                }
             });
         } else {
             examSubjectSelect.disabled = true;
@@ -384,12 +393,28 @@ async function renderManageExams() {
         
         window.allLoadedExams = response.documents;
         
+        let facultySubjects = [];
+        try {
+            facultySubjects = JSON.parse(localStorage.getItem('faculty_subjects') || "[]");
+        } catch(e) {}
+        const isDBAdmin = localStorage.getItem('faculty_email') === 'techno-dms@hotmail.com';
+        
+        let filteredExams = window.allLoadedExams.filter(exam => {
+            if (isDBAdmin) return true;
+            let subjectName = exam.subject_id;
+            if (window.subjectsByLevel && window.subjectsByLevel[exam.level]) {
+                const subObj = window.subjectsByLevel[exam.level].find(s => s.id === exam.subject_id);
+                if (subObj) subjectName = subObj.name;
+            }
+            return facultySubjects.includes(subjectName);
+        });
+        
         let html = '';
         
-        if (response.documents.length === 0) {
+        if (filteredExams.length === 0) {
             html = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد أي اختبارات مرفوعة حالياً.</td></tr>';
         } else {
-            response.documents.forEach(exam => {
+            filteredExams.forEach(exam => {
                 let subjectName = exam.subject_id;
                 if (window.subjectsByLevel && window.subjectsByLevel[exam.level]) {
                     const subObj = window.subjectsByLevel[exam.level].find(s => s.id === exam.subject_id);
@@ -555,13 +580,24 @@ window.renderStudentResults = async function() {
             window.DB_CONFIG.resultsCol,
             [window.AppwriteQuery.orderDesc('$createdAt')]
         );
-        if (response.documents.length === 0) {
+        let facultySubjects = [];
+        try {
+            facultySubjects = JSON.parse(localStorage.getItem('faculty_subjects') || "[]");
+        } catch(e) {}
+        const isDBAdmin = localStorage.getItem('faculty_email') === 'techno-dms@hotmail.com';
+
+        let filteredResults = response.documents.filter(res => {
+            if (isDBAdmin) return true;
+            return facultySubjects.includes(res.subjectName);
+        });
+
+        if (filteredResults.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد نتائج للطلاب حتى الآن.</td></tr>';
             return;
         }
 
         tbody.innerHTML = '';
-        response.documents.forEach(res => {
+        filteredResults.forEach(res => {
             const scorePercent = Math.round((res.score / res.totalScore) * 100) || 0;
             let badgeClass = 'bg-danger';
             if (scorePercent >= 85) badgeClass = 'bg-success';
