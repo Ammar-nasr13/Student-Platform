@@ -37,11 +37,21 @@ async function loadStudents() {
             window.DB_CONFIG.dbId,
             window.DB_CONFIG.studentsCol,
             [
-                window.AppwriteQuery.limit(100)
+                window.AppwriteQuery.limit(1000)
             ]
         );
         
         allStudents = response.documents || [];
+        // ترتيب الطلاب حسب المستوى (1 ثم 2 ثم 3 ثم 4)، وإذا تساوى المستوى نرتبهم من الأحدث للأقدم
+        allStudents.sort((a, b) => {
+            const levelA = parseInt(a.level) || 0;
+            const levelB = parseInt(b.level) || 0;
+            if (levelA !== levelB) {
+                return levelA - levelB; // تصاعدي حسب المستوى
+            }
+            return new Date(b.$createdAt) - new Date(a.$createdAt); // تنازلي حسب تاريخ الإضافة
+        });
+        
         renderStudents(allStudents);
     } catch (error) {
         console.error("Error loading students:", error);
@@ -154,12 +164,27 @@ window.saveStudent = async function() {
         
         if (docId) {
             // Update existing
-            await window.AppwriteDB.updateDocument(
+            const updatedDoc = await window.AppwriteDB.updateDocument(
                 window.DB_CONFIG.dbId,
                 window.DB_CONFIG.studentsCol,
                 docId,
                 payload
             );
+            
+            // تحديث المصفوفة محلياً وإعادة الترتيب لاحتمالية تغير المستوى
+            const index = allStudents.findIndex(s => s.$id === docId);
+            if (index !== -1) {
+                allStudents[index] = updatedDoc;
+            }
+            allStudents.sort((a, b) => {
+                const levelA = parseInt(a.level) || 0;
+                const levelB = parseInt(b.level) || 0;
+                if (levelA !== levelB) {
+                    return levelA - levelB;
+                }
+                return new Date(b.$createdAt) - new Date(a.$createdAt);
+            });
+            
             if (typeof showToast === 'function') showToast("تم تحديث بيانات الطالب بنجاح", "success");
         } else {
             // Check if code already exists to avoid duplicates
@@ -177,12 +202,24 @@ window.saveStudent = async function() {
             }
             
             // Create new
-            await window.AppwriteDB.createDocument(
+            const newDoc = await window.AppwriteDB.createDocument(
                 window.DB_CONFIG.dbId,
                 window.DB_CONFIG.studentsCol,
                 window.AppwriteID.unique(),
                 payload
             );
+            
+            // إضافة الطالب للمصفوفة محلياً وإعادة الترتيب وعرضه مباشرة لتجنب تأخير الفهرسة
+            allStudents.push(newDoc);
+            allStudents.sort((a, b) => {
+                const levelA = parseInt(a.level) || 0;
+                const levelB = parseInt(b.level) || 0;
+                if (levelA !== levelB) {
+                    return levelA - levelB;
+                }
+                return new Date(b.$createdAt) - new Date(a.$createdAt);
+            });
+            
             if (typeof showToast === 'function') showToast("تم إضافة الطالب بنجاح", "success");
         }
         
@@ -201,7 +238,8 @@ window.saveStudent = async function() {
             }
         }
         
-        loadStudents();
+        // إعادة عرض القائمة محلياً بعد التحديث
+        filterStudents(); // Filter and render
     } catch (error) {
         console.error("Save Student Error:", error);
         if (typeof showToast === 'function') showToast("حدث خطأ أثناء الحفظ: " + error.message, "error");
@@ -242,8 +280,12 @@ async function executeDelete(id) {
             window.DB_CONFIG.studentsCol,
             id
         );
+        
+        // إزالة الطالب محلياً وتحديث العرض فوراً
+        allStudents = allStudents.filter(s => s.$id !== id);
+        
         if (typeof showToast === 'function') showToast("تم حذف الطالب بنجاح", "success");
-        loadStudents();
+        filterStudents();
     } catch (error) {
         console.error("Delete error:", error);
         if (typeof showToast === 'function') showToast("حدث خطأ أثناء الحذف: " + error.message, "error");

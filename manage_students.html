@@ -71,9 +71,14 @@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
             <div class="card-header text-white py-3 d-flex flex-wrap justify-content-between align-items-center" style="background-color: #0f2b46;">
                 <h5 class="fw-bold m-0">قائمة الطلاب المسجلين <i class="fa-solid fa-address-book ms-2"></i></h5>
-                <button class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#studentModal" onclick="openAddStudentModal()">
-                    <i class="fa-solid fa-user-plus me-1"></i> إضافة طالب جديد
-                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light fw-bold btn-sm shadow-sm" onclick="loadStudents()">
+                        <i class="fa-solid fa-arrows-rotate me-1"></i> تحديث
+                    </button>
+                    <button class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#studentModal" onclick="openAddStudentModal()">
+                        <i class="fa-solid fa-user-plus me-1"></i> إضافة طالب جديد
+                    </button>
+                </div>
             </div>
             <div class="card-body bg-light">
                 <!-- شريط البحث الفلتر -->
