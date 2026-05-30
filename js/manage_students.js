@@ -42,14 +42,16 @@ async function loadStudents() {
         );
         
         allStudents = response.documents || [];
-        // ترتيب الطلاب حسب المستوى (1 ثم 2 ثم 3 ثم 4)، وإذا تساوى المستوى نرتبهم من الأحدث للأقدم
+        // ترتيب الطلاب حسب المستوى (1 ثم 2 ثم 3 ثم 4)، وإذا تساوى المستوى نرتبهم أبجدياً حسب الاسم
         allStudents.sort((a, b) => {
             const levelA = parseInt(a.level) || 0;
             const levelB = parseInt(b.level) || 0;
             if (levelA !== levelB) {
                 return levelA - levelB; // تصاعدي حسب المستوى
             }
-            return new Date(b.$createdAt) - new Date(a.$createdAt); // تنازلي حسب تاريخ الإضافة
+            const nameA = a.name || "";
+            const nameB = b.name || "";
+            return nameA.localeCompare(nameB, 'ar'); // ترتيب أبجدي عربي
         });
         
         renderStudents(allStudents);
@@ -182,7 +184,9 @@ window.saveStudent = async function() {
                 if (levelA !== levelB) {
                     return levelA - levelB;
                 }
-                return new Date(b.$createdAt) - new Date(a.$createdAt);
+                const nameA = a.name || "";
+                const nameB = b.name || "";
+                return nameA.localeCompare(nameB, 'ar');
             });
             
             if (typeof showToast === 'function') showToast("تم تحديث بيانات الطالب بنجاح", "success");
@@ -217,7 +221,9 @@ window.saveStudent = async function() {
                 if (levelA !== levelB) {
                     return levelA - levelB;
                 }
-                return new Date(b.$createdAt) - new Date(a.$createdAt);
+                const nameA = a.name || "";
+                const nameB = b.name || "";
+                return nameA.localeCompare(nameB, 'ar');
             });
             
             if (typeof showToast === 'function') showToast("تم إضافة الطالب بنجاح", "success");
