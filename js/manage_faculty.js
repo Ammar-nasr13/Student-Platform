@@ -218,7 +218,7 @@ async function saveDoctor() {
         fetchDoctors();
     } catch (error) {
         console.error("Error saving doctor:", error);
-        Swal.fire('خطأ', 'حدث خطأ أثناء حفظ البيانات', 'error');
+        Swal.fire('خطأ', 'تفاصيل الخطأ: ' + (error.message || 'حدث خطأ أثناء حفظ البيانات'), 'error');
     } finally {
         btn.innerHTML = oldText;
         btn.disabled = false;
