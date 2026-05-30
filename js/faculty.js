@@ -588,7 +588,12 @@ window.renderStudentResults = async function() {
 
         let filteredResults = response.documents.filter(res => {
             if (isDBAdmin) return true;
-            return facultySubjects.includes(res.subjectName);
+            let actualSubjectName = res.subjectName;
+            if (window.subjectsByLevel && res.level && window.subjectsByLevel[res.level]) {
+                const subObj = window.subjectsByLevel[res.level].find(s => s.id === res.subjectName);
+                if (subObj) actualSubjectName = subObj.name;
+            }
+            return facultySubjects.includes(actualSubjectName) || facultySubjects.includes(res.subjectName);
         });
 
         if (filteredResults.length === 0) {
@@ -598,6 +603,12 @@ window.renderStudentResults = async function() {
 
         tbody.innerHTML = '';
         filteredResults.forEach(res => {
+            let displaySubjectName = res.subjectName;
+            if (window.subjectsByLevel && res.level && window.subjectsByLevel[res.level]) {
+                const subObj = window.subjectsByLevel[res.level].find(s => s.id === res.subjectName);
+                if (subObj) displaySubjectName = subObj.name;
+            }
+
             const scorePercent = Math.round((res.score / res.totalScore) * 100) || 0;
             let badgeClass = 'bg-danger';
             if (scorePercent >= 85) badgeClass = 'bg-success';
@@ -612,7 +623,7 @@ window.renderStudentResults = async function() {
             tr.innerHTML = `
                 <td class="fw-bold text-primary">${res.studentName || 'غير معروف'} ${res.details ? '<i class="fa-solid fa-eye text-success ms-1" style="font-size: 0.8em;"></i>' : ''}</td>
                 <td>${res.examTitle || 'غير معروف'}</td>
-                <td><span class="badge bg-secondary">${res.subjectName || 'غير محدد'}</span></td>
+                <td><span class="badge bg-secondary">${displaySubjectName || 'غير محدد'}</span></td>
                 <td class="fw-bold">${res.score} / ${res.totalScore}</td>
                 <td>
                     <span class="badge ${badgeClass} fs-6">${scorePercent}%</span>
