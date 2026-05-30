@@ -167,23 +167,26 @@ async function executePrint() {
     }
 
     // 3. Logo Handling
-    const logoInput = document.getElementById('print-logo');
-    let logoDataUrl = '';
-    const logoPositionEl = document.querySelector('input[name="logoPosition"]:checked');
-    const logoPosition = logoPositionEl ? logoPositionEl.value : 'right';
+    const logoRightInput = document.getElementById('print-logo-right');
+    const logoCenterInput = document.getElementById('print-logo-center');
+    const logoLeftInput = document.getElementById('print-logo-left');
 
-    if (logoInput && logoInput.files && logoInput.files[0]) {
-        try {
-            logoDataUrl = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.onerror = e => reject(e);
-                reader.readAsDataURL(logoInput.files[0]);
-            });
-        } catch (error) {
-            console.error("Error reading logo file:", error);
+    const readLogo = (input) => new Promise((resolve) => {
+        if (input && input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            resolve('');
         }
-    }
+    });
+
+    const [logoRightUrl, logoCenterUrl, logoLeftUrl] = await Promise.all([
+        readLogo(logoRightInput),
+        readLogo(logoCenterInput),
+        readLogo(logoLeftInput)
+    ]);
 
     // 4. Build HTML Template (Academic Letter Format)
     let html = `
@@ -196,16 +199,18 @@ async function executePrint() {
             body * {
                 visibility: hidden;
             }
-            #print-container, #print-container * {
-                visibility: visible;
-            }
             #print-container {
+                display: block !important;
+                visibility: visible;
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
                 direction: rtl;
                 font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            #print-container * {
+                visibility: visible;
             }
             .print-card {
                 page-break-after: always;
@@ -227,16 +232,6 @@ async function executePrint() {
                 border-bottom: 4px double #1a365d;
                 padding-bottom: 20px;
             }
-            .print-header.center-logo {
-                flex-direction: column;
-                text-align: center;
-            }
-            .print-header.right-logo {
-                flex-direction: row;
-            }
-            .print-header.left-logo {
-                flex-direction: row-reverse;
-            }
             .logo-placeholder {
                 width: 120px;
             }
@@ -245,9 +240,17 @@ async function executePrint() {
                 max-height: 120px;
                 object-fit: contain;
             }
+            .center-logo-img {
+                max-width: 100px;
+                max-height: 100px;
+                margin-bottom: 10px;
+            }
             .university-titles {
                 flex-grow: 1;
                 text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
             .university-titles h2 {
                 color: #1a365d !important;
@@ -327,22 +330,20 @@ async function executePrint() {
     `;
 
     selectedDocs.forEach(doc => {
-        let headerClass = 'right-logo';
-        if (logoPosition === 'left') headerClass = 'left-logo';
-        else if (logoPosition === 'center') headerClass = 'center-logo';
-
-        const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" class="logo-img" alt="شعار">` : `<div class="logo-placeholder"></div>`;
-        const dummyPlaceholder = logoPosition === 'center' ? '' : `<div class="logo-placeholder"></div>`;
+        const rightHtml = logoRightUrl ? `<img src="${logoRightUrl}" class="logo-img" alt="شعار يمين">` : `<div class="logo-placeholder"></div>`;
+        const centerHtml = logoCenterUrl ? `<img src="${logoCenterUrl}" class="logo-img center-logo-img" alt="شعار وسط">` : ``;
+        const leftHtml = logoLeftUrl ? `<img src="${logoLeftUrl}" class="logo-img" alt="شعار يسار">` : `<div class="logo-placeholder"></div>`;
 
         html += `
         <div class="print-card">
-            <div class="print-header ${headerClass}">
-                ${logoPosition === 'right' || logoPosition === 'center' ? logoHtml : dummyPlaceholder}
+            <div class="print-header">
+                ${rightHtml}
                 <div class="university-titles">
+                    ${centerHtml}
                     <h2>جامعة المنيا - كلية السياحة والفنادق</h2>
                     <h3>قسم تكنولوجيا صناعة السياحة والضيافة</h3>
                 </div>
-                ${logoPosition === 'left' ? logoHtml : dummyPlaceholder}
+                ${leftHtml}
             </div>
             
             <div class="doc-title">

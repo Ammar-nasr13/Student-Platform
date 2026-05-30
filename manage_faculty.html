@@ -220,25 +220,19 @@
                     </div>
                     
                     <hr class="text-muted opacity-25">
-                    <p class="text-muted fw-bold mb-3"><i class="fa-solid fa-image me-1"></i> إعدادات الشعار للطباعة (اختياري):</p>
-                    <div class="mb-3">
-                        <input class="form-control" type="file" id="print-logo" accept="image/*">
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label small fw-bold">موضع الشعار:</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="logoPosition" id="logo-right" value="right" checked>
-                                <label class="form-check-label" for="logo-right">اليمين</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="logoPosition" id="logo-center" value="center">
-                                <label class="form-check-label" for="logo-center">المنتصف</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="logoPosition" id="logo-left" value="left">
-                                <label class="form-check-label" for="logo-left">اليسار</label>
-                            </div>
+                    <p class="text-muted fw-bold mb-3"><i class="fa-solid fa-image me-1"></i> إعدادات الشعارات للطباعة (اختياري):</p>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">الشعار الأيمن</label>
+                            <input class="form-control form-control-sm" type="file" id="print-logo-right" accept="image/*">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">الشعار الأوسط</label>
+                            <input class="form-control form-control-sm" type="file" id="print-logo-center" accept="image/*">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">الشعار الأيسر</label>
+                            <input class="form-control form-control-sm" type="file" id="print-logo-left" accept="image/*">
                         </div>
                     </div>
                 </div>
