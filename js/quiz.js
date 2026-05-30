@@ -259,6 +259,7 @@ function startQuiz(e, t, n) {
   currentQuestionIndex = 0;
   score = 0;
   userAnswers = [];
+  window.isExamActiveForStudent = true;
   
   document.getElementById("quiz-setup").classList.add("d-none");
   document.getElementById("quiz-play").classList.remove("d-none");
@@ -717,6 +718,7 @@ window.processExamSubmission = function () {
     clearInterval(quizTimer);
     score = 0;
     userAnswers = [];
+    window.isExamActiveForStudent = false;
     
     const direction = (currentQuiz.questions && currentQuiz.questions[0] && currentQuiz.questions[0].direction) ? currentQuiz.questions[0].direction : 'rtl';
     
@@ -887,3 +889,90 @@ window.goToSetup = goToSetup;
 window.renderAllQuestions = renderAllQuestions;
 window.submitFullExam = submitFullExam;
 window.processExamSubmission = processExamSubmission;
+
+// Anti-Cheat: Prevent Screenshots while taking the exam
+(function setupAntiCheat() {
+    let blackoutOverlay = null;
+
+    function createOverlay() {
+        if (!blackoutOverlay) {
+            blackoutOverlay = document.createElement("div");
+            blackoutOverlay.id = "anti-cheat-overlay";
+            blackoutOverlay.style.cssText = `
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                width: 100vw; height: 100vh;
+                background-color: black;
+                z-index: 999999999;
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                color: red;
+                font-family: 'Cairo', sans-serif;
+            `;
+            blackoutOverlay.innerHTML = `
+                <i class="fa-solid fa-camera-slash" style="font-size: 5rem; margin-bottom: 20px;"></i>
+                <h2 style="font-size: 2.5rem; font-weight: bold; text-align: center; margin-bottom: 10px;">تحذير أمني</h2>
+                <p style="font-size: 1.5rem; color: white; text-align: center; margin: 0 20px;">غير مسموح بتصوير أو تسجيل الشاشة أثناء حل الاختبارات!</p>
+            `;
+            document.body.appendChild(blackoutOverlay);
+        }
+    }
+
+    function isSolvingExam() {
+        return window.isExamActiveForStudent === true;
+    }
+
+    function showBlackout() {
+        if (!isSolvingExam()) return;
+        createOverlay();
+        blackoutOverlay.style.display = "flex";
+    }
+
+    function hideBlackout() {
+        if (blackoutOverlay) {
+            blackoutOverlay.style.display = "none";
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        createOverlay();
+        
+        // Listen to PrintScreen keyup
+        window.addEventListener("keyup", (e) => {
+            if (e.key === "PrintScreen") {
+                showBlackout();
+                setTimeout(hideBlackout, 3000);
+            }
+        });
+
+        // Listen to Win+Shift+S or Cmd+Shift+3/4 (keydown)
+        window.addEventListener("keydown", (e) => {
+            if (e.metaKey && e.shiftKey && (e.key === "s" || e.key === "S" || e.key === "3" || e.key === "4")) {
+                showBlackout();
+                setTimeout(hideBlackout, 3000);
+            }
+        });
+
+        // Whenever window loses focus (like snipping tool opening)
+        window.addEventListener("blur", () => {
+            if (isSolvingExam()) {
+                showBlackout();
+            }
+        });
+
+        // When window regains focus, hide blackout
+        window.addEventListener("focus", () => {
+            hideBlackout();
+        });
+        
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isSolvingExam()) {
+                showBlackout();
+            } else {
+                hideBlackout();
+            }
+        });
+    });
+})();
