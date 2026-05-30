@@ -49,8 +49,8 @@ async function loadStudents() {
             if (levelA !== levelB) {
                 return levelA - levelB; // تصاعدي حسب المستوى
             }
-            const nameA = a.name || "";
-            const nameB = b.name || "";
+            const nameA = (a.name || "").trim();
+            const nameB = (b.name || "").trim();
             return nameA.localeCompare(nameB, 'ar'); // ترتيب أبجدي عربي
         });
         
@@ -184,8 +184,8 @@ window.saveStudent = async function() {
                 if (levelA !== levelB) {
                     return levelA - levelB;
                 }
-                const nameA = a.name || "";
-                const nameB = b.name || "";
+                const nameA = (a.name || "").trim();
+                const nameB = (b.name || "").trim();
                 return nameA.localeCompare(nameB, 'ar');
             });
             
@@ -221,8 +221,8 @@ window.saveStudent = async function() {
                 if (levelA !== levelB) {
                     return levelA - levelB;
                 }
-                const nameA = a.name || "";
-                const nameB = b.name || "";
+                const nameA = (a.name || "").trim();
+                const nameB = (b.name || "").trim();
                 return nameA.localeCompare(nameB, 'ar');
             });
             
