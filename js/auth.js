@@ -19,13 +19,23 @@ function closeAuthGateway() {
 function updateUIForFaculty() {
   if ("true" === localStorage.getItem("is_faculty")) {
     const e = document.querySelector(".navbar-nav");
-    if (e && !document.getElementById("nav-add-exam")) {
-      const t = document.createElement("li");
-      ((t.className = "nav-item ms-xl-3 mt-3 mt-xl-0"),
-        (t.id = "nav-add-exam"),
-        (t.innerHTML =
-          '<a href="add_exam.html" class="btn btn-warning fw-bold px-3 rounded-pill text-dark shadow-sm"><i class="fa-solid fa-plus-circle me-1"></i> إضافة اختبار</a>'),
-        e.appendChild(t));
+    if (e) {
+      if (localStorage.getItem("faculty_email") === "techno-dms@hotmail.com" && !document.getElementById("nav-manage-students")) {
+        const li = document.createElement("li");
+        li.className = "nav-item";
+        li.id = "nav-manage-students";
+        const isActive = window.location.pathname.includes("manage_students.html") ? "active" : "";
+        li.innerHTML = `<a class="nav-link ${isActive}" href="manage_students.html">إدارة الطلاب</a>`;
+        e.appendChild(li);
+      }
+      if (!document.getElementById("nav-add-exam")) {
+        const t = document.createElement("li");
+        ((t.className = "nav-item ms-xl-3 mt-3 mt-xl-0"),
+          (t.id = "nav-add-exam"),
+          (t.innerHTML =
+            '<a href="add_exam.html" class="btn btn-warning fw-bold px-3 rounded-pill text-dark shadow-sm"><i class="fa-solid fa-plus-circle me-1"></i> إضافة اختبار</a>'),
+          e.appendChild(t));
+      }
     }
   }
 }
@@ -71,8 +81,11 @@ async function logoutFaculty() {
       console.error("Logout error:", e);
     }
     localStorage.removeItem("is_faculty");
+    localStorage.removeItem("faculty_email");
     const e = document.getElementById("nav-add-exam");
     e && e.remove();
+    const ms = document.getElementById("nav-manage-students");
+    ms && ms.remove();
     const t = document.getElementById("auth-gateway");
     t
       ? (t.classList.remove("d-none", "fade-out"),
@@ -137,6 +150,7 @@ async function loginFaculty() {
     try {
       (await window.AppwriteAccount.createEmailPasswordSession(e, t),
         localStorage.setItem("is_faculty", "true"),
+        localStorage.setItem("faculty_email", e),
         localStorage.removeItem("is_student"), // Clear student session if exists
         n.classList.add("d-none"),
         closeAuthGateway(),
@@ -155,6 +169,7 @@ async function loginFaculty() {
             n.classList.remove("d-none"),
           void setTimeout(() => {
             (localStorage.setItem("is_faculty", "true"),
+              localStorage.setItem("faculty_email", e),
               n.classList.add("d-none"),
               n.classList.replace("alert-success", "alert-danger"),
               closeAuthGateway(),
